@@ -32,7 +32,7 @@ namespace ocean.ViewModels
             });
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.CoffeeSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "Break",
                 NavigationType = typeof(BreakPage),
                 NavigationDestination = new Uri("Views/BreakPage.xaml", UriKind.RelativeOrAbsolute)
@@ -47,7 +47,7 @@ namespace ocean.ViewModels
 
             this.OptionsMenu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.CogsSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "Settings",
                 NavigationType = typeof(SettingsPage),
                 //NavigationDestination = new Uri("Views/SettingsPage.xaml", UriKind.RelativeOrAbsolute)
@@ -55,7 +55,7 @@ namespace ocean.ViewModels
             });
             this.OptionsMenu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.InfoCircleSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "About",
                 NavigationType = typeof(AboutPage),
                 NavigationDestination = new Uri("Views/AboutPage.xaml", UriKind.RelativeOrAbsolute)

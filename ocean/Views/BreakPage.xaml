@@ -18,7 +18,7 @@
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
-                                       Kind="CoffeeSolid" />
+                                       Kind="CodeBranchSolid" />
 
     </Grid>
 </Page>
