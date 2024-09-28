@@ -240,6 +240,22 @@ namespace SomeNameSpace
                 MessageBox.Show(e.Message);
                 return null;
             }
-        }        
+        }
+
+
+        public void DataBase_SET_Save(string table, float set_num, byte tempsn)
+        {
+            using SQLiteConnection conn = new SQLiteConnection(ConnString);
+
+            conn.Open();
+
+            string sql = "update " + table + " set [VALUE]=" + set_num + " where SN=" + tempsn;
+
+
+            SQLiteCommand odc = new SQLiteCommand(sql, conn);
+            odc.ExecuteNonQuery();
+            odc.Dispose();
+        }
+
     }
 }
