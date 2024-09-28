@@ -36,8 +36,8 @@ namespace ocean.UI
 
         //数据库对接
         int select_index;
-        DataBase_Interface DB_Com = new DataBase_Interface();
-        DB_sqlite DB_comv = new DB_sqlite();
+        //DataBase_Interface DB_Com = new DataBase_Interface();
+        DB_sqlite DB_Com = new DB_sqlite();
         string newValue;
 
         bool brun = false;
@@ -392,6 +392,7 @@ namespace ocean.UI
                                     {
                                         dtset.Rows[vindex][5] = temp_val;
                                         DB_Com.DataBase_SET_Save("PARAMETER_SET", temp_val, (byte)gbuffer[5]);
+                                        
                                     }
                                     else
                                     {
@@ -534,8 +535,8 @@ namespace ocean.UI
             int tempsn = x + z;
             string val = dtset.Rows[x][5].ToString();
             float value=Convert.ToSingle(val);
-            //DB_Com.DataBase_SET_Save("PARAMETER_SET", value, (byte)tempsn);
-            DB_comv.DataBase_SET_Save("PARAMETER_SET", value, (byte)tempsn);
+            DB_Com.DataBase_SET_Save("PARAMETER_SET", value, (byte)tempsn);
+            
             if (CommonRes.mySerialPort.IsOpen==true)
             {
                 if (Protocol_num == 0)
@@ -579,9 +580,9 @@ namespace ocean.UI
             string val = dtfactor.Rows[x][2].ToString();
             float value = Convert.ToSingle(val);
 
-            //DB_Com.DataBase_SET_Save("PARAMETER_FACTOR", value, (byte)select_index);
+            DB_Com.DataBase_SET_Save("PARAMETER_FACTOR", value, (byte)tempsn);
             
-            DB_comv.DataBase_SET_Save("PARAMETER_FACTOR", value, (byte)tempsn);
+            
             if (CommonRes.mySerialPort.IsOpen==true)
             {
                 if (Protocol_num == 0)

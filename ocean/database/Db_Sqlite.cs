@@ -3,9 +3,17 @@ using System.Data;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Windows;
+using System.Data.Odbc;
 
 namespace SomeNameSpace
 {
+
+    public struct Data_r
+    {
+        public int SN, COMMAND, LENG, NO, TYP, ACK;
+        public float VALUE, FACTOR;
+        public string NAME, UNITor;
+    }
     class DB_sqlite
     {
         /// <summary>
@@ -18,6 +26,25 @@ namespace SomeNameSpace
 
         //public static string ConnString = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=./MOON.db;";
         public static string ConnString = "Data Source=test.db";
+
+        public Data_r[] data = new Data_r[200];
+        public int u = 0;
+        public int j = 0;
+
+        //OleDbConnection conn;
+        //OleDbCommand cmd;
+        //OleDbDataReader dr;
+
+        OdbcConnection conn;
+        OdbcCommand cmd;
+        OdbcDataReader dr;
+
+        string[] error1 = new string[16];
+        public int runnum;
+        int knum = 0;//记录存在多少条PRUN记录
+        int num_pso = 0;//记录存在多少条PSO记录
+        int UG_Num = 0;
+
 
 
         /// <summary>
