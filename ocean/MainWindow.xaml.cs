@@ -15,7 +15,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using ocean.UI;
-using SomeNameSpace;
 using MenuItem = ocean.ViewModels.MenuItem;
 
 
@@ -41,14 +40,9 @@ namespace ocean
             // Navigate to the home page.
             this.Loaded += (sender, args) => this.navigationServiceEx.Navigate(new Uri("Views/MainPage.xaml", UriKind.RelativeOrAbsolute));
 
+            this.navigationServiceEx.load_table();
 
-            //CommonRes.dt1 = DB_Access.GetDBTable("PARAMETER_RUN");
-            //CommonRes.dt2 = DB_Access.GetDBTable("PARAMETER_SET");
-            //CommonRes.dt3 = DB_Access.GetDBTable("PARAMETER_FACTOR");
 
-            CommonRes.dt1 = DB_sqlite.GetDBTable("PARAMETER_RUN");
-            CommonRes.dt2 = DB_sqlite.GetDBTable("PARAMETER_SET");
-            CommonRes.dt3 = DB_sqlite.GetDBTable("PARAMETER_FACTOR");
 
         }
 
@@ -94,16 +88,7 @@ namespace ocean
 
         private void MetroWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            MessageBox.Show("数据将保存！");
-
-            //DB_Access.UpdateDBTable(CommonRes.dt1, "PARAMETER_RUN");
-            //DB_Access.UpdateDBTable(CommonRes.dt2, "PARAMETER_SET");
-            //DB_Access.UpdateDBTable(CommonRes.dt3, "PARAMETER_FACTOR");
-
-
-            DB_sqlite.UpdateDBTable(CommonRes.dt1, "PARAMETER_RUN");
-            DB_sqlite.UpdateDBTable(CommonRes.dt2, "PARAMETER_SET");
-            DB_sqlite.UpdateDBTable(CommonRes.dt3, "PARAMETER_FACTOR");
+            this.navigationServiceEx.WindowClosing();
         }
     }
 }

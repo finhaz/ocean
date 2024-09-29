@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using MahApps.Metro.Controls;
+using SomeNameSpace;
 
 namespace ocean.ViewModels
 {
