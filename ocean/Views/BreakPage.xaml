@@ -11,14 +11,19 @@
       mc:Ignorable="d">
 
     <Grid>
-
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="26*"/>
+            <ColumnDefinition Width="40*"/>
+        </Grid.ColumnDefinitions>
         <iconPacks:PackIconFontAwesome Width="48"
                                        Height="48"
                                        Margin="10"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
-                                       Kind="CodeBranchSolid" />
+                                       Kind="CodeBranchSolid" 
+                                       Grid.Column="0"/>
+        
 
     </Grid>
 </Page>
