@@ -11,7 +11,11 @@
       >
 
     <Grid>
-        <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="218*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.RowSpan="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="122"  MinWidth="122" MaxWidth="200"/>
                 <ColumnDefinition Width="2*"/>
@@ -60,7 +64,7 @@
                         <DataGrid x:Name="datashow" 
                                   CellEditEnding="datashow_CellEditEnding" 
                                   BeginningEdit="datashow_BeginningEdit"
-                                  ItemsSource="{Binding dtrun, Mode=TwoWay}">
+                                  ItemsSource="{Binding ucom.dtrun, Mode=TwoWay}">
 
                         </DataGrid>
                     </TabItem>
@@ -69,7 +73,7 @@
                         <DataGrid x:Name="dataset"
                                   CellEditEnding="dataset_CellEditEnding" 
                                   BeginningEdit="dataset_BeginningEdit"
-                                  ItemsSource="{Binding dtset,Mode=TwoWay}">
+                                  ItemsSource="{Binding ucom.dtset,Mode=TwoWay}">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
@@ -88,7 +92,7 @@
                         <DataGrid x:Name="datafactor"
                                   CellEditEnding="datafactor_CellEditEnding" 
                                   BeginningEdit="datafactor_BeginningEdit"
-                                  ItemsSource="{Binding dtfactor,Mode=TwoWay}">
+                                  ItemsSource="{Binding ucom.dtfactor,Mode=TwoWay}">
 
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
@@ -105,8 +109,8 @@
                         </DataGrid>
                     </TabItem>
                 </TabControl>
-               
-                <TextBox TextWrapping="Wrap" Name="show_text" Grid.Row="2" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2"></TextBox>
+
+                <TextBox TextWrapping="Wrap" Name="show_text" Grid.Row="2" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2" Text="{Binding ucom.textmain.Text,Mode=TwoWay}"></TextBox>
 
             </Grid>
 

@@ -14,7 +14,7 @@ namespace SomeNameSpace
         public float VALUE, FACTOR;
         public string NAME, UNITor;
     }
-    class DB_sqlite
+    public class DB_sqlite
     {
         /// <summary>
         /// 操作sqlite数据库(.NET Core)
