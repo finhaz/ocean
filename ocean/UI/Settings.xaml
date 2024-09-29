@@ -14,7 +14,8 @@
             <ColumnDefinition Width="40*"/>
         </Grid.ColumnDefinitions>
         <Button Click="Button_Click"></Button>
-        <TextBox Name="ty" Text="{Binding ChangeTextBox.text,Mode=TwoWay,UpdateSourceTrigger=Explicit}" Margin="5"  FontSize="12" Grid.Column="1"/>
+        <TextBox Name="ty" Text="{Binding ChangeTextBox.Text,Mode=TwoWay}" Margin="5"  FontSize="12" Grid.Column="1"></TextBox>
+        
     </Grid>
     
     

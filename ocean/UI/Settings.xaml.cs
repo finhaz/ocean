@@ -22,18 +22,19 @@ namespace ocean.UI
     /// </summary>
     public partial class Settings : Page
     {
-        public TextBox ChangeTextBox { get; set; }
+        public TextBox<string> ChangeTextBox { get; set; }
 
         public Settings()
         {
             InitializeComponent();
 
-            ChangeTextBox = new TextBox ();
-            //ChangeTextBox.TextChangeCallBack = (text) => { MessageBox.Show(text); };//声明TextChange
+            ChangeTextBox = new TextBox<string>();
+            ChangeTextBox.TextChangeCallBack = (text) => { MessageBox.Show(text); };//声明TextChange
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+         
             int i = 1;
         }
     }
