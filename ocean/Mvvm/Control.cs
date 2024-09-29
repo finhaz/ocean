@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 //数据控件其实很好理解，它就是把UI控件中存储的数据提取出来,
 //好让ViewModel可以通过修改数据来控制UI变化；
@@ -73,6 +74,32 @@ namespace ocean.Mvvm
             }
         }
     }
+
+
+    public class MyCommand : ICommand
+    {
+        private readonly Action<object> execAction;
+        private readonly Func<object, bool> changeFunc;
+
+        public MyCommand(Action<object> execAction, Func<object, bool> changeFunc)
+        {
+            this.execAction = execAction;
+            this.changeFunc = changeFunc;
+        }
+
+        public event EventHandler CanExecuteChanged;
+
+        public bool CanExecute(object parameter)
+        {
+            return this.changeFunc.Invoke(parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            this.execAction.Invoke(parameter);
+        }
+    }
+
 
 
     public class NotifyObject: INotifyPropertyChanged
