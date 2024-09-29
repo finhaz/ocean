@@ -22,14 +22,13 @@ namespace ocean.UI
     /// </summary>
     public partial class Settings : Page
     {
-        public TextBox<string> ChangeTextBox { get; set; }
+        public VM_PageTextBox Uvm { get; set; }
 
         public Settings()
         {
             InitializeComponent();
 
-            ChangeTextBox = new TextBox<string>();
-            ChangeTextBox.TextChangeCallBack = (text) => { MessageBox.Show(text); };//声明TextChange
+            Uvm = new VM_PageTextBox();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
