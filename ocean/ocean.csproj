@@ -48,8 +48,4 @@
     <Resource Include="Assets\tgBtn_MouseOver.png" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Communication\" />
-  </ItemGroup>
-
 </Project>
