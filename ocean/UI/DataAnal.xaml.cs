@@ -30,55 +30,12 @@ namespace ocean.UI
     /// </summary>
     public partial class DataAnal : Page
     {
-        //定时器
-        private DispatcherTimer mDataTimer = null; //定时器
-        private long timerExeCount = 0; //定时器执行次数
-        DateTime s1;
-        DateTime s2;
-
         public CommonRes ucom { get; set; }
-
-
 
         public DataAnal()
         {
-            InitializeComponent();
-         
-        }
-
-
-        private void InitTimer()
-        {
-            if (mDataTimer == null)
-            {
-                mDataTimer = new DispatcherTimer();
-                mDataTimer.Tick += new EventHandler(DataTimer_Tick);
-                mDataTimer.Interval = TimeSpan.FromSeconds(10);
-            }
-        }
-        private void DataTimer_Tick(object sender, EventArgs e)
-        {
-            s2 = DateTime.Now;
-            s1 = DateTime.Now;
-            ++timerExeCount;
-
-            ucom.show_stop();
-        }
-
-        public void StartTimer()
-        {
-            if (mDataTimer != null && mDataTimer.IsEnabled == false)
-            {
-                mDataTimer.Start();
-                s1 = DateTime.Now;
-            }
-        }
-        public void StopTimer()
-        {
-            if (mDataTimer != null && mDataTimer.IsEnabled == true)
-            {
-                mDataTimer.Stop();
-            }
+            ucom = new CommonRes();
+            InitializeComponent();        
         }
 
 
@@ -109,22 +66,6 @@ namespace ocean.UI
            
         }
 
-        private void Page_Loaded(object sender, EventArgs e)
-        {
-            ucom = new CommonRes();
-
-            ucom.dtrun = CommonRes.dt1;
-
-            ucom.dtset = CommonRes.dt2;
-
-            ucom.dtfactor = CommonRes.dt3;
-
-            InitTimer();
-            
-            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
-            ucom.DB_Com.runnum = ucom.dtrun.Rows.Count;
-        }
-
 
         private void datashow_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
@@ -149,13 +90,7 @@ namespace ocean.UI
         {
             //读取选中行
             var x = dataset.SelectedIndex;
-            string y = ucom.dtset.Rows[0][0].ToString();
-            int z = Convert.ToInt32(y);
-            int tempsn = x + z;
-            string val =  ucom.dtset.Rows[x][5].ToString();
-            float value=Convert.ToSingle(val);
-            ucom.DB_Com.DataBase_SET_Save("PARAMETER_SET", value, (byte)tempsn);
-            ucom.mbutton_set(tempsn, value);
+            ucom.mbutton_set("PARAMETER_SET", (int)x);
         }
 
 
@@ -177,14 +112,8 @@ namespace ocean.UI
         private void MButton3_Click(object sender, RoutedEventArgs e)
         {
             //读取选中行
-            var x = datafactor.SelectedIndex;           
-            string y = ucom.dtfactor.Rows[0][0].ToString();
-            int z = Convert.ToInt32(y);
-            int tempsn = x + z;
-            string val =  ucom.dtfactor.Rows[x][2].ToString();
-            float value = Convert.ToSingle(val);
-            ucom.DB_Com.DataBase_SET_Save("PARAMETER_FACTOR", value, (byte)tempsn);
-            ucom.mbutton_set(tempsn, value);
+            var x = datafactor.SelectedIndex; 
+            ucom.mbutton_set("PARAMETER_FACTOR", (int)x);
         }
 
         private void datafactor_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -201,33 +130,29 @@ namespace ocean.UI
                 if (ucom.bshow)
                 {
                     btShow.Content = "停止采集";
-                    StartTimer();
+                    ucom.StartTimer();
                 }
                 else
                 {
                     btShow.Content = "开始采集";
-                    StopTimer();
+                    ucom.StopTimer();
                 }
             }
             else
             {
                 MessageBox.Show("打开串口！");
             }
-
         }
 
 
         private void cbProcho_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {   
-            if(ucom!=null)
+            switch (cbProcho.SelectedIndex)
             {
-                switch (cbProcho.SelectedIndex)
-                {
-                    case 0: ucom.Protocol_num = 0; break;
-                    case 1: ucom.Protocol_num = 1; break;
-                    default: ucom.Protocol_num = 0; break;
-                }
-            }                  
+                case 0: ucom.Protocol_num = 0; break;
+                case 1: ucom.Protocol_num = 1; break;
+                default: ucom.Protocol_num = 0; break;
+            }                 
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

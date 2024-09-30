@@ -66,7 +66,11 @@ namespace ocean
         public Message_modbus FCOM2 = new Message_modbus();
 
 
-
+        //定时器
+        private DispatcherTimer mDataTimer = null; //定时器
+        private long timerExeCount = 0; //定时器执行次数
+        DateTime s1;
+        DateTime s2;
 
 
         //针对数据协议：
@@ -77,7 +81,23 @@ namespace ocean
         public CommonRes()
         {
             textmain = new TextBox();
+
+            dtrun = CommonRes.dt1;
+
+            dtset = CommonRes.dt2;
+
+            dtfactor = CommonRes.dt3;
+
+            //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+
+            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+
+            DB_Com.runnum = dtrun.Rows.Count;
+
+            InitTimer();
+
         }
+
 
         public void show_stop()
         {
@@ -309,8 +329,39 @@ namespace ocean
             textmain.Text += txt;
         }
 
-        public void mbutton_set(int tempsn,float value)
+        public void mbutton_set(string table,int x)
         {
+            string y;
+            int z;
+            int tempsn;
+            string val;
+            float value;
+
+            if (table == "PARAMETER_FACTOR")
+            {
+                y = dtfactor.Rows[0][0].ToString();
+                z = Convert.ToInt32(y);
+                tempsn = x + z;
+
+
+                val = dtfactor.Rows[x][2].ToString();
+                value = Convert.ToSingle(val);
+            }
+            else
+            {
+                y = dtset.Rows[0][0].ToString();
+                z = Convert.ToInt32(y);
+                tempsn = x + z;
+
+
+                val = dtset.Rows[x][5].ToString();
+                value = Convert.ToSingle(val);
+            }
+
+
+
+            DB_Com.DataBase_SET_Save(table, value, (byte)tempsn);
+
             if (CommonRes.mySerialPort.IsOpen == true)
             {
                 if (Protocol_num == 0)
@@ -329,6 +380,44 @@ namespace ocean
                 MessageBox.Show("请打开串口！");
             }
         }
+
+
+
+
+        private void InitTimer()
+        {
+            if (mDataTimer == null)
+            {
+                mDataTimer = new DispatcherTimer();
+                mDataTimer.Tick += new EventHandler(DataTimer_Tick);
+                mDataTimer.Interval = TimeSpan.FromSeconds(10);
+            }
+        }
+        private void DataTimer_Tick(object sender, EventArgs e)
+        {
+            s2 = DateTime.Now;
+            s1 = DateTime.Now;
+            ++timerExeCount;
+
+            show_stop();
+        }
+
+        public void StartTimer()
+        {
+            if (mDataTimer != null && mDataTimer.IsEnabled == false)
+            {
+                mDataTimer.Start();
+                s1 = DateTime.Now;
+            }
+        }
+        public void StopTimer()
+        {
+            if (mDataTimer != null && mDataTimer.IsEnabled == true)
+            {
+                mDataTimer.Stop();
+            }
+        }
+
 
 
 
