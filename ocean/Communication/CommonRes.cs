@@ -11,6 +11,8 @@ using SomeNameSpace;
 using System.Windows.Threading;
 using ocean.UI;
 using System.Windows.Controls;
+using ocean.Mvvm;
+using System.Windows;
 
 namespace ocean
 {
@@ -267,6 +269,69 @@ namespace ocean
         {
             textmain.Text += para;
         }
+
+        public void runstop_cotnrol(bool pbrun)
+        {
+            //bool brun;
+            int send_num = 0;
+            brun = pbrun;
+            //textBox1.Text = "系统停止运行";
+            if (Protocol_num == 0)//FE协议
+            {
+                NYS_com.Monitor_Run(brun);
+                send_num = NYS_com.sendbf[4] + 5;
+                CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, send_num);
+            }
+            else if (Protocol_num == 1)//modbus
+            {
+                //1号机1通道
+                FCOM2.Monitor_Run(1, 128, brun);
+                send_num = 8;
+                CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, send_num);
+            }
+
+            string txt = "TX:";
+            for (int i = 0; i < send_num; i++)
+            {
+                if (Protocol_num == 0)
+                {
+                    txt += Convert.ToString(NYS_com.sendbf[i], 16);
+                }
+                else if (Protocol_num == 1)
+                {
+                    txt += Convert.ToString(FCOM2.sendbf[i], 16);
+                }
+                txt += ' ';
+            }
+            txt += '\r';
+            txt += '\n';
+            //show_text.Text+=txt;
+            textmain.Text += txt;
+        }
+
+        public void mbutton_set(int tempsn,float value)
+        {
+            if (CommonRes.mySerialPort.IsOpen == true)
+            {
+                if (Protocol_num == 0)
+                {
+                    NYS_com.Monitor_Set((byte)tempsn, (byte)(DB_Com.data[tempsn].COMMAND), value);
+                    CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
+                }
+                else if (Protocol_num == 1)
+                {
+                    FCOM2.Monitor_Set_06(tempsn, value);
+                    CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
+                }
+            }
+            else
+            {
+                MessageBox.Show("请打开串口！");
+            }
+        }
+
+
+
 
     }
 }

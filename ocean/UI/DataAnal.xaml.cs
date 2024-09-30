@@ -35,12 +35,9 @@ namespace ocean.UI
         private long timerExeCount = 0; //定时器执行次数
         DateTime s1;
         DateTime s2;
+
         public CommonRes ucom { get; set; }
 
-        //针对数据协议：
-        byte[] gbuffer = new byte[4096];
-        int gb_index = 0;//缓冲区注入位置
-        int get_index = 0;// 缓冲区捕捉位置
 
 
         public DataAnal()
@@ -94,91 +91,22 @@ namespace ocean.UI
 
             //PSO_v.pso_init = false;
             //IPSO_v.pso_init = false;
-            int send_num = 0;
 
             if (!CommonRes.mySerialPort.IsOpen)
             {
                 MessageBox.Show("请打开串口！");
                 return;
             }
-            //Num_time = 0;
 
-            ucom.brun = true;
-
+            ucom.runstop_cotnrol(true);
             textBox1.Text= "系统正在运行";
-
-            if (ucom.Protocol_num == 0)//FE协议
-            {
-                ucom.NYS_com.Monitor_Run(ucom.brun);
-                send_num = ucom.NYS_com.sendbf[4] + 5;
-                CommonRes.mySerialPort.Write(ucom.NYS_com.sendbf, 0, send_num);
-            }
-            else if (ucom.Protocol_num == 1)//modbus
-            {
-                //1号机1通道
-                ucom.FCOM2.Monitor_Run(1, 128, ucom.brun);
-                send_num = 8;
-                CommonRes.mySerialPort.Write(ucom.FCOM2.sendbf, 0, send_num);
-            }
-
-            string txt = "TX:";
-            for (int i = 0; i < send_num; i++)
-            {  
-                if (ucom.Protocol_num == 0)
-                {
-                    txt += Convert.ToString(ucom.NYS_com.sendbf[i], 16);                    
-                }
-                else if (ucom.Protocol_num == 1)
-                {
-                    txt += Convert.ToString(ucom.FCOM2.sendbf[i], 16);
-                }
-                txt += ' ';
-            }
-            txt += '\r';
-            txt += '\n';
-            //show_text.Text+=txt;
-            ucom.textmain.Text += txt;
-
-
         }
 
         private void btSTOP_Click(object sender, RoutedEventArgs e)
         {
-            //bool brun;
-            int send_num = 0;
-            ucom.brun =false;
+            ucom.runstop_cotnrol(false);
             textBox1.Text = "系统停止运行";
-            if (ucom.Protocol_num == 0)//FE协议
-            {
-                ucom.NYS_com.Monitor_Run(ucom.brun);
-                send_num = ucom.NYS_com.sendbf[4] + 5;
-                CommonRes.mySerialPort.Write(ucom.NYS_com.sendbf, 0, send_num);
-            }
-            else if (ucom.Protocol_num == 1)//modbus
-            {
-                //1号机1通道
-                ucom.FCOM2.Monitor_Run(1, 128, ucom.brun);
-                send_num = 8;
-                CommonRes.mySerialPort.Write(ucom.FCOM2.sendbf, 0, send_num);
-            }
-
-            string txt = "TX:";
-            for (int i = 0; i < send_num; i++)
-            {
-                if (ucom.Protocol_num == 0)
-                {
-                    txt += Convert.ToString(ucom.NYS_com.sendbf[i], 16);
-                }
-                else if (ucom.Protocol_num == 1)
-                {
-                    txt += Convert.ToString(ucom.FCOM2.sendbf[i], 16);
-                }
-                txt += ' ';
-            }
-            txt += '\r';
-            txt += '\n';
-            //show_text.Text+=txt;
-            ucom.textmain.Text += txt;
+           
         }
 
         private void Page_Loaded(object sender, EventArgs e)
@@ -227,24 +155,7 @@ namespace ocean.UI
             string val =  ucom.dtset.Rows[x][5].ToString();
             float value=Convert.ToSingle(val);
             ucom.DB_Com.DataBase_SET_Save("PARAMETER_SET", value, (byte)tempsn);
-            
-            if (CommonRes.mySerialPort.IsOpen==true)
-            {
-                if (ucom.Protocol_num == 0)
-                {
-                    ucom.NYS_com.Monitor_Set((byte)tempsn, (byte)(ucom.DB_Com.data[tempsn].COMMAND), value);
-                    CommonRes.mySerialPort.Write(ucom.NYS_com.sendbf, 0, ucom.NYS_com.sendbf[4] + 5);
-                }
-                else if (ucom.Protocol_num == 1)
-                {
-                    ucom.FCOM2.Monitor_Set_06(tempsn, value);
-                    CommonRes.mySerialPort.Write(ucom.FCOM2.sendbf, 0, 8);
-                }
-            }
-            else
-            {
-                MessageBox.Show("请打开串口！");
-            }
+            ucom.mbutton_set(tempsn, value);
         }
 
 
@@ -272,27 +183,8 @@ namespace ocean.UI
             int tempsn = x + z;
             string val =  ucom.dtfactor.Rows[x][2].ToString();
             float value = Convert.ToSingle(val);
-
             ucom.DB_Com.DataBase_SET_Save("PARAMETER_FACTOR", value, (byte)tempsn);
-            
-            
-            if (CommonRes.mySerialPort.IsOpen==true)
-            {
-                if (ucom.Protocol_num == 0)
-                {
-                    ucom.NYS_com.Monitor_Set((byte)tempsn, (byte)(ucom.DB_Com.data[tempsn].COMMAND), value);
-                    CommonRes.mySerialPort.Write(ucom.NYS_com.sendbf, 0, ucom.NYS_com.sendbf[4] + 5);
-                }
-                else if (ucom.Protocol_num == 1)
-                {
-                    ucom.FCOM2.Monitor_Set_06(tempsn, value);
-                    CommonRes.mySerialPort.Write(ucom.FCOM2.sendbf, 0, 8);
-                }
-            }
-            else
-            {
-                MessageBox.Show("请打开串口！");
-            }
+            ucom.mbutton_set(tempsn, value);
         }
 
         private void datafactor_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
@@ -309,7 +201,6 @@ namespace ocean.UI
                 if (ucom.bshow)
                 {
                     btShow.Content = "停止采集";
-                    //MessageBox.Show("数据采集开始");
                     StartTimer();
                 }
                 else
@@ -341,7 +232,6 @@ namespace ocean.UI
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(this.mySerialPort_DataReceived);
             CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
         }
     }
