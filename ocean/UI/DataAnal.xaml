@@ -41,8 +41,7 @@
                         Click="btRUN_Click" Width="80"/>
                 <Button Name="btSTOP" Content="停止" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Click="btSTOP_Click" Width="80"/>
-                <Button Name="btShow" Content="数据采集" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Click="btShow_Click" Width="80"/>
+                <Button Name="btShow" Content="{Binding ucom.btShow.Content, Mode=TwoWay}" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Command="{Binding ucom.ButtonIncrease}"/>
                 <TextBlock Text="通讯协议选择" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="4" Grid.ColumnSpan="2" Margin="25,0,0,0" />
                 <ComboBox Name="cbProcho" FontSize="10" Grid.Row="5" Margin="0,1,0,1" Grid.ColumnSpan="2" SelectionChanged="cbProcho_SelectionChanged">
                     <ComboBoxItem >FE协议</ComboBoxItem>
@@ -70,8 +69,7 @@
 
                     <TabItem Header="调试参数">
                         <DataGrid x:Name="dataset"
-                                  CellEditEnding="dataset_CellEditEnding" 
-                                  BeginningEdit="dataset_BeginningEdit"
+                                  CellEditEnding="dataset_CellEditEnding"
                                   ItemsSource="{Binding ucom.dtset,Mode=TwoWay}">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
@@ -89,8 +87,7 @@
 
                     <TabItem Header="修正系数">
                         <DataGrid x:Name="datafactor"
-                                  CellEditEnding="datafactor_CellEditEnding" 
-                                  BeginningEdit="datafactor_BeginningEdit"
+                                  CellEditEnding="datafactor_CellEditEnding"
                                   ItemsSource="{Binding ucom.dtfactor,Mode=TwoWay}">
 
                             <DataGrid.Columns>

@@ -79,12 +79,6 @@ namespace ocean.UI
             ucom.DB_Com.runnum=ucom.dtrun.Rows.Count;
         }
 
-        private void dataset_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            //读取选中行
-            var x = dataset.SelectedIndex;
-        }
-
 
         private void MButton2_Click(object sender, RoutedEventArgs e)
         {
@@ -103,12 +97,6 @@ namespace ocean.UI
         }
 
 
-        private void datafactor_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {            
-            var x = datafactor.SelectedIndex;
-        }
-
-
         private void MButton3_Click(object sender, RoutedEventArgs e)
         {
             //读取选中行
@@ -120,28 +108,6 @@ namespace ocean.UI
         {
             ucom.newValue = (e.EditingElement as TextBox).Text;
             CommonRes.dt3 = ucom.dtfactor;
-        }
-
-        private void btShow_Click(object sender, RoutedEventArgs e)
-        {
-            if (CommonRes.mySerialPort.IsOpen == true)
-            {
-                ucom.bshow = !ucom.bshow;
-                if (ucom.bshow)
-                {
-                    btShow.Content = "停止采集";
-                    ucom.StartTimer();
-                }
-                else
-                {
-                    btShow.Content = "开始采集";
-                    ucom.StopTimer();
-                }
-            }
-            else
-            {
-                MessageBox.Show("打开串口！");
-            }
         }
 
 

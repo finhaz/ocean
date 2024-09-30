@@ -13,21 +13,33 @@ using ocean.UI;
 using System.Windows.Controls;
 using ocean.Mvvm;
 using System.Windows;
+using System.ComponentModel;
+using System.Windows.Input;
 
 namespace ocean
 {
     public class CommonRes
     {
+        //静态字段
         public static SerialPort mySerialPort = new SerialPort();
-
-        public TextBox textmain { get; set; }
-
-
         public static DataTable dt1 = new DataTable();
         public static DataTable dt2 = new DataTable();
         public static DataTable dt3 = new DataTable();
 
+        //控件绑定相关
+        public TextBox textmain { get; set; }
 
+        //按键
+        public Button btShow { get; set; }
+
+        bool isCanExec = true;
+        public ICommand ButtonIncrease => new MyCommand(ButtonIncreaseAction, MyCanExec);
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
+
+        //数据处理
         public DataTable dtrun { get; set; }
         public DataTable dtset { get; set; }
         public DataTable dtfactor { get; set; }
@@ -78,9 +90,17 @@ namespace ocean
         int gb_index = 0;//缓冲区注入位置
         int get_index = 0;// 缓冲区捕捉位置
 
+
+
+
+
         public CommonRes()
         {
             textmain = new TextBox();
+
+            btShow = new Button();
+
+            btShow.Content = "数据采集";
 
             dtrun = CommonRes.dt1;
 
@@ -418,7 +438,33 @@ namespace ocean
             }
         }
 
+        private bool MyCanExec(object parameter)
+        {
+            return isCanExec;
+        }
 
+        private void ButtonIncreaseAction(object parameter)
+        {
+            //MessageBox.Show("h!");
+            if (CommonRes.mySerialPort.IsOpen == true)
+            {
+                bshow = !bshow;
+                if (bshow)
+                {
+                    btShow.Content = "停止采集";
+                    StartTimer();
+                }
+                else
+                {
+                    btShow.Content = "开始采集";
+                    StopTimer();
+                }
+            }
+            else
+            {
+                MessageBox.Show("打开串口！");
+            }
+        }
 
 
 
