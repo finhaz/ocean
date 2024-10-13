@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO.Ports;
 using System.Windows.Threading;
+using ocean.Communication;
 
 namespace ocean.UI
 {
@@ -22,6 +23,8 @@ namespace ocean.UI
     /// </summary>
     public partial class debug_serial : Page
     {
+        public Debugsera tcom { get; set; }
+
         delegate void HanderInterfaceUpdataDelegate(string mySendData);
         HanderInterfaceUpdataDelegate myUpdataHander;
         delegate void txtGotoEndDelegate();
@@ -31,6 +34,7 @@ namespace ocean.UI
 
         public debug_serial()
         {
+            tcom = new Debugsera();
             InitializeComponent();
         }
 
@@ -149,7 +153,7 @@ namespace ocean.UI
             string abc, abc1;
             if (ckHexState == true)
             {
-                abc = ByteArrayToHexString(buf);
+                abc = tcom.ByteArrayToHexString(buf);
                 string hexStringView = "";
                 for (int i = 0; i < abc.Length; i += 2)
                 {
@@ -174,56 +178,6 @@ namespace ocean.UI
 
 
 
-        public string ByteArrayToHexString(byte[] data)
-        {
-            StringBuilder sb = new StringBuilder(data.Length * 3);
-            foreach (byte b in data)
-                sb.Append(Convert.ToString(b, 16).PadLeft(2, '0'));
-            return sb.ToString().ToUpper();
-        }
-
-        public byte[] HexStringToByteArray(string s)
-        {
-            //s=s.ToUpper();
-            s = s.Replace(" ", "");
-            if (s.Length % 2 != 0)
-            {
-                s = s.Substring(0, s.Length - 1) + "0" + s.Substring(s.Length - 1);
-            }
-            byte[] buffer = new byte[s.Length / 2];
-
-
-            try
-            {
-                for (int i = 0; i < s.Length; i += 2)
-                    buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
-                return buffer;
-            }
-            catch
-            {
-                string errorString = "E4";
-                byte[] errorData = new byte[errorString.Length / 2];
-                errorData[0] = (byte)Convert.ToByte(errorString, 16);
-                return errorData;
-            }
-        }
-
-        public string StringToHexString(string s)
-        {
-            //s = s.ToUpper();
-            s = s.Replace(" ", "");
-
-            string buffer = "";
-            char[] myChar;
-            myChar = s.ToCharArray();
-            for (int i = 0; i < s.Length; i++)
-            {
-                //buffer = buffer + Convert.ToInt32(myChar[i]);
-                buffer = buffer + Convert.ToString(myChar[i], 16);
-                buffer = buffer.ToUpper();
-            }
-            return buffer;
-        }
 
         private void btClearView_Click(object sender, RoutedEventArgs e)
         {
@@ -247,14 +201,14 @@ namespace ocean.UI
                     txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
                     if (ckAdvantechCmd.IsChecked == true)
                     {
-                        byte[] sendAdvCmd = HexStringToByteArray("0D");
+                        byte[] sendAdvCmd = tcom.HexStringToByteArray("0D");
                         CommonRes.mySerialPort.Write(sendAdvCmd, 0, 1);
                         txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
                     }
                 }
                 else
                 {
-                    byte[] sendHexData = HexStringToByteArray(strSend);
+                    byte[] sendHexData = tcom.HexStringToByteArray(strSend);
                     CommonRes.mySerialPort.Write(sendHexData, 0, sendHexData.Length);
                 }
             }
@@ -308,7 +262,7 @@ namespace ocean.UI
             {
                 //将字符器转为Ascii码
                 string hexString, hexStringView = "";
-                hexString = StringToHexString(tbSend.Text);
+                hexString = tcom.StringToHexString(tbSend.Text);
                 for (int i = 0; i < hexString.Length; i += 2)
                 {
                     hexStringView += hexString.Substring(i, 2) + " ";
