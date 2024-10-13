@@ -4,15 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.IO.Ports;
+using System.Windows.Threading;
+
 
 namespace ocean.Communication
 {
-    public class Debugsera
+    public class Debugsera : Page
     {
         //控件绑定相关
         public TextBox tbReceive { get; set; }
+        public TextBox txtRecive { get; set; }
+
+        public bool ckHexState;
 
 
+        delegate void HanderInterfaceUpdataDelegate(string mySendData);
+        HanderInterfaceUpdataDelegate myUpdataHander;
+        delegate void txtGotoEndDelegate();
+
+
+        public Debugsera()
+        {
+            tbReceive=new TextBox();
+            txtRecive=new TextBox();
+            txtRecive.Text = "0";
+
+        }
 
 
         public string ByteArrayToHexString(byte[] data)
@@ -65,5 +83,65 @@ namespace ocean.Communication
             }
             return buffer;
         }
+
+
+        private void getControlState()
+        {
+
+        }
+        private void getData(string sendData)
+        {
+            tbReceive.Text += sendData;
+        }
+
+        private void txtGotoEnd()
+        {
+            tbReceive.ScrollToEnd();
+        }
+
+        private void txtReciveEvent(string byteNum)
+        {
+            txtRecive.Text = Convert.ToString(Convert.ToInt32(txtRecive.Text) + Convert.ToInt32(byteNum));
+        }
+
+
+
+        public void mySerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+
+            int n = CommonRes.mySerialPort.BytesToRead;
+            byte[] buf = new byte[n];
+            CommonRes.mySerialPort.Read(buf, 0, n);
+            myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
+            txtGotoEndDelegate myGotoend = txtGotoEnd;
+            HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
+            string abc, abc1;
+            if (ckHexState == true)
+            {
+                abc = ByteArrayToHexString(buf);
+                string hexStringView = "";
+                for (int i = 0; i < abc.Length; i += 2)
+                {
+                    hexStringView += abc.Substring(i, 2) + " ";
+                }
+                abc = hexStringView;
+                abc1 = abc.Replace(" ", "");
+                if (abc1.Substring(abc1.Length - 2, 2) == "0D")
+                {
+                    abc = abc + "\n";
+                }
+
+            }
+            else
+            {
+                abc = System.Text.Encoding.Default.GetString(buf);
+            }
+            Dispatcher.Invoke(myUpdataHander, new string[] { abc });
+            Dispatcher.Invoke(myGotoend);
+            Dispatcher.Invoke(myUpdata1, new string[] { n.ToString() });
+        }
+
+
+
     }
 }

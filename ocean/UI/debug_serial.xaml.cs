@@ -25,11 +25,6 @@ namespace ocean.UI
     {
         public Debugsera tcom { get; set; }
 
-        delegate void HanderInterfaceUpdataDelegate(string mySendData);
-        HanderInterfaceUpdataDelegate myUpdataHander;
-        delegate void txtGotoEndDelegate();
-
-        public bool ckHexState;
 
 
         public debug_serial()
@@ -121,72 +116,17 @@ namespace ocean.UI
             btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
         }
 
-        private void getControlState()
-        {
-
-        }
-
-        private void getData(string sendData)
-        {
-            tbReceive.Text += sendData;
-        }
-
-        private void txtGotoEnd()
-        {
-            tbReceive.ScrollToEnd();
-        }
-
-        private void txtReciveEvent(string byteNum)
-        {
-            txtRecive.Text = Convert.ToString(Convert.ToInt32(txtRecive.Text) + Convert.ToInt32(byteNum));
-        }
-
-        private void mySerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-
-            int n = CommonRes.mySerialPort.BytesToRead;
-            byte[] buf = new byte[n];
-            CommonRes.mySerialPort.Read(buf, 0, n);
-            myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
-            txtGotoEndDelegate myGotoend = txtGotoEnd;
-            HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
-            string abc, abc1;
-            if (ckHexState == true)
-            {
-                abc = tcom.ByteArrayToHexString(buf);
-                string hexStringView = "";
-                for (int i = 0; i < abc.Length; i += 2)
-                {
-                    hexStringView += abc.Substring(i, 2) + " ";
-                }
-                abc = hexStringView;
-                abc1 = abc.Replace(" ", "");
-                if (abc1.Substring(abc1.Length - 2, 2) == "0D")
-                {
-                    abc = abc + "\n";
-                }
-
-            }
-            else
-            {
-                abc = System.Text.Encoding.Default.GetString(buf);
-            }
-            Dispatcher.Invoke(myUpdataHander, new string[] { abc });
-            Dispatcher.Invoke(myGotoend);
-            Dispatcher.Invoke(myUpdata1, new string[] { n.ToString() });
-        }
-
-
 
 
         private void btClearView_Click(object sender, RoutedEventArgs e)
         {
-            tbReceive.Text = "";
+            tcom.tbReceive.Text = "";
+            tcom.txtRecive.Text = "0";
         }
 
         private void ck16View_Click(object sender, RoutedEventArgs e)
         {
-            ckHexState = (bool)ck16View.IsChecked;
+            tcom.ckHexState = (bool)ck16View.IsChecked;
         }
 
         private void btSend_Event(string strSend, bool hexState)
@@ -429,13 +369,13 @@ namespace ocean.UI
             cbStopBits.ItemsSource = stopBits;
             cbStopBits.Text = Convert.ToString(cbStopBits.Items[0]);
             #endregion
-            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(this.mySerialPort_DataReceived);
+            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(tcom.mySerialPort_DataReceived);
 
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
             //mySerialPort.Encoding = System.Text.Encoding.GetEncoding("UTF8");
-            ckHexState = (bool)ck16View.IsChecked;
+            tcom.ckHexState = (bool)ck16View.IsChecked;
 
             time1.Tick += new EventHandler(time1_Tick);
             tbkIntervalTime.Visibility = Visibility.Hidden;
@@ -458,7 +398,7 @@ namespace ocean.UI
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.mySerialPort.DataReceived-= new SerialDataReceivedEventHandler(this.mySerialPort_DataReceived);
+            CommonRes.mySerialPort.DataReceived-= new SerialDataReceivedEventHandler(tcom.mySerialPort_DataReceived);
         }
     }
 }
