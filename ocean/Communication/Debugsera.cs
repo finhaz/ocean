@@ -30,6 +30,12 @@ namespace ocean.Communication
             txtRecive=new TextBox();
             txtRecive.Text = "0";
 
+            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
+
         }
 
 

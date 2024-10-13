@@ -369,11 +369,7 @@ namespace ocean.UI
             cbStopBits.ItemsSource = stopBits;
             cbStopBits.Text = Convert.ToString(cbStopBits.Items[0]);
             #endregion
-            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(tcom.mySerialPort_DataReceived);
 
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
             //mySerialPort.Encoding = System.Text.Encoding.GetEncoding("UTF8");
             tcom.ckHexState = (bool)ck16View.IsChecked;
 
