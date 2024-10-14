@@ -137,14 +137,14 @@
             <TextBox VerticalScrollBarVisibility="Auto" IsReadOnly="True" Name="tbReceive" Grid.Column="2" Margin="0,1,0,0" TextWrapping="Wrap" Text="{Binding tcom.tbReceive.Text, Mode=TwoWay}" ></TextBox>
             <StatusBar Name="statusBar1"  Height="20" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="0">
                 <TextBlock Text="状态："></TextBlock>
-                <TextBlock Name="tbComState" Text="0" MinWidth="150"></TextBlock>
+                <TextBlock Name="tbComState" Text="{Binding tcom.tbComState.Text,Mode=TwoWay}" MinWidth="150"></TextBlock>
                 <Separator Background="#FFC9C6C6"/>
                 <TextBlock></TextBlock>
                 <TextBlock Text="接收："></TextBlock>
                 <TextBlock Name="txtRecive" Text="{Binding tcom.txtRecive.Text, Mode=TwoWay}" MinWidth="100"></TextBlock>
                 <Separator Background="#FFC9C6C6"/>
                 <TextBlock Text="发送："></TextBlock>
-                <TextBlock Name="txtSend" Text="0"></TextBlock>
+                <TextBlock Name="txtSend" Text="{Binding tcom.txtSend.Text,Mode=TwoWay}"></TextBlock>
             </StatusBar>
             <Separator Height="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,20" VerticalAlignment="Bottom"/>
             <Rectangle Fill="#FFACACAC" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Top"  Height="1"/>

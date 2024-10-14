@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.IO.Ports;
 using System.Windows.Threading;
+using System.Windows;
 
 
 namespace ocean.Communication
@@ -16,7 +17,17 @@ namespace ocean.Communication
         public TextBox tbReceive { get; set; }
         public TextBox txtRecive { get; set; }
 
+
+        public TextBox txtSend { get; set; }
+
+        public TextBox tbComState { get; set; }
+
+        public CheckBox ckAdvantechCmd { get; set; }
+
+
         public bool ckHexState;
+
+
 
 
         delegate void HanderInterfaceUpdataDelegate(string mySendData);
@@ -28,7 +39,13 @@ namespace ocean.Communication
         {
             tbReceive=new TextBox();
             txtRecive=new TextBox();
+            txtSend=new TextBox();
+            tbComState=new TextBox();
+            ckAdvantechCmd=new CheckBox();
+
             txtRecive.Text = "0";
+            txtSend.Text = "0";
+            tbComState.Text = "0";
 
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
 
@@ -145,6 +162,38 @@ namespace ocean.Communication
             Dispatcher.Invoke(myUpdataHander, new string[] { abc });
             Dispatcher.Invoke(myGotoend);
             Dispatcher.Invoke(myUpdata1, new string[] { n.ToString() });
+        }
+
+
+
+        public void btSend_Event(string strSend, bool hexState)
+        {
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+                if (hexState == false)
+                {
+                    //if (ckAdvantechCmd.IsChecked == true) { strSend = strSend.ToUpper(); }
+                    byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
+                    CommonRes.mySerialPort.Write(sendData, 0, sendData.Length);
+                    txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
+                    if (ckAdvantechCmd.IsChecked == true)
+                    {
+                        byte[] sendAdvCmd = HexStringToByteArray("0D");
+                        CommonRes.mySerialPort.Write(sendAdvCmd, 0, 1);
+                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
+                    }
+                }
+                else
+                {
+                    byte[] sendHexData = HexStringToByteArray(strSend);
+                    CommonRes.mySerialPort.Write(sendHexData, 0, sendHexData.Length);
+                }
+            }
+            else
+            {
+                tbComState.Text = "串口未开";
+                MessageBox.Show("串口没有打开，请检查！");
+            }
         }
 
 

@@ -30,6 +30,7 @@ namespace ocean.UI
         public debug_serial()
         {
             tcom = new Debugsera();
+
             InitializeComponent();
         }
 
@@ -41,7 +42,7 @@ namespace ocean.UI
         {
             if (CommonRes.mySerialPort.IsOpen)
             {
-                btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+                tcom.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
             }
         }
 
@@ -113,7 +114,7 @@ namespace ocean.UI
 
         private void btSend_Click(object sender, RoutedEventArgs e)
         {
-            btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+            tcom.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
         }
 
 
@@ -129,35 +130,7 @@ namespace ocean.UI
             tcom.ckHexState = (bool)ck16View.IsChecked;
         }
 
-        private void btSend_Event(string strSend, bool hexState)
-        {
-            if (CommonRes.mySerialPort.IsOpen)
-            {
-                if (hexState == false)
-                {
-                    //if (ckAdvantechCmd.IsChecked == true) { strSend = strSend.ToUpper(); }
-                    byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
-                    CommonRes.mySerialPort.Write(sendData, 0, sendData.Length);
-                    txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
-                    if (ckAdvantechCmd.IsChecked == true)
-                    {
-                        byte[] sendAdvCmd = tcom.HexStringToByteArray("0D");
-                        CommonRes.mySerialPort.Write(sendAdvCmd, 0, 1);
-                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
-                    }
-                }
-                else
-                {
-                    byte[] sendHexData = tcom.HexStringToByteArray(strSend);
-                    CommonRes.mySerialPort.Write(sendHexData, 0, sendHexData.Length);
-                }
-            }
-            else
-            {
-                tbComState.Text = "串口未开";
-                MessageBox.Show("串口没有打开，请检查！");
-            }
-        }
+
 
         private void ckAutoSend_Click(object sender, RoutedEventArgs e)
         {
@@ -320,7 +293,7 @@ namespace ocean.UI
             str = Convert.ToString(bt1.Content);
             TextBox tb1 = gdExpend.FindName("expendTextBox" + str.Substring(str.Length - 1, 1)) as TextBox;
             CheckBox ck1 = gdExpend.FindName("ckExpend" + str.Substring(str.Length - 1, 1)) as CheckBox;
-            btSend_Event(tb1.Text, (bool)ck1.IsChecked);
+            tcom.btSend_Event(tb1.Text, (bool)ck1.IsChecked);
             //MessageBox.Show("点了确定！" + str.Substring(str.Length - 1, 1));
         }
 
