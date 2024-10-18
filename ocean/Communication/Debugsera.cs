@@ -17,6 +17,7 @@ namespace ocean.Communication
         public TextBox tbReceive { get; set; }
         public TextBox txtRecive { get; set; }
 
+        
 
         public TextBox txtSend { get; set; }
 
@@ -24,10 +25,22 @@ namespace ocean.Communication
 
         public CheckBox ckAdvantechCmd { get; set; }
 
+        public ComboBox cbBaudRate { get; set; }
+        public ComboBox cbDataBits { get; set; }
+
+        public ComboBox cbParity { get; set; }
+        public ComboBox cbPortName{ get; set; }
+        public ComboBox cbStopBits{ get; set; }
+        
+        public CheckBox ck16Send { get; set; }
+
+        public TextBox tbSend { get; set; }
+
 
         public bool ckHexState;
 
-
+        //SerialPort mySerialPort = new SerialPort();
+        public DispatcherTimer time1 = new DispatcherTimer();
 
 
         delegate void HanderInterfaceUpdataDelegate(string mySendData);
@@ -43,9 +56,15 @@ namespace ocean.Communication
             tbComState=new TextBox();
             ckAdvantechCmd=new CheckBox();
 
+            ck16Send=new CheckBox();
+            tbSend=new TextBox();
+
             txtRecive.Text = "0";
             txtSend.Text = "0";
             tbComState.Text = "0";
+
+            time1.Tick += new EventHandler(time1_Tick);
+
 
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
 
@@ -196,7 +215,13 @@ namespace ocean.Communication
             }
         }
 
-
+        private void time1_Tick(object sender, EventArgs e)
+        {
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+                btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+            }
+        }
 
     }
 }

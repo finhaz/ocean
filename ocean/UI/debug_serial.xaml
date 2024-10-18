@@ -6,8 +6,7 @@
       xmlns:local="clr-namespace:ocean.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="debug_serial"
-      Initialized="Page_Loaded" Unloaded="Page_Unloaded"
+      Title="debug_serial" Unloaded="Page_Unloaded"
       >
 
     <Page.Resources>
@@ -123,13 +122,13 @@
                     <ColumnDefinition Width="192"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox TextWrapping="Wrap" Name="tbSend" Grid.Column="1" Margin="3,0,0,0" AcceptsReturn="True" TextChanged="tbSend_TextChanged" Grid.RowSpan="2"></TextBox>
+                <TextBox TextWrapping="Wrap" Name="tbSend" Text="{Binding tcom.tbSend.Text, Mode=TwoWay}" Grid.Column="1" Margin="3,0,0,0" AcceptsReturn="True" TextChanged="tbSend_TextChanged" Grid.RowSpan="2"></TextBox>
                 <Rectangle Fill="#FFACACAC" Width="1" HorizontalAlignment="Right" Grid.RowSpan="2"></Rectangle>
                 <Button Name="btSend" Content="发送" Margin="118,7,6,55" Click="btSend_Click" VerticalContentAlignment="Top"/>
                 <Button Name="btExpend" Content="扩展" Margin="118,37,6,25" VerticalContentAlignment="Top" Click="btExpend_Click"/>
-                <CheckBox Name="ck16Send" Content="16进制发送"  Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
+                <CheckBox Name="ck16Send" Content="16进制发送" IsChecked="{Binding tcom.ck16Send.IsChecked, Mode=TwoWay}" Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
                 <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
-                <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top" Click="ckAdvantechCmd_Click"/>
+                <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
                 <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click"/>
                 <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2"/>
                 <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="0" VerticalAlignment="Top" Width="50" TextChanged="tbIntervalTime_TextChanged" Grid.RowSpan="2"/>
