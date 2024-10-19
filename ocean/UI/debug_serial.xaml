@@ -109,7 +109,7 @@
                     <Button Visibility="Hidden" Content="更改" Grid.Row="4" Margin="74,0,10,0"></Button>
                     <Button Visibility="Hidden" Content="搜索空闲串口" Grid.Row="6" Margin="10,2,30,2"></Button>
                     <CheckBox Visibility="Hidden" Name="ckAutoClear" Content="自动清空" Margin="10,2,0,0" Grid.Row="2" Height="16" VerticalAlignment="Top"/>
-                    <CheckBox Name="ck16View" Content="16进制显示" Margin="10,2,0,2" Grid.Row="3" Click="ck16View_Click"/>
+                    <CheckBox Name="ck16View" Content="16进制显示" Margin="10,2,0,2" Grid.Row="3" Click="ck16View_Click" IsChecked="{Binding tcom.ck16View.IsChecked, Mode=TwoWay}" />
                 </Grid>
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5"/>

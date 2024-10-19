@@ -33,6 +33,7 @@ namespace ocean.Communication
         public ComboBox cbStopBits{ get; set; }
         
         public CheckBox ck16Send { get; set; }
+        public CheckBox ck16View { get; set; }
 
         public TextBox tbSend { get; set; }
 
@@ -57,13 +58,17 @@ namespace ocean.Communication
             ckAdvantechCmd=new CheckBox();
 
             ck16Send=new CheckBox();
-            tbSend=new TextBox();
+            ck16View=new CheckBox();
+            tbSend =new TextBox();
 
             txtRecive.Text = "0";
             txtSend.Text = "0";
             tbComState.Text = "0";
 
             time1.Tick += new EventHandler(time1_Tick);
+
+            //mySerialPort.Encoding = System.Text.Encoding.GetEncoding("UTF8");
+            ckHexState = (bool)ck16View.IsChecked;
 
 
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);

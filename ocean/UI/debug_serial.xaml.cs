@@ -65,8 +65,7 @@ namespace ocean.UI
             cbStopBits.Text = Convert.ToString(cbStopBits.Items[0]);
             #endregion
 
-            //mySerialPort.Encoding = System.Text.Encoding.GetEncoding("UTF8");
-            tcom.ckHexState = (bool)ck16View.IsChecked;
+
 
 
             tbkIntervalTime.Visibility = Visibility.Hidden;
