@@ -81,14 +81,14 @@
                     <TextBlock Text="检验位" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="3" Height="16" Width="36"/>
                     <TextBlock Text="数据位" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="4" Height="16" Width="36"/>
                     <TextBlock Text="停止位" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,4" Grid.Row="5" Height="16" Width="36"/>
-                    <ComboBox Name="cbPortName" FontSize="10" Grid.Column="1" Grid.Row="1" Margin="2,1,10,1"/>
-                    <ComboBox Name="cbBaudRate" FontSize="10" Grid.Column="1" Grid.Row="2" Margin="2,1,10,1"/>
-                    <ComboBox Name="cbParity" FontSize="10" Grid.Column="1" Grid.Row="3" Margin="2,1,10,1"/>
-                    <ComboBox Name="cbDataBits" FontSize="10" Grid.Column="1" Grid.Row="4" Margin="2,1,10,1"/>
-                    <ComboBox Name="cbStopBits" FontSize="10" Grid.Column="1" Grid.Row="5" Margin="2,1,10,1"/>
-                    <Ellipse Name="comState" Style="{StaticResource EllipseStyleRed}" Grid.Row="6" HorizontalAlignment="Left"
+                    <ComboBox Name="cbPortName" FontSize="10" Grid.Column="1" Grid.Row="1" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbPortName.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbPortName.Text, Mode=TwoWay}" IsEnabled="{Binding tcom.cbPortName.IsEnabled,Mode=TwoWay}"/>
+                    <ComboBox Name="cbBaudRate" FontSize="10" Grid.Column="1" Grid.Row="2" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbBaudRate.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbBaudRate.Text, Mode=TwoWay}" IsEnabled="{Binding tcom.cbBaudRate.IsEnabled,Mode=TwoWay}"/>
+                    <ComboBox Name="cbParity" FontSize="10" Grid.Column="1" Grid.Row="3" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbParity.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbParity.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbParity.IsEnabled,Mode=TwoWay}"/>
+                    <ComboBox Name="cbDataBits" FontSize="10" Grid.Column="1" Grid.Row="4" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbDataBits.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbDataBits.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbDataBits.IsEnabled,Mode=TwoWay}"/>
+                    <ComboBox Name="cbStopBits" FontSize="10" Grid.Column="1" Grid.Row="5" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbStopBits.ItemsSource,Mode=TwoWay}" Text="{Binding tcom.cbStopBits.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbStopBits.IsEnabled,Mode=TwoWay}"/>
+                    <Ellipse Name="comState" Style="{Binding tcom.comState.Style, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"
                              Width="20" Margin="15,8,0,7"/>
-                    <Button Name="btOpenCom" Content="打开串口" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
+                    <Button Name="btOpenCom" Content="{Binding tcom.btOpenCom.Content,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
                             Click="btOpenCom_Click" />
                 </Grid>
                 <Grid Grid.Row="1">
@@ -130,8 +130,8 @@
                 <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
                 <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
                 <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click"/>
-                <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2"/>
-                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="0" VerticalAlignment="Top" Width="50" TextChanged="tbIntervalTime_TextChanged" Grid.RowSpan="2"/>
+                <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2" Visibility="{Binding tcom.tbkIntervalTime.Visibility, Mode=TwoWay}"/>
+                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="0" VerticalAlignment="Top" Width="50" TextChanged="tbIntervalTime_TextChanged" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}"/>
             </Grid>
             <TextBox VerticalScrollBarVisibility="Auto" IsReadOnly="True" Name="tbReceive" Grid.Column="2" Margin="0,1,0,0" TextWrapping="Wrap" Text="{Binding tcom.tbReceive.Text, Mode=TwoWay}" ></TextBox>
             <StatusBar Name="statusBar1"  Height="20" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="0">

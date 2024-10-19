@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.IO.Ports;
 using System.Windows.Threading;
 using System.Windows;
+using System.Windows.Shapes;
 
 
 namespace ocean.Communication
@@ -38,6 +39,15 @@ namespace ocean.Communication
         public TextBox tbSend { get; set; }
 
 
+        public TextBlock tbkIntervalTime { get; set; }
+        public TextBox tbIntervalTime { get; set; }
+
+        public Border bdExpend { get; set; }
+
+        public Button btOpenCom { get; set; }
+
+        public Ellipse comState { get; set; }
+
         public bool ckHexState;
 
         //SerialPort mySerialPort = new SerialPort();
@@ -57,13 +67,31 @@ namespace ocean.Communication
             tbComState=new TextBox();
             ckAdvantechCmd=new CheckBox();
 
-            ck16Send=new CheckBox();
+            cbBaudRate=new ComboBox();
+            cbDataBits=new ComboBox();
+            cbParity=new ComboBox();
+            cbPortName=new ComboBox();
+            cbStopBits=new ComboBox();
+
+            ck16Send =new CheckBox();
             ck16View=new CheckBox();
             tbSend =new TextBox();
+
+
+            tbkIntervalTime =new TextBlock();
+            tbIntervalTime=new TextBox();
+            bdExpend=new Border();
+
+            btOpenCom=new Button();
+
+            comState=new Ellipse();
 
             txtRecive.Text = "0";
             txtSend.Text = "0";
             tbComState.Text = "0";
+            btOpenCom.Content = "打开串口";
+            comState.Style = (Style)FindResource("EllipseStyleRed");
+
 
             time1.Tick += new EventHandler(time1_Tick);
 
@@ -77,6 +105,61 @@ namespace ocean.Communication
 
             CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
 
+
+            some_intial();
+
+            tbkIntervalTime.Visibility = Visibility.Hidden;
+            tbIntervalTime.Visibility = Visibility.Hidden;
+            bdExpend.Visibility = Visibility.Hidden;
+
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+                cbBaudRate.IsEnabled = false;
+                cbDataBits.IsEnabled = false;
+                cbParity.IsEnabled = false;
+                cbPortName.IsEnabled = false;
+                cbStopBits.IsEnabled = false;
+
+                btOpenCom.Content = "关闭串口";
+                comState.Style = (Style)FindResource("EllipseStyleGreen");
+            }
+
+        }
+
+
+        public void some_intial()
+        {
+            #region//串口设置初始化
+            //串口cbComName.Text
+            try
+            {
+                string[] portsName = SerialPort.GetPortNames();
+                Array.Sort(portsName);
+                cbPortName.ItemsSource = portsName;
+                cbPortName.Text = Convert.ToString(cbPortName.Items[0]);
+            }
+            catch
+            {
+                cbPortName.Text = "暂无串口";
+            }
+
+            //波特率cbBaudRate.Text
+            int[] baudRateData = { 4800, 9600, 19200, 38400, 43000, 56000 };
+            cbBaudRate.ItemsSource = baudRateData;
+            cbBaudRate.Text = Convert.ToString(cbBaudRate.Items[1]);
+            //检验位cbParity.Text
+            string[] parityBit = { "无", "奇校验", "偶校验" };
+            cbParity.ItemsSource = parityBit;
+            cbParity.Text = Convert.ToString(cbParity.Items[0]);
+            //数据位cbDataBits.Text
+            int[] dataBits = { 6, 7, 8 };
+            cbDataBits.ItemsSource = dataBits;
+            cbDataBits.Text = Convert.ToString(cbDataBits.Items[2]);
+            //停止位cbStopBits.Text
+            int[] stopBits = { 1, 2 };
+            cbStopBits.ItemsSource = stopBits;
+            cbStopBits.Text = Convert.ToString(cbStopBits.Items[0]);
+            #endregion
         }
 
 
