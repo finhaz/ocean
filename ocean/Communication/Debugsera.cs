@@ -48,7 +48,14 @@ namespace ocean.Communication
 
         public Ellipse comState { get; set; }
 
+        public CheckBox ckAutoSend { get; set; }
+
+
+        public Grid grdSend { get; set; }
+
         public bool ckHexState;
+
+        
 
         //SerialPort mySerialPort = new SerialPort();
         public DispatcherTimer time1 = new DispatcherTimer();
@@ -86,14 +93,22 @@ namespace ocean.Communication
 
             comState=new Ellipse();
 
+            ckAutoSend=new CheckBox();
+            grdSend=new Grid();
+
+
             txtRecive.Text = "0";
             txtSend.Text = "0";
             tbComState.Text = "0";
+            tbIntervalTime.Text= "0";
             btOpenCom.Content = "打开串口";
-            comState.Style = (Style)FindResource("EllipseStyleRed");
+            //comState.Style = (Style)FindResource("EllipseStyleRed");
 
 
             time1.Tick += new EventHandler(time1_Tick);
+
+            tbIntervalTime.TextChanged += new System.Windows.Controls.TextChangedEventHandler(tbIntervalTime_TextChanged);
+
 
             //mySerialPort.Encoding = System.Text.Encoding.GetEncoding("UTF8");
             ckHexState = (bool)ck16View.IsChecked;
@@ -310,6 +325,29 @@ namespace ocean.Communication
                 btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
             }
         }
+
+
+        private void tbIntervalTime_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ckAutoSend.IsChecked == true)
+            {
+                if (Convert.ToDouble(tbIntervalTime.Text) == 0)
+                {
+                    time1.Stop();
+                }
+                else
+                {
+                    time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
+                    time1.Start();
+                }
+            }
+        }
+
+
+
+
+
+
 
     }
 }

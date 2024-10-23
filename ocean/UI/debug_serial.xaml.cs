@@ -162,6 +162,8 @@ namespace ocean.UI
             //get16View((bool)ck16Send.IsChecked);
         }
 
+
+
         private void get16View(bool isHex)
         {
             if (isHex == true)
@@ -220,21 +222,6 @@ namespace ocean.UI
             }
         }
 
-        private void tbIntervalTime_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ckAutoSend.IsChecked == true)
-            {
-                if (Convert.ToDouble(tbIntervalTime.Text) == 0)
-                {
-                    tcom.time1.Stop();
-                }
-                else
-                {
-                    tcom.time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
-                    tcom.time1.Start();
-                }
-            }
-        }
 
         private void btExpend_Click(object sender, RoutedEventArgs e)
         {

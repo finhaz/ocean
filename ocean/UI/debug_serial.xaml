@@ -129,9 +129,9 @@
                 <CheckBox Name="ck16Send" Content="16进制发送" IsChecked="{Binding tcom.ck16Send.IsChecked, Mode=TwoWay}" Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
                 <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
                 <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
-                <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click"/>
+                <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click" IsChecked="{Binding tcom.ckAutoSend.IsChecked}"/>
                 <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2" Visibility="{Binding tcom.tbkIntervalTime.Visibility, Mode=TwoWay}"/>
-                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="0" VerticalAlignment="Top" Width="50" TextChanged="tbIntervalTime_TextChanged" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}"/>
+                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="{Binding tcom.tbIntervalTime.Text,Mode=TwoWay}" VerticalAlignment="Top" Width="50" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}"/>
             </Grid>
             <TextBox VerticalScrollBarVisibility="Auto" IsReadOnly="True" Name="tbReceive" Grid.Column="2" Margin="0,1,0,0" TextWrapping="Wrap" Text="{Binding tcom.tbReceive.Text, Mode=TwoWay}" ></TextBox>
             <StatusBar Name="statusBar1"  Height="20" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="0">
