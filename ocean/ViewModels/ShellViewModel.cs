@@ -19,21 +19,21 @@ namespace ocean.ViewModels
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.BugSolid },
-                Label = "Bugs",
+                Label = "串口调试界面",
                 NavigationType = typeof(BugsPage),
                 NavigationDestination = new Uri("UI/debug_serial.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
-                Label = "User",
+                Label = "电控界面",
                 NavigationType = typeof(UserPage),
                 NavigationDestination = new Uri("UI/DataAnal.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
-                Label = "Break",
+                Label = "Modbus数据界面",
                 NavigationType = typeof(BreakPage),
                 NavigationDestination = new Uri("Views/BreakPage.xaml", UriKind.RelativeOrAbsolute)
             });
