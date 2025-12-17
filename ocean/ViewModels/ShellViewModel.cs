@@ -35,7 +35,7 @@ namespace ocean.ViewModels
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "Modbus数据界面",
                 NavigationType = typeof(BreakPage),
-                NavigationDestination = new Uri("Views/BreakPage.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("UI/Modserial.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {

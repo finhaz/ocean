@@ -18,7 +18,8 @@
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Top"
                                        Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
-                                       Kind="CogsSolid" />
+                                       Kind="CodeBranchSolid" 
+                                       Grid.Column="0"/>
         <Button Width="80"
                 Height="50"
                 Content="打开串口"
