@@ -32,18 +32,20 @@
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="20*"/>
+                    <RowDefinition Height="20*"/>
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="100*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Name="textBox1" Text="系统停止运行" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.ColumnSpan="2" Margin="25,0,0,0" />
-                <Button Name="btRUN" Content="运行" Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <TextBox Name="runAddr"  Grid.Row="1"  Grid.ColumnSpan="2" Text="{Binding zcom.runAddr.Text, Mode=TwoWay}"></TextBox>
+                <Button Name="btRUN" Content="运行" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Click="btRUN_Click" Width="80"/>
-                <Button Name="btSTOP" Content="停止" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                <Button Name="btSTOP" Content="停止" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Click="btSTOP_Click" Width="80"/>
-                <Button Name="btShow" Content="{Binding ucom.btShow.Content, Mode=TwoWay}" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Command="{Binding ucom.ButtonIncrease}"/>
-                <TextBlock Text="通讯协议选择" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="4" Grid.ColumnSpan="2" Margin="25,0,0,0" />
-                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="5" Margin="0,1,0,1" Grid.ColumnSpan="2" SelectionChanged="cbProcho_SelectionChanged">
+                <Button Name="btShow" Content="{Binding ucom.btShow.Content, Mode=TwoWay}" Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Command="{Binding ucom.ButtonIncrease}"/>
+                <TextBlock Text="通讯协议选择" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="5" Grid.ColumnSpan="2" Margin="25,0,0,0" />
+                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="6" Margin="0,1,0,1" Grid.ColumnSpan="2" SelectionChanged="cbProcho_SelectionChanged">
                     <ComboBoxItem >FE协议</ComboBoxItem>
                     <ComboBoxItem IsSelected="True">Modbus协议</ComboBoxItem>
                 </ComboBox>

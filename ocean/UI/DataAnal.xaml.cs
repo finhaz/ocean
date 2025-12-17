@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ocean.Communication;
+using SomeNameSpace;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -19,7 +21,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using SomeNameSpace;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -31,10 +32,12 @@ namespace ocean.UI
     public partial class DataAnal : Page
     {
         public CommonRes ucom { get; set; }
+        public Dataasera zcom { get; set; }
 
         public DataAnal()
         {
             ucom = new CommonRes();
+            zcom=new Dataasera();
             InitializeComponent();        
         }
 
@@ -54,14 +57,15 @@ namespace ocean.UI
                 MessageBox.Show("请打开串口！");
                 return;
             }
-
-            ucom.runstop_cotnrol(true);
+            int addr = Int32.Parse(zcom.runAddr.Text);
+            ucom.runstop_cotnrol(addr,true);
             textBox1.Text= "系统正在运行";
         }
 
         private void btSTOP_Click(object sender, RoutedEventArgs e)
         {
-            ucom.runstop_cotnrol(false);
+            int addr = Int32.Parse(zcom.runAddr.Text);
+            ucom.runstop_cotnrol(addr,false);
             textBox1.Text = "系统停止运行";
            
         }

@@ -310,7 +310,7 @@ namespace ocean
             textmain.Text += para;
         }
 
-        public void runstop_cotnrol(bool pbrun)
+        public void runstop_cotnrol(int addr,bool pbrun)
         {
             //bool brun;
             int send_num = 0;
@@ -325,7 +325,7 @@ namespace ocean
             else if (Protocol_num == 1)//modbus
             {
                 //1号机1通道
-                FCOM2.Monitor_Run(1, 128, brun);
+                FCOM2.Monitor_Run(1, addr, brun);
                 send_num = 8;
                 CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, send_num);
             }
