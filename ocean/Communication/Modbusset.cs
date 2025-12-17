@@ -15,18 +15,18 @@ namespace ocean.Communication
         public DataTable dtm { get; set; }
         public Modbusset() 
         {
-            dt1.Columns.Add("序号", typeof(int));   
-            dt1.Columns.Add("名称", typeof(string)); 
-            dt1.Columns.Add("数值", typeof(double)); 
-            dt1.Columns.Add("指令", typeof(double)); 
-            dt1.Columns.Add("写", typeof(double));
-            dt1.Columns.Add("单位", typeof(string));
-            dt1.Columns.Add("范围", typeof(string));
-            dt1.Columns.Add("区块", typeof(string));
-            dt1.Columns.Add("地址", typeof(int));
-            dt1.Columns.Add("数量", typeof(int));
-            dt1.Columns.Add("位偏移", typeof(int));
-            dt1.Columns.Add("位数", typeof(int));
+            dt1.Columns.Add("ID", typeof(int));   
+            dt1.Columns.Add("Name", typeof(string)); 
+            dt1.Columns.Add("Value", typeof(double)); 
+            dt1.Columns.Add("Command", typeof(double)); 
+            dt1.Columns.Add("IsButtonClicked", typeof(bool));
+            dt1.Columns.Add("Unit", typeof(string));
+            dt1.Columns.Add("Rangle", typeof(string));
+            dt1.Columns.Add("IsSelected", typeof(bool));
+            dt1.Columns.Add("Addr", typeof(int));
+            dt1.Columns.Add("Number", typeof(int));
+            dt1.Columns.Add("NOffSet", typeof(int));
+            dt1.Columns.Add("NBit", typeof(int));
             dtm = dt1;
             kind_num = "保持寄存器(RW)";
             sadd = "1";

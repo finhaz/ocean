@@ -41,9 +41,9 @@ namespace ocean.UI
             // 创建新行并赋值
             DataRow newRow = mcom.dtm.NewRow();
             int radd = Int32.Parse(mcom.sadd);
-            newRow["序号"] = a;
-            newRow["区块"] = mcom.kind_num;
-            newRow["地址"] = radd;
+            newRow["ID"] = a;
+            //newRow["区块"] = mcom.kind_num;
+            newRow["Addr"] = radd;
             a = a + 1;
             mcom.dtm.Rows.Add(newRow);
         }
