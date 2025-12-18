@@ -41,12 +41,12 @@ namespace ocean.Communication
         public string dSelectedOption { get; set; }
         public static DataTable dt1 = new DataTable();
         public DataTable dtm { get; set; }
-        public Modbusset() 
+        static Modbusset()
         {
-            dt1.Columns.Add("ID", typeof(int));   
-            dt1.Columns.Add("Name", typeof(string)); 
-            dt1.Columns.Add("Value", typeof(double)); 
-            dt1.Columns.Add("Command", typeof(double)); 
+            dt1.Columns.Add("ID", typeof(int));
+            dt1.Columns.Add("Name", typeof(string));
+            dt1.Columns.Add("Value", typeof(double));
+            dt1.Columns.Add("Command", typeof(double));
             dt1.Columns.Add("IsButtonClicked", typeof(bool));
             dt1.Columns.Add("Unit", typeof(string));
             dt1.Columns.Add("Rangle", typeof(string));
@@ -55,6 +55,12 @@ namespace ocean.Communication
             dt1.Columns.Add("Number", typeof(int));
             dt1.Columns.Add("NOffSet", typeof(int));
             dt1.Columns.Add("NBit", typeof(int));
+
+        }
+
+        public Modbusset() 
+        {
+
             dtm = dt1;
             kind_num = "保持寄存器(RW)";
             Sadd = "1";
