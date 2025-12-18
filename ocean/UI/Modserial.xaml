@@ -80,13 +80,23 @@
                 <DataGrid x:Name="dataGrodx"
                                 ItemsSource="{Binding mcom.dtm, Mode=TwoWay}"
                                 AutoGenerateColumns="False"
-                          CanUserAddRows="False" >
+                          CanUserAddRows="False" 
+                          MouseDoubleClick="DataGrodx_MouseDoubleClick">
                     <DataGrid.Columns>
                         <!-- 前四列：普通文本 -->
                         <DataGridTextColumn Header="序号" Binding="{Binding ID}"/>
                         <DataGridTextColumn Header="名称" Binding="{Binding Name}"/>
-                        <DataGridTextColumn Header="数值" Binding="{Binding Value}"/>
-                        <DataGridTextColumn Header="指令" Binding="{Binding Command}"/>
+                        <DataGridTemplateColumn Header="数值" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <!-- 给TextBlock绑定双击事件 -->
+                                    <TextBlock Text="{Binding Value}"
+                                               Background="LightSkyBlue"  />
+                                    <!-- 鼠标悬浮显示手型，提升体验 -->
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="指令" Binding="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <!-- 第五列：按钮列 -->
                         <DataGridTemplateColumn Header="写" Width="100">
                             <DataGridTemplateColumn.CellTemplate>

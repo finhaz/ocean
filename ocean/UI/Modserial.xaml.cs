@@ -18,6 +18,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Data;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ocean.UI
 {
@@ -49,14 +54,21 @@ namespace ocean.UI
 
         public Modbusset mcom { get; set; }
         public CommonRes ucom {  get; set; }
+
+        public Message_modbus zcom { get; set; }
+
         public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string> { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
         public ICommand ButtonCommand { get; }
 
+        // 定义变量记录上一次点击的信息（避免多个TextBlock互相干扰）
+        private DateTime _lastClickTime;
+        private TextBlock _lastClickedTextBlock;
 
         public Modserial()
         {
             mcom = new Modbusset();
             ucom = new CommonRes();
+            zcom=new Message_modbus();
             InitializeComponent();
             this.DataContext = this;
             dataGrodx.DataContext = this;
@@ -74,18 +86,27 @@ namespace ocean.UI
                 // 处理按钮点击逻辑（例如弹出对话框）
                 //MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
                 int addr = Convert.ToInt32(rowView["Addr"]);
+
                 if (!CommonRes.mySerialPort.IsOpen)
                 {
                     MessageBox.Show("请打开串口！");
                     return;
                 }
-                ucom.runstop_cotnrol(addr, true);
+                //ucom.runstop_cotnrol(addr, true);
+                try
+                {
+                    int anum = Convert.ToInt32(rowView["Command"]);
+                    zcom.Monitor_Set_06(addr, anum);
+                    CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+                }
+                catch
+                {
+                    MessageBox.Show("输入命令不能为空！");
+                }
+                             
+
+
             }
-
-
-            
-            
-            
 
         }
 
@@ -100,6 +121,7 @@ namespace ocean.UI
                 // 创建新行并赋值
                 DataRow newRow = mcom.dtm.NewRow();
                 newRow["ID"] = mcom.dtm.Rows.Count + 1;
+                newRow["Value"] = radd;
                 newRow["SelectedOption"] = mcom.kind_num;
                 newRow["Addr"] = radd;
                 newRow["Number"] = 1;
@@ -146,6 +168,47 @@ namespace ocean.UI
                 MessageBox.Show("请指定行！");
             }
         }
+
+
+
+        private void DataGrodx_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // 1. 查找点击的单元格（核心：通过可视化树找DataGridCell）
+            var cell = FindVisualParent<DataGridCell>(e.OriginalSource as DependencyObject);
+            if (cell == null) return;
+
+            // 2. 判断是否是数值列
+            if (cell.Column.Header.ToString() == "数值")
+            {
+                // 3. 提取数值
+                var rowView = cell.DataContext as DataRowView;
+                if (rowView != null)
+                {
+                    object value = rowView["Value"];
+                    value = value == DBNull.Value ? "空值" : value;
+                    MessageBox.Show($"当前数值：{value}", "数值详情");
+                    int addr = Convert.ToInt32(rowView["Addr"]);
+                    zcom.Monitor_Get_03(addr, 1);
+                    CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+
+                }
+            }
+        }
+
+        // 辅助方法：向上查找可视化树中的指定类型元素（必须有这个方法！）
+        private T FindVisualParent<T>(DependencyObject obj) where T : DependencyObject
+        {
+            while (obj != null)
+            {
+                if (obj is T target)
+                {
+                    return target;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            return null;
+        }
+
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
