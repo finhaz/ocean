@@ -108,7 +108,7 @@
                     </TabItem>
                 </TabControl>
 
-                <TextBox TextWrapping="Wrap" Name="show_text" Grid.Row="2" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2" Text="{Binding ucom.textmain.Text,Mode=TwoWay}"></TextBox>
+                <TextBox TextWrapping="Wrap" Name="show_text"  Grid.Row="2" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2" Text="{Binding ucom.textmain.Text,Mode=TwoWay}"></TextBox>
 
             </Grid>
 

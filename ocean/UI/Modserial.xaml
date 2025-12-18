@@ -127,6 +127,10 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabControl>
+            <TextBox TextWrapping="Wrap" Name="show_text"  
+          Grid.Column="2"
+          Grid.Row="3" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2" Text="{Binding mcom.BoxStr,Mode=TwoWay}"></TextBox>
         </Grid>
+       
     </Grid>
 </Page>

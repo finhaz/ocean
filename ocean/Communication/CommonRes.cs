@@ -25,6 +25,7 @@ namespace ocean
         public static DataTable dt1 = new DataTable();
         public static DataTable dt2 = new DataTable();
         public static DataTable dt3 = new DataTable();
+        public static int Protocol_num { get; set; } 
 
         //控件绑定相关
         public TextBox textmain { get; set; }
@@ -69,7 +70,7 @@ namespace ocean
         public int mrow;
         public int Num_time = 0;
         public int Num_DSP = 0;
-        public int Protocol_num = 1;
+        
         static int Set_Num_DSP = 2;//代表有机子数
 
 
@@ -107,6 +108,8 @@ namespace ocean
             dtset = CommonRes.dt2;
 
             dtfactor = CommonRes.dt3;
+
+            Protocol_num = 1;
 
             //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
 
@@ -465,8 +468,5 @@ namespace ocean
                 MessageBox.Show("打开串口！");
             }
         }
-
-
-
     }
 }

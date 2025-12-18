@@ -119,9 +119,9 @@ namespace ocean.UI
         {   
             switch (cbProcho.SelectedIndex)
             {
-                case 0: ucom.Protocol_num = 0; break;
-                case 1: ucom.Protocol_num = 1; break;
-                default: ucom.Protocol_num = 0; break;
+                case 0: CommonRes.Protocol_num = 0; break;
+                case 1: CommonRes.Protocol_num = 1; break;
+                default: CommonRes.Protocol_num = 0; break;
             }                 
         }
 

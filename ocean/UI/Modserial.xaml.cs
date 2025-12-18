@@ -53,8 +53,6 @@ namespace ocean.UI
     {
 
         public Modbusset mcom { get; set; }
-        public CommonRes ucom {  get; set; }
-
         public Message_modbus zcom { get; set; }
 
         public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string> { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
@@ -67,7 +65,6 @@ namespace ocean.UI
         public Modserial()
         {
             mcom = new Modbusset();
-            ucom = new CommonRes();
             zcom=new Message_modbus();
             InitializeComponent();
             this.DataContext = this;
@@ -212,7 +209,7 @@ namespace ocean.UI
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
+            CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mcom.mySerialPort_DataReceived);
         }
 
     }
