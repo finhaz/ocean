@@ -56,16 +56,15 @@
                 <TextBox Text="参数名" Grid.Row="0"></TextBox>
                 <TextBox Text="数值" Grid.Row="0" Grid.Column="1"></TextBox>
                 <TextBox Text="数据条数" Grid.Row="1"></TextBox>
-                <TextBox Text="1" Grid.Row="1" Grid.Column="1"></TextBox>
+                <TextBox Text="{Binding mcom.snum, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"></TextBox>
                 <TextBox Text="类型" Grid.Row="2"></TextBox>
-                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="2" Grid.Column="1"  Margin="0,1,0,1" Grid.ColumnSpan="2" SelectionChanged="cbProcho_SelectionChanged">
-                    <ComboBoxItem >线圈状态(RW)</ComboBoxItem>
-                    <ComboBoxItem >离散输入(RO)</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">保持寄存器(RW)</ComboBoxItem>
-                    <ComboBoxItem >输入寄存器(RO)</ComboBoxItem>
-                </ComboBox>
+                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="2" Grid.Column="1"  Margin="0,1,0,1" 
+                          Grid.ColumnSpan="2" 
+                          SelectionChanged="cbProcho_SelectionChanged" 
+                          ItemsSource="{Binding Options}"
+                          SelectedItem="{Binding mcom.dSelectedOption, Mode=TwoWay}"/>
                 <TextBox Text="起始地址" Grid.Row="3"></TextBox>
-                <TextBox Text="{Binding mcom.sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"></TextBox>
+                <TextBox Text="{Binding mcom.Sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"></TextBox>
                 <Button Content="确定" Grid.Row="5" Grid.Column="0" Click="setsure_click" ></Button>
                 <Button Content="取消" Grid.Row="5" Grid.Column="1" Click="setcancel_click" ></Button>
             </Grid>
@@ -78,10 +77,10 @@
                 <RowDefinition Height="20*"/>
             </Grid.RowDefinitions>
             <TabControl>
-                <DataGrid x:Name="dataGrodx" 
+                <DataGrid x:Name="dataGrodx"
                                 ItemsSource="{Binding mcom.dtm, Mode=TwoWay}"
                                 AutoGenerateColumns="False"
-                                CanUserAddRows="True">
+                          CanUserAddRows="False" >
                     <DataGrid.Columns>
                         <!-- 前四列：普通文本 -->
                         <DataGridTextColumn Header="序号" Binding="{Binding ID}"/>
@@ -101,8 +100,16 @@
                         <DataGridTextColumn Header="单位" Binding="{Binding Unit}"/>
                         <DataGridTextColumn Header="范围" Binding="{Binding Rangle}"/>
                         <!-- ：选择框列 -->
-                        <DataGridCheckBoxColumn Header="区块" 
-                                Binding="{Binding IsSelected, Mode=TwoWay}"/>
+                        <DataGridTemplateColumn Header="区块" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox FontSize="10" 
+                                              SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                              ItemsSource="{Binding ElementName=dataGrodx, Path=DataContext.Options}" />
+                                    <!-- 若选项是对象，需指定显示字段 -->
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
                         <DataGridTextColumn Header="数量" Binding="{Binding Number}"/>
                         <DataGridTextColumn Header="偏移" Binding="{Binding NOffSet}"/>

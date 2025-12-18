@@ -1,6 +1,7 @@
 ﻿using ocean.Communication;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -21,31 +22,74 @@ namespace ocean.UI
     /// <summary>
     /// Modserial.xaml 的交互逻辑
     /// </summary>
+    /// 
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            _execute = execute;
+            _canExecute = canExecute;
+        }
+
+        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+        public void Execute(object parameter) => _execute(parameter);
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+    }
     public partial class Modserial
     {
 
         public Modbusset mcom { get; set; }
-        public int a = 1;
+        public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string> { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
+        public ICommand ButtonCommand { get; }
+
+
         public Modserial()
         {
             mcom = new Modbusset();
             InitializeComponent();
-            
+            this.DataContext = this;
+            dataGrodx.DataContext = this;
+            // 初始化命令
+            ButtonCommand = new RelayCommand(OnButtonClick);
+ 
         }
 
+        private void OnButtonClick(object parameter)
+        {
+            if (parameter is DataRowView rowView)
+            {
+                // 处理按钮点击逻辑（例如弹出对话框）
+                MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
+            }
+        }
 
 
         private void setsure_click(object sender, RoutedEventArgs e)
         {
             Setadd.Visibility = Visibility.Collapsed;
-            // 创建新行并赋值
-            DataRow newRow = mcom.dtm.NewRow();
-            int radd = Int32.Parse(mcom.sadd);
-            newRow["ID"] = a;
-            //newRow["区块"] = mcom.kind_num;
-            newRow["Addr"] = radd;
-            a = a + 1;
-            mcom.dtm.Rows.Add(newRow);
+            int radd = Int32.Parse(mcom.Sadd);
+            int rsnum = Int32.Parse(mcom.snum);
+            int i = 0;
+            for (i = 0; i < rsnum; i++) {
+                // 创建新行并赋值
+                DataRow newRow = mcom.dtm.NewRow();
+                newRow["ID"] = mcom.dtm.Rows.Count + 1;
+                newRow["SelectedOption"] = mcom.kind_num;
+                newRow["Addr"] = radd;
+                newRow["Number"] = 1;
+                newRow["NOffSet"] = 0;
+                newRow["NBit"] = 16;
+                mcom.dtm.Rows.Add(newRow);
+                radd = radd + 1;
+            }
+            mcom.Sadd = Convert.ToString(radd);
         }
 
         private void setcancel_click(object sender, RoutedEventArgs e)
