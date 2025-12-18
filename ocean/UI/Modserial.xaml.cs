@@ -1,9 +1,11 @@
 ﻿using ocean.Communication;
+using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,6 +48,7 @@ namespace ocean.UI
     {
 
         public Modbusset mcom { get; set; }
+        public CommonRes ucom {  get; set; }
         public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string> { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
         public ICommand ButtonCommand { get; }
 
@@ -53,6 +56,7 @@ namespace ocean.UI
         public Modserial()
         {
             mcom = new Modbusset();
+            ucom = new CommonRes();
             InitializeComponent();
             this.DataContext = this;
             dataGrodx.DataContext = this;
@@ -63,11 +67,26 @@ namespace ocean.UI
 
         private void OnButtonClick(object parameter)
         {
+            
+
             if (parameter is DataRowView rowView)
             {
                 // 处理按钮点击逻辑（例如弹出对话框）
-                MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
+                //MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
+                int addr = Convert.ToInt32(rowView["Addr"]);
+                if (!CommonRes.mySerialPort.IsOpen)
+                {
+                    MessageBox.Show("请打开串口！");
+                    return;
+                }
+                ucom.runstop_cotnrol(addr, true);
             }
+
+
+            
+            
+            
+
         }
 
 
@@ -126,6 +145,11 @@ namespace ocean.UI
             {
                 MessageBox.Show("请指定行！");
             }
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
         }
 
     }

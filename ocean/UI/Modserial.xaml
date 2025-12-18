@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:ocean.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Modserial">
+      Title="Modserial" Unloaded="Page_Unloaded">
 
     <Grid>
         <Grid.ColumnDefinitions>
