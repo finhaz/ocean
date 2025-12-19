@@ -54,20 +54,25 @@
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
-                <TextBox Text="参数名" Grid.Row="0"></TextBox>
-                <TextBox Text="数值" Grid.Row="0" Grid.Column="1"></TextBox>
+                <TextBox Text="参数名" 
+                         Grid.Row="0" />
+                <TextBox Text="数值" Grid.Row="0" 
+                         Grid.Column="1" />
                 <TextBox Text="数据条数" Grid.Row="1"></TextBox>
-                <TextBox Text="{Binding mcom.snum, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"></TextBox>
+                <TextBox Text="{Binding ModbusSet.Snum, Mode=TwoWay}" 
+                         Grid.Row="1" Grid.Column="1"></TextBox>
                 <TextBox Text="类型" Grid.Row="2"></TextBox>
                 <ComboBox Name="cbProcho" FontSize="10" Grid.Row="2" Grid.Column="1"  Margin="0,1,0,1" 
                           Grid.ColumnSpan="2" 
                           SelectionChanged="cbProcho_SelectionChanged" 
-                          ItemsSource="{Binding Options}"
-                          SelectedItem="{Binding mcom.dSelectedOption, Mode=TwoWay}"/>
+                          ItemsSource="{Binding ModbusSet.Options}"
+                          SelectedItem="{Binding ModbusSet.DSelectedOption, Mode=TwoWay}"/>
                 <TextBox Text="起始地址" Grid.Row="3"></TextBox>
-                <TextBox Text="{Binding mcom.Sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"></TextBox>
-                <Button Content="确定" Grid.Row="5" Grid.Column="0" Click="setsure_click" ></Button>
-                <Button Content="取消" Grid.Row="5" Grid.Column="1" Click="setcancel_click" ></Button>
+                <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"></TextBox>
+                <Button Content="确定" Grid.Row="5" Grid.Column="0" 
+                        Click="setsure_click" ></Button>
+                <Button Content="取消" Grid.Row="5" Grid.Column="1" 
+                        Click="setcancel_click" ></Button>
             </Grid>
         </Grid>
 
@@ -79,7 +84,7 @@
             </Grid.RowDefinitions>
             <TabControl>
                 <DataGrid x:Name="dataGrodx"
-                                ItemsSource="{Binding mcom.dtm, Mode=TwoWay}"
+                                ItemsSource="{Binding ModbusSet.dtm, Mode=TwoWay}"
                                 AutoGenerateColumns="False"
                           CanUserAddRows="False" 
                           MouseDoubleClick="DataGrodx_MouseDoubleClick">
@@ -103,7 +108,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Button Content="写" 
-                            Command="{Binding DataContext.ButtonCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                            Command="{Binding ButtonCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                             CommandParameter="{Binding}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -116,7 +121,8 @@
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
                                               SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
-                                              ItemsSource="{Binding ElementName=dataGrodx, Path=DataContext.Options}" />
+                                              ItemsSource="{Binding DataContext.ModbusSet.Options, 
+                          RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                                     <!-- 若选项是对象，需指定显示字段 -->
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -135,7 +141,7 @@
                      Margin="3,0,0,0" 
                      AcceptsReturn="True" 
                      Grid.RowSpan="2" 
-                     Text="{Binding mcom.BoxStr,Mode=TwoWay}"
+                     Text="{Binding ModbusSet.BoxStr,Mode=TwoWay}"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                      TextChanged="ShowText_TextChanged">
             </TextBox>

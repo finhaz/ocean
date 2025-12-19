@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ocean.Mvvm;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel;
 using System.Data;
@@ -8,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using ocean.Mvvm;
 
 namespace ocean.Communication
 
@@ -19,14 +20,8 @@ namespace ocean.Communication
     
         public Modbusset()
         {
-
-
-            dtm = dt1.Clone(); // 仅复制结构，不复制数据
-            Sadd = "0";
-            snum = "1";
-            dSelectedOption = "保持寄存器(RW)";
+            dtm = dt1.Copy(); 
             zcom = new Message_modbus();
-
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
         }
 
@@ -63,20 +58,42 @@ namespace ocean.Communication
             set => SetProperty(ref _kindNum, value); // 一行搞定，无需重复逻辑
         }
 
+        private string _snum = "1";
+        public string Snum
+        {
+            get => _snum;
+            set => SetProperty(ref _snum, value);
+        }
+
+        private string _dSelectedOption = "保持寄存器(RW)";
+        public string DSelectedOption
+        {
+            get => _dSelectedOption;
+            set => SetProperty(ref _dSelectedOption, value);
+        }
+
+        private int _readpos;
+        public int Readpos
+        {
+            get => _readpos;
+            set => SetProperty(ref _readpos, value);
+        }
+
+        public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string>
+        { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
+
 
         //针对数据协议：
         byte[] gbuffer = new byte[4096];
         int gb_index = 0;//缓冲区注入位置
         int get_index = 0;// 缓冲区捕捉位置
 
-        public string snum { get; set; }
-        public string dSelectedOption { get; set; }
         public static DataTable dt1 = new DataTable();
         public DataTable dtm { get; set; }
 
-        public int readpos = 0;
 
         public Message_modbus zcom { get; set; }
+
         static Modbusset()
         {
             dt1.Columns.Add("ID", typeof(int));
@@ -145,7 +162,7 @@ namespace ocean.Communication
                 {
                     if (dtm.Rows.Count > 0)
                     {
-                        dtm.Rows[readpos - 1]["Value"] = temp_Value;
+                        dtm.Rows[Readpos - 1]["Value"] = temp_Value;
                     }
                 }
             }
