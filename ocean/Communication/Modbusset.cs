@@ -148,7 +148,7 @@ namespace ocean.Communication
                 temp_Value =Monitor_Solve(buffer);
                 if (dtm.Rows.Count > 0)
                 {
-                    dtm.Rows[readpos + 1]["Value"] = temp_Value;
+                    dtm.Rows[readpos-1]["Value"] = temp_Value;
                 }
             }
             else
@@ -163,8 +163,8 @@ namespace ocean.Communication
             int Value = 0;
             if (buffer[1]==3)
             {
-                byte[] typeBytes = new byte[2];
-                Array.Copy(buffer, 2, typeBytes, 0, 2);
+                byte[] typeBytes = new byte[buffer[2]];
+                Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
                 Array.Reverse(typeBytes);
                 Value = BitConverter.ToInt16(typeBytes, 0);
             }

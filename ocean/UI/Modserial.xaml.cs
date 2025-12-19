@@ -1,8 +1,10 @@
-﻿using ocean.Communication;
+﻿using Microsoft.Xaml.Behaviors;
+using ocean.Communication;
 using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Data;
 using System.Data.Common;
 using System.IO.Ports;
@@ -10,19 +12,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Data;
+using Microsoft.Xaml.Behaviors;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ocean.UI
 {
@@ -49,6 +53,51 @@ namespace ocean.UI
             remove => CommandManager.RequerySuggested -= value;
         }
     }
+
+
+    public class TextBoxAutoScrollBehavior : Behavior<TextBox>
+    {
+        // 可选：定义是否滚动到顶部的属性（默认滚动到顶部）
+        public bool ScrollToTop
+        {
+            get { return (bool)GetValue(ScrollToTopProperty); }
+            set { SetValue(ScrollToTopProperty, value); }
+        }
+
+        public static readonly DependencyProperty ScrollToTopProperty =
+            DependencyProperty.Register("ScrollToTop", typeof(bool), typeof(TextBoxAutoScrollBehavior), new PropertyMetadata(true));
+
+        // 附加到TextBox时
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            AssociatedObject.TextChanged += OnTextChanged;
+        }
+
+        // 从TextBox分离时
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            AssociatedObject.TextChanged -= OnTextChanged;
+        }
+
+        // 文本变化时滚动
+        private void OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (AssociatedObject == null) return;
+
+            if (ScrollToTop)
+            {
+                AssociatedObject.ScrollToHome(); // 滚动到顶部
+            }
+            else
+            {
+                AssociatedObject.ScrollToEnd(); // 滚动到底部
+            }
+        }
+    }
+
+
     public partial class Modserial
     {
 
