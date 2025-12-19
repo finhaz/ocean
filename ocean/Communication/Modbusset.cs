@@ -91,7 +91,7 @@ namespace ocean.Communication
 
             dtm = dt1;
             kind_num = "保持寄存器(RW)";
-            Sadd = "1";
+            Sadd = "0";
             snum = "1";
             dSelectedOption = "保持寄存器(RW)";
             zcom = new Message_modbus();
@@ -146,9 +146,12 @@ namespace ocean.Communication
             {
                 Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
                 temp_Value =Monitor_Solve(buffer);
-                if (dtm.Rows.Count > 0)
+                if (buffer[1] == 3)
                 {
-                    dtm.Rows[readpos-1]["Value"] = temp_Value;
+                    if (dtm.Rows.Count > 0)
+                    {
+                        dtm.Rows[readpos - 1]["Value"] = temp_Value;
+                    }
                 }
             }
             else

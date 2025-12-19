@@ -3,8 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-      xmlns:local="clr-namespace:ocean.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Modserial" Unloaded="Page_Unloaded">
@@ -41,6 +39,8 @@
             </Grid.RowDefinitions>
             <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
             <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
+            <Button Content="导出配置" Grid.Row="3" Grid.ColumnSpan="2" Click="ExportConfig_Click"/>
+            <Button Content="导入配置" Grid.Row="4" Grid.ColumnSpan="2" Click="ImportConfig_Click"/>
             <Grid Name="Setadd" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20*"/>
@@ -135,11 +135,9 @@
                      Margin="3,0,0,0" 
                      AcceptsReturn="True" 
                      Grid.RowSpan="2" 
-                     Text="{Binding mcom.BoxStr,Mode=TwoWay}">
-                <!-- 添加自动滚动行为 -->
-                <i:Interaction.Behaviors>
-                    <local:TextBoxAutoScrollBehavior ScrollToTop="True"/>
-                </i:Interaction.Behaviors>
+                     Text="{Binding mcom.BoxStr,Mode=TwoWay}"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     TextChanged="ShowText_TextChanged">
             </TextBox>
         </Grid>
        

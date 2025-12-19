@@ -1,4 +1,6 @@
-﻿using Microsoft.Xaml.Behaviors;
+﻿using Microsoft.Win32;
+using Microsoft.Xaml.Behaviors;
+using Microsoft.Xaml.Behaviors;
 using ocean.Communication;
 using ocean.Mvvm;
 using System;
@@ -13,6 +15,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,9 +28,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Xaml.Behaviors;
-using System.Windows;
-using System.Windows.Controls;
+using System.Xml;
+using Newtonsoft.Json; // 必须添加，否则JsonConvert识别不到
+using System.IO; // 操作文件的核心命名空间
 
 namespace ocean.UI
 {
@@ -54,48 +58,6 @@ namespace ocean.UI
         }
     }
 
-
-    public class TextBoxAutoScrollBehavior : Behavior<TextBox>
-    {
-        // 可选：定义是否滚动到顶部的属性（默认滚动到顶部）
-        public bool ScrollToTop
-        {
-            get { return (bool)GetValue(ScrollToTopProperty); }
-            set { SetValue(ScrollToTopProperty, value); }
-        }
-
-        public static readonly DependencyProperty ScrollToTopProperty =
-            DependencyProperty.Register("ScrollToTop", typeof(bool), typeof(TextBoxAutoScrollBehavior), new PropertyMetadata(true));
-
-        // 附加到TextBox时
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            AssociatedObject.TextChanged += OnTextChanged;
-        }
-
-        // 从TextBox分离时
-        protected override void OnDetaching()
-        {
-            base.OnDetaching();
-            AssociatedObject.TextChanged -= OnTextChanged;
-        }
-
-        // 文本变化时滚动
-        private void OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (AssociatedObject == null) return;
-
-            if (ScrollToTop)
-            {
-                AssociatedObject.ScrollToHome(); // 滚动到顶部
-            }
-            else
-            {
-                AssociatedObject.ScrollToEnd(); // 滚动到底部
-            }
-        }
-    }
 
 
     public partial class Modserial
@@ -260,5 +222,96 @@ namespace ocean.UI
             CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mcom.mySerialPort_DataReceived);
         }
 
+        private void ShowText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+
+            // 滚动到内容末尾（常用）
+            textBox.ScrollToEnd();
+
+            // 可选：滚动到顶部
+            // textBox.ScrollToHome();
+
+            // 可选：滚动到水平末尾
+            // textBox.ScrollToRightEnd();
+        }
+
+        private void ExportConfig_Click(object sender, RoutedEventArgs e)
+        {
+            // 打开保存文件对话框
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                Title = "导出Modbus配置",
+                FileName = $"ModbusConfig_{DateTime.Now:yyyyMMddHHmmss}.json"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    //// 方式1：如果是ObservableCollection<ModbusConfigItem>
+                    //var configList = mcom.dtm.ToList();
+                    //string json = JsonConvert.SerializeObject(configList, Formatting.Indented);
+
+                    // 方式2：如果是DataTable
+                    string json = JsonConvert.SerializeObject(mcom.dtm, Newtonsoft.Json.Formatting.Indented);
+
+                    // 写入文件
+                    File.WriteAllText(saveFileDialog.FileName, json);
+                    MessageBox.Show("导出成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"导出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void ImportConfig_Click(object sender, RoutedEventArgs e)
+        {
+            // 打开文件选择对话框
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                Title = "导入Modbus配置"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    string json = File.ReadAllText(openFileDialog.FileName);
+
+                    //// 方式1：如果是ObservableCollection<ModbusConfigItem>
+                    //var configList = JsonConvert.DeserializeObject<List<ModbusConfigItem>>(json);
+                    //mcom.dtm.Clear(); // 清空原有数据
+                    //foreach (var item in configList)
+                    //{
+                    //    mcom.dtm.Add(item);
+                    //}
+
+                    //方式2：如果是DataTable
+                    DataTable importedDt = JsonConvert.DeserializeObject<DataTable>(json);
+                    mcom.dtm.Clear();
+                    foreach (DataRow row in importedDt.Rows)
+                    {
+                         mcom.dtm.ImportRow(row);
+                    }
+
+                    MessageBox.Show("导入成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"导入失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
     }
+
+
+
+
 }
