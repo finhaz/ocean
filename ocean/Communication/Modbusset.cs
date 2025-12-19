@@ -8,20 +8,32 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ocean.Mvvm;
 
 namespace ocean.Communication
 
 {
-    public class Modbusset : INotifyPropertyChanged
+    public class Modbusset : ObservableObject
     {
+
+    
+        public Modbusset()
+        {
+
+
+            dtm = dt1.Clone(); // 仅复制结构，不复制数据
+            Sadd = "0";
+            snum = "1";
+            dSelectedOption = "保持寄存器(RW)";
+            zcom = new Message_modbus();
+
+            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+        }
+
+
         // 1. 声明属性变更事件
         public event PropertyChangedEventHandler PropertyChanged;
-        //针对数据协议：
-        byte[] gbuffer = new byte[4096];
-        int gb_index = 0;//缓冲区注入位置
-        int get_index = 0;// 缓冲区捕捉位置
 
-        
 
         // 2. 触发事件的方法（供属性的set调用）
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -34,32 +46,29 @@ namespace ocean.Communication
         public string Sadd // 推荐帕斯卡命名法（首字母大写），XAML绑定可兼容小写（但建议统一）
         {
             get => _sadd;
-            set
-            {
-                if (_sadd != value)
-                {
-                    _sadd = value;
-                    OnPropertyChanged(); // 关键：值变化时触发通知，UI会同步更新
-                }
-            }
+            set => SetProperty(ref _sadd, value); // 一行搞定，无需重复逻辑
         }
+
         private string _boxStr = string.Empty;
         public string BoxStr
         {
             get => _boxStr;
-            set
-            {
-                if (_boxStr != value)
-                {
-                    _boxStr = value;
-                    // 触发事件，通知UI更新
-                    OnPropertyChanged(nameof(BoxStr));
-                }
-            }
+            set => SetProperty(ref _boxStr, value); // 一行搞定，无需重复逻辑
+        }
+
+        private string _kindNum = "保持寄存器(RW)";
+        public string KindNum
+        {
+            get => _kindNum;
+            set => SetProperty(ref _kindNum, value); // 一行搞定，无需重复逻辑
         }
 
 
-        public string kind_num ;
+        //针对数据协议：
+        byte[] gbuffer = new byte[4096];
+        int gb_index = 0;//缓冲区注入位置
+        int get_index = 0;// 缓冲区捕捉位置
+
         public string snum { get; set; }
         public string dSelectedOption { get; set; }
         public static DataTable dt1 = new DataTable();
@@ -81,23 +90,9 @@ namespace ocean.Communication
             dt1.Columns.Add("Addr", typeof(int));
             dt1.Columns.Add("Number", typeof(int));
             dt1.Columns.Add("NOffSet", typeof(int));
-            dt1.Columns.Add("NBit", typeof(int));
-
-            
+            dt1.Columns.Add("NBit", typeof(int));        
         }
 
-        public Modbusset() 
-        {
-
-            dtm = dt1;
-            kind_num = "保持寄存器(RW)";
-            Sadd = "0";
-            snum = "1";
-            dSelectedOption = "保持寄存器(RW)";
-            zcom = new Message_modbus();
-
-            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
-        }
 
 
         public void mySerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)

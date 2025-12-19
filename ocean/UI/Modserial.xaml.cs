@@ -129,7 +129,7 @@ namespace ocean.UI
                 DataRow newRow = mcom.dtm.NewRow();
                 newRow["ID"] = mcom.dtm.Rows.Count + 1;
                 newRow["Value"] = radd;
-                newRow["SelectedOption"] = mcom.kind_num;
+                newRow["SelectedOption"] = mcom.KindNum;
                 newRow["Addr"] = radd;
                 newRow["Number"] = 1;
                 newRow["NOffSet"] = 0;
@@ -150,11 +150,11 @@ namespace ocean.UI
             switch (cbProcho.SelectedIndex)
             {
                 
-                case 0: mcom.kind_num = "线圈状态(RW)"; break;
-                case 1: mcom.kind_num = "离散输入(RO)"; break;
-                case 2: mcom.kind_num = "保持寄存器(RW)"; break;
-                case 3: mcom.kind_num = "输入寄存器(RO)"; break;
-                default: mcom.kind_num = "保持寄存器(RW)"; break;
+                case 0: mcom.KindNum = "线圈状态(RW)"; break;
+                case 1: mcom.KindNum = "离散输入(RO)"; break;
+                case 2: mcom.KindNum = "保持寄存器(RW)"; break;
+                case 3: mcom.KindNum = "输入寄存器(RO)"; break;
+                default: mcom.KindNum = "保持寄存器(RW)"; break;
                 
             }
         }

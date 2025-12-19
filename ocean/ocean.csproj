@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Communication\新文件夹\**" />
+    <EmbeddedResource Remove="Communication\新文件夹\**" />
+    <None Remove="Communication\新文件夹\**" />
+    <Page Remove="Communication\新文件夹\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\closeBtn_default.png" />
     <None Remove="Assets\closeBtn_MouseOver.png" />
     <None Remove="Assets\img_background.png" />

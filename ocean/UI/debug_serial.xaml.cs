@@ -25,12 +25,8 @@ namespace ocean.UI
     {
         public Debugsera tcom { get; set; }
 
-
-
         public debug_serial()
         {
-           
-
             InitializeComponent();
 
             tcom = new Debugsera();
