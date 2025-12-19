@@ -38,50 +38,17 @@ namespace ocean.UI
     /// Modserial.xaml 的交互逻辑
     /// </summary>
     /// 
-    public class RelayCommand : ICommand
-    {
-        private readonly Action<object> _execute;
-        private readonly Predicate<object> _canExecute;
-
-        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
-        {
-            _execute = execute;
-            _canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
-        public void Execute(object parameter) => _execute(parameter);
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-    }
-
-
 
     public partial class Modserial
     {
-
-        //public Modbusset mcom { get; set; }
         private AppViewModel _globalVM = AppViewModel.Instance;
-
         public ICommand ButtonCommand { get; }
-
-        // 定义变量记录上一次点击的信息（避免多个TextBlock互相干扰）
-        private DateTime _lastClickTime;
-        private TextBlock _lastClickedTextBlock;
 
         public Modserial()
         {
-            //mcom = new Modbusset();
 
             InitializeComponent();
-
             DataContext = _globalVM;
-
-            //this.DataContext = this;
-            //dataGrodx.DataContext = this;
             // 初始化命令
             ButtonCommand = new RelayCommand(OnButtonClick);
  
@@ -101,7 +68,6 @@ namespace ocean.UI
                     MessageBox.Show("请打开串口！");
                     return;
                 }
-                //ucom.runstop_cotnrol(addr, true);
                 try
                 {
                     int anum = Convert.ToInt32(rowView["Command"]);
@@ -216,10 +182,7 @@ namespace ocean.UI
         }
 
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(AppViewModel.Instance.ModbusSet.mySerialPort_DataReceived);
-        }
+
 
         private void ShowText_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -308,6 +271,28 @@ namespace ocean.UI
             }
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 将Modbusset的HandleSerialData方法注册为当前活跃处理者
+            CommonRes.CurrentDataHandler = _globalVM.ModbusSet.HandleSerialData;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            // 仅当当前处理者是本Page的Modbusset时，才取消
+            if (CommonRes.CurrentDataHandler == _globalVM.ModbusSet.HandleSerialData)
+            {
+                CommonRes.CurrentDataHandler = null;
+            }
+            // 释放Modbusset资源
+            _globalVM.ModbusSet.Dispose();
+        }
+
+        // 释放资源
+        public void Dispose()
+        {
+            Page_Unloaded(null, null);
+        }
     }
 
 

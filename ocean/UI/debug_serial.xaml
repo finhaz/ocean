@@ -48,7 +48,14 @@
                     <ComboBox Name="cbBaudRate" FontSize="10" Grid.Column="1" Grid.Row="2" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbBaudRate.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbBaudRate.Text, Mode=TwoWay}" IsEnabled="{Binding tcom.cbBaudRate.IsEnabled,Mode=TwoWay}"/>
                     <ComboBox Name="cbParity" FontSize="10" Grid.Column="1" Grid.Row="3" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbParity.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbParity.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbParity.IsEnabled,Mode=TwoWay}"/>
                     <ComboBox Name="cbDataBits" FontSize="10" Grid.Column="1" Grid.Row="4" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbDataBits.ItemsSource, Mode=TwoWay}" Text="{Binding tcom.cbDataBits.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbDataBits.IsEnabled,Mode=TwoWay}"/>
-                    <ComboBox Name="cbStopBits" FontSize="10" Grid.Column="1" Grid.Row="5" Margin="2,1,10,1" ItemsSource="{Binding tcom.cbStopBits.ItemsSource,Mode=TwoWay}" Text="{Binding tcom.cbStopBits.Text,Mode=TwoWay}" IsEnabled="{Binding tcom.cbStopBits.IsEnabled,Mode=TwoWay}"/>
+
+                    <!-- 停止位ComboBox：ItemsSource绑定到StopBitValues -->
+                    <ComboBox Name="cbStopBits" 
+                    Grid.Column="1" Grid.Row="5" 
+                    Margin="2,1,10,1" FontSize="10"
+                    ItemsSource="{Binding SerialConfig.StopBitValues, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.SelectedStopBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/> 
                     <Ellipse Name="comState" Style="{Binding tcom.comState.Style, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"
                              Width="20" Margin="15,8,0,7"/>
                     <Button Name="btOpenCom" Content="{Binding tcom.btOpenCom.Content,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"

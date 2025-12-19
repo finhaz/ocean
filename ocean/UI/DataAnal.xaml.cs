@@ -31,11 +31,13 @@ namespace ocean.UI
     /// </summary>
     public partial class DataAnal : Page
     {
-        public CommonRes ucom { get; set; }
+        // 保存委托实例引用，用于卸载时比较
+        private CommonRes.SerialDataReceivedHandler _registeredHandler;
+        public MKlll ucom { get; set; }
 
         public DataAnal()
         {
-            ucom = new CommonRes();
+            ucom = new MKlll();
             InitializeComponent();        
         }
 
@@ -125,7 +127,24 @@ namespace ocean.UI
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
+            //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
+            CommonRes.CurrentDataHandler = _registeredHandler;
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 仅当当前处理者是本Page的MKlll时，才取消
+            if (CommonRes.CurrentDataHandler == _registeredHandler)
+            {
+                CommonRes.CurrentDataHandler = null;
+            }
+            // 释放MKlll资源
+            //_globalVM.MKlll.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Page_Unloaded(null, null);
         }
     }
 }

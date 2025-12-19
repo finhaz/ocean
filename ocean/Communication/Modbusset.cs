@@ -10,33 +10,26 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using System.Data;
+using System.Windows;
 
 namespace ocean.Communication
 
 {
     public class Modbusset : ObservableObject
     {
-
-    
+  
         public Modbusset()
         {
-            dtm = dt1.Copy(); 
+            dtm = new DataTable();
+            AddDataTableColumns(dtm);
+
             zcom = new Message_modbus();
-            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+            //CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
         }
 
-
-        // 1. 声明属性变更事件
-        public event PropertyChangedEventHandler PropertyChanged;
-
-
-        // 2. 触发事件的方法（供属性的set调用）
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        // 3. 将sadd从**字段**改为**私有字段+公共属性**（带通知）
+        // 从**字段**改为**私有字段+公共属性**（带通知）
         private string _sadd = "0"; // 初始值可根据你的业务调整
         public string Sadd // 推荐帕斯卡命名法（首字母大写），XAML绑定可兼容小写（但建议统一）
         {
@@ -88,89 +81,64 @@ namespace ocean.Communication
         int gb_index = 0;//缓冲区注入位置
         int get_index = 0;// 缓冲区捕捉位置
 
-        public static DataTable dt1 = new DataTable();
         public DataTable dtm { get; set; }
 
 
         public Message_modbus zcom { get; set; }
-
-        static Modbusset()
+        // 提取列初始化的通用方法（便于复用，可选）
+        private void AddDataTableColumns(DataTable dt)
         {
-            dt1.Columns.Add("ID", typeof(int));
-            dt1.Columns.Add("Name", typeof(string));
-            dt1.Columns.Add("Value", typeof(double));
-            dt1.Columns.Add("Command", typeof(double));
-            dt1.Columns.Add("IsButtonClicked", typeof(bool));
-            dt1.Columns.Add("Unit", typeof(string));
-            dt1.Columns.Add("Rangle", typeof(string));
-            dt1.Columns.Add("SelectedOption", typeof(string));
-            dt1.Columns.Add("Addr", typeof(int));
-            dt1.Columns.Add("Number", typeof(int));
-            dt1.Columns.Add("NOffSet", typeof(int));
-            dt1.Columns.Add("NBit", typeof(int));        
+            dt.Columns.Add("ID", typeof(int));
+            dt.Columns.Add("Name", typeof(string));
+            dt.Columns.Add("Value", typeof(double));
+            dt.Columns.Add("Command", typeof(double));
+            dt.Columns.Add("IsButtonClicked", typeof(bool));
+            dt.Columns.Add("Unit", typeof(string));
+            dt.Columns.Add("Rangle", typeof(string));
+            dt.Columns.Add("SelectedOption", typeof(string));
+            dt.Columns.Add("Addr", typeof(int));
+            dt.Columns.Add("Number", typeof(int));
+            dt.Columns.Add("NOffSet", typeof(int));
+            dt.Columns.Add("NBit", typeof(int));        
         }
 
 
-
-        public void mySerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        // 核心：业务处理方法（适配CommonRes的委托）
+        public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len, int protocolNum)
         {
             byte[] buffer = new byte[200];
             int i = 0;
-            int buffer_len = 0;
-
             string str = "RX:";
-            int n_dsp = 0;
-            int check_result = 0;
-            int gb_last = gb_index;//记录上次的位置
+            int temp_Value = 0;
 
-            int temp_Value;
-
-            try
-            {
-                if (CommonRes.Protocol_num == 0)
-                {
-                    buffer_len = CommonRes.mySerialPort.Read(gbuffer, 0, gbuffer.Length);
-                }
-                else if (CommonRes.Protocol_num == 1)
-                {
-                    buffer_len = CommonRes.mySerialPort.Read(gbuffer, gb_index, (gbuffer.Length - gb_index));
-                    gb_index = gb_index + buffer_len;
-                    if (gb_index >= gbuffer.Length)
-                        gb_index = gb_index - gbuffer.Length;
-                }
-            }
-            catch
-            {
-                return;
-            }
-
-
+            // 1. 拼接串口数据字符串（原逻辑）
             for (i = 0; i < buffer_len; i++)
             {
                 str += Convert.ToString(gbuffer[(gb_last + i) % gbuffer.Length], 16) + ' ';
             }
             str += '\r';
-            //richTextBox1.Text += str;
-            //output(str);
-            BoxStr += str;
 
-            if(CommonRes.Protocol_num==1)
+            // 2. 跨线程更新UI属性（BoxStr）
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                BoxStr += str;
+            });
+
+            // 3. Modbus协议1的业务处理（原逻辑）
+            if (protocolNum == 1)
             {
                 Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
-                temp_Value =Monitor_Solve(buffer);
-                if (buffer[1] == 3)
+                temp_Value = Monitor_Solve(buffer);
+
+                if (buffer[1] == 3 && dtm.Rows.Count > 0)
                 {
-                    if (dtm.Rows.Count > 0)
+                    // 跨线程更新DataTable（避免UI线程异常）
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
                         dtm.Rows[Readpos - 1]["Value"] = temp_Value;
-                    }
+                    });
                 }
             }
-            else
-            {
-
-            }
-
         }
 
         public int Monitor_Solve(byte[] buffer)
@@ -212,6 +180,11 @@ namespace ocean.Communication
             string txt = "";
             txt = zcom.TX_showstr(zcom.sendbf, send_num);
             BoxStr += txt;
+        }
+
+        public void Dispose()
+        {
+            // 若有其他资源需释放，在此处理
         }
 
     }

@@ -36,6 +36,9 @@ namespace ocean.Mvvm
             set => SetProperty(ref _modbusSet, value);
         }
 
+        // 全局串口配置实例（所有页面共享）
+        public SerialConfigViewModel SerialConfig { get; } = new SerialConfigViewModel();
+
         // 可添加其他全局共享属性（如之前的CommonRes、Debugsera等）
         // private CommonRes _ucom;
         // public CommonRes Ucom { get => _ucom; set => SetProperty(ref _ucom, value); }

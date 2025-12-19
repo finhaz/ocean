@@ -1,5 +1,8 @@
-﻿using System;
+﻿using ocean.Communication;
+using ocean.Mvvm;
+using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,9 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.IO.Ports;
 using System.Windows.Threading;
-using ocean.Communication;
 
 namespace ocean.UI
 {
@@ -23,11 +24,14 @@ namespace ocean.UI
     /// </summary>
     public partial class debug_serial : Page
     {
+        private AppViewModel _globalVM = AppViewModel.Instance;
         public Debugsera tcom { get; set; }
 
         public debug_serial()
         {
             InitializeComponent();
+            // 将Page的DataContext绑定到全局ViewModel
+            //DataContext = _globalVM;
 
             tcom = new Debugsera();
 
