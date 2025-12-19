@@ -64,6 +64,10 @@ namespace ocean.Communication
         public string dSelectedOption { get; set; }
         public static DataTable dt1 = new DataTable();
         public DataTable dtm { get; set; }
+
+        public int readpos = 0;
+
+        public Message_modbus zcom { get; set; }
         static Modbusset()
         {
             dt1.Columns.Add("ID", typeof(int));
@@ -90,6 +94,8 @@ namespace ocean.Communication
             Sadd = "1";
             snum = "1";
             dSelectedOption = "保持寄存器(RW)";
+            zcom = new Message_modbus();
+
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
         }
 
@@ -105,6 +111,7 @@ namespace ocean.Communication
             int check_result = 0;
             int gb_last = gb_index;//记录上次的位置
 
+            int temp_Value;
 
             try
             {
@@ -134,6 +141,53 @@ namespace ocean.Communication
             //richTextBox1.Text += str;
             //output(str);
             BoxStr += str;
+
+            if(CommonRes.Protocol_num==1)
+            {
+                Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
+                temp_Value =Monitor_Solve(buffer);
+                if (dtm.Rows.Count > 0)
+                {
+                    dtm.Rows[readpos + 1]["Value"] = temp_Value;
+                }
+            }
+            else
+            {
+
+            }
+
         }
+
+        public int Monitor_Solve(byte[] buffer)
+        {
+            int Value = 0;
+            if (buffer[1]==3)
+            {
+                byte[] typeBytes = new byte[2];
+                Array.Copy(buffer, 2, typeBytes, 0, 2);
+                Array.Reverse(typeBytes);
+                Value = BitConverter.ToInt16(typeBytes, 0);
+            }
+            else if (buffer[1]==6)
+            {
+
+            }
+            return Value;
+        }
+
+
+        public void Monitor_Get(int addr,int value)
+        {
+            zcom.Monitor_Get_03(addr, value);
+            CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+        }
+
+
+        public void Monitor_Set(int addr,int value)
+        {
+            zcom.Monitor_Set_06(addr, value);
+            CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+        }
+
     }
 }

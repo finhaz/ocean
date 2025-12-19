@@ -121,7 +121,7 @@ namespace ocean.UI
             {
                 case 0: CommonRes.Protocol_num = 0; break;
                 case 1: CommonRes.Protocol_num = 1; break;
-                default: CommonRes.Protocol_num = 0; break;
+                default: CommonRes.Protocol_num = 1; break;
             }                 
         }
 

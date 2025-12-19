@@ -53,7 +53,7 @@ namespace ocean.UI
     {
 
         public Modbusset mcom { get; set; }
-        public Message_modbus zcom { get; set; }
+
 
         public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string> { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
         public ICommand ButtonCommand { get; }
@@ -65,7 +65,7 @@ namespace ocean.UI
         public Modserial()
         {
             mcom = new Modbusset();
-            zcom=new Message_modbus();
+
             InitializeComponent();
             this.DataContext = this;
             dataGrodx.DataContext = this;
@@ -93,8 +93,7 @@ namespace ocean.UI
                 try
                 {
                     int anum = Convert.ToInt32(rowView["Command"]);
-                    zcom.Monitor_Set_06(addr, anum);
-                    CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+                    mcom.Monitor_Set(addr, anum);
                 }
                 catch
                 {
@@ -185,8 +184,8 @@ namespace ocean.UI
                     value = value == DBNull.Value ? "空值" : value;
                     MessageBox.Show($"当前数值：{value}", "数值详情");
                     int addr = Convert.ToInt32(rowView["Addr"]);
-                    zcom.Monitor_Get_03(addr, 1);
-                    CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+                    mcom.Monitor_Get(addr, 1);
+                    mcom.readpos = Convert.ToInt32(rowView["ID"]);
 
                 }
             }
