@@ -136,7 +136,7 @@ namespace ocean.Communication
                 cbStopBits.IsEnabled = false;
 
                 btOpenCom.Content = "关闭串口";
-                //comState.Style = (Style)FindResource("EllipseStyleGreen");
+                comState.Style = (Style)FindResource("EllipseStyleGreen");
             }
 
         }

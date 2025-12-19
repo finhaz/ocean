@@ -32,12 +32,10 @@ namespace ocean.UI
     public partial class DataAnal : Page
     {
         public CommonRes ucom { get; set; }
-        public Dataasera zcom { get; set; }
 
         public DataAnal()
         {
             ucom = new CommonRes();
-            zcom=new Dataasera();
             InitializeComponent();        
         }
 
@@ -57,14 +55,14 @@ namespace ocean.UI
                 MessageBox.Show("请打开串口！");
                 return;
             }
-            int addr = Int32.Parse(zcom.runAddr.Text);
+            int addr = Int32.Parse(ucom.rText);
             ucom.runstop_cotnrol(addr,true);
             textBox1.Text= "系统正在运行";
         }
 
         private void btSTOP_Click(object sender, RoutedEventArgs e)
         {
-            int addr = Int32.Parse(zcom.runAddr.Text);
+            int addr = Int32.Parse(ucom.rText);
             ucom.runstop_cotnrol(addr,false);
             textBox1.Text = "系统停止运行";
            

@@ -181,15 +181,25 @@ namespace ocean.Communication
 
         public void Monitor_Get(int addr,int value)
         {
+            int send_num = 8;
             zcom.Monitor_Get_03(addr, value);
-            CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+            CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
+
+            string txt = "";
+            txt = zcom.TX_showstr(zcom.sendbf, send_num);
+            BoxStr += txt;
         }
 
 
         public void Monitor_Set(int addr,int value)
         {
+            int send_num = 8;
             zcom.Monitor_Set_06(addr, value);
-            CommonRes.mySerialPort.Write(zcom.sendbf, 0, 8);
+            CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
+
+            string txt = "";
+            txt = zcom.TX_showstr(zcom.sendbf, send_num);
+            BoxStr += txt;
         }
 
     }

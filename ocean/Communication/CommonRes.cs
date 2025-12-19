@@ -27,6 +27,8 @@ namespace ocean
         public static DataTable dt3 = new DataTable();
         public static int Protocol_num { get; set; } 
 
+        public string rText {  get; set; }
+
         //控件绑定相关
         public TextBox textmain { get; set; }
 
@@ -110,6 +112,8 @@ namespace ocean
             dtfactor = CommonRes.dt3;
 
             Protocol_num = 1;
+
+            rText = "128";
 
             //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
 

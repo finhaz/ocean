@@ -38,7 +38,7 @@
                     <RowDefinition Height="100*"/>
                 </Grid.RowDefinitions>
                 <TextBlock Name="textBox1" Text="系统停止运行" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.ColumnSpan="2" Margin="25,0,0,0" />
-                <TextBox Name="runAddr"  Grid.Row="1"  Grid.ColumnSpan="2" Text="{Binding zcom.runAddr.Text, Mode=TwoWay}"></TextBox>
+                <TextBox Name="runAddr"  Grid.Row="1"  Grid.ColumnSpan="2" Text="{Binding ucom.rText, Mode=TwoWay}"></TextBox>
                 <Button Name="btRUN" Content="运行" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Click="btRUN_Click" Width="80"/>
                 <Button Name="btSTOP" Content="停止" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
