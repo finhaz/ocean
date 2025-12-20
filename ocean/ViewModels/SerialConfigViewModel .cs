@@ -486,5 +486,85 @@ namespace ocean.ViewModels
         #endregion
 
 
+        #region 新增：16进制预览相关属性（控制UI显示/内容）
+        /// <summary>
+        /// 是否显示16进制预览框（替代动态创建/删除控件）
+        /// </summary>
+        private Visibility _tb16ViewVisibility = Visibility.Collapsed;
+        public Visibility Tb16ViewVisibility
+        {
+            get => _tb16ViewVisibility;
+            set => SetProperty(ref _tb16ViewVisibility, value);
+        }
+
+        /// <summary>
+        /// 16进制预览框的文本内容（替代直接赋值控件Text）
+        /// </summary>
+        private string _tb16ViewText = string.Empty;
+        public string Tb16ViewText
+        {
+            get => _tb16ViewText;
+            set => SetProperty(ref _tb16ViewText, value);
+        }
+
+        /// <summary>
+        /// 是否勾选AdvantechCmd（绑定到ckAdvantechCmd的IsChecked）
+        /// </summary>
+        private bool _isAdvantechCmdChecked = false;
+        public bool IsAdvantechCmdChecked
+        {
+            get => _isAdvantechCmdChecked;
+            set => SetProperty(ref _isAdvantechCmdChecked, value);
+        }
+
+        #endregion
+
+        #region 核心方法：更新16进制预览文本（原转换逻辑移至此处）
+        /// <summary>
+        /// 切换16进制预览的显示状态，并更新内容
+        /// </summary>
+        /// <param name="isHex">是否启用16进制预览</param>
+        public void Toggle16View(bool isHex)
+        {
+            if (isHex)
+            {
+                // 显示16进制预览框
+                Tb16ViewVisibility = Visibility.Visible;
+                // 更新预览文本
+                Update16ViewText();
+            }
+            else
+            {
+                // 隐藏16进制预览框
+                Tb16ViewVisibility = Visibility.Collapsed;
+                Tb16ViewText = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 计算16进制预览文本（复用原转换逻辑）
+        /// </summary>
+        private void Update16ViewText()
+        {
+            string hexString = StringToHexString(TbSendText);
+            string hexStringView = string.Empty;
+
+            for (int i = 0; i < hexString.Length; i += 2)
+            {
+                hexStringView += hexString.Substring(i, 2) + " ";
+            }
+
+            // 若勾选AdvantechCmd，追加0D
+            if (IsAdvantechCmdChecked)
+            {
+                hexStringView += "0D";
+            }
+
+            Tb16ViewText = hexStringView;
+        }
+        #endregion
+
+
+
     }
 }

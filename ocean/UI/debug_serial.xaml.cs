@@ -43,12 +43,13 @@ namespace ocean.UI
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
             CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
-
+            bdExpend.Visibility = Visibility.Hidden;
             if (CommonRes.mySerialPort.IsOpen)
             {
 
                 btOpenCom.Content = "关闭串口";
                 comState.Style = (Style)FindResource("EllipseStyleGreen");
+                
             }
 
         }
@@ -250,55 +251,13 @@ namespace ocean.UI
         }
 
 
-
+        #region 简化后的get16View方法（仅触发ViewModel逻辑）
         private void get16View(bool isHex)
         {
-            if (isHex == true)
-            {
-                //将字符器转为Ascii码
-                string hexString, hexStringView = "";
-                hexString = _globalVM.SerialConfig.StringToHexString(tbSend.Text);
-                for (int i = 0; i < hexString.Length; i += 2)
-                {
-                    hexStringView += hexString.Substring(i, 2) + " ";
-                }
-                if (ckAdvantechCmd.IsChecked == true) { hexStringView += "0D"; }
-
-                TextBox myText = grdSend.FindName("tb16View") as TextBox;
-                //如果已有tb16View这个控件，则进行显示，如没有则创建并进行显示
-                if (myText != null)
-                {
-                    myText.Text = hexStringView;
-                }
-                else
-                {
-                    #region//创建一个文本框来显示字符串的Acsii码
-                    TextBox myTextBox = new TextBox();
-                    myTextBox.VerticalAlignment = VerticalAlignment.Top;
-                    myTextBox.Height = 22;
-                    myTextBox.Margin = new Thickness(3, 0, 0, 0);
-                    myTextBox.IsReadOnly = true;
-                    myTextBox.IsEnabled = true;
-                    tbSend.Margin = new Thickness(3, 22, 0, 0);
-                    grdSend.Children.Add(myTextBox);
-                    grdSend.RegisterName("tb16View", myTextBox);
-                    myTextBox.SetValue(Grid.ColumnProperty, 1);
-                    myTextBox.Text = hexStringView;
-                    #endregion
-                }
-            }
-            else
-            {
-                //移除tb16View控件
-                TextBox myTextBox = grdSend.FindName("tb16View") as TextBox;
-                if (myTextBox != null)
-                {
-                    grdSend.Children.Remove(myTextBox);//移除对应按钮控件   
-                    grdSend.UnregisterName("tb16View");
-                    tbSend.Margin = new Thickness(3, 0, 0, 0);
-                }
-            }
+            // 直接调用ViewModel的方法，无需操作任何UI控件
+            _globalVM.SerialConfig.Toggle16View(isHex);
         }
+
 
         private void ckAdvantechCmd_Click(object sender, RoutedEventArgs e)
         {
@@ -308,6 +267,7 @@ namespace ocean.UI
                 get16View((bool)ckAsciiView.IsChecked);
             }
         }
+        #endregion
 
 
         private void btExpend_Click(object sender, RoutedEventArgs e)

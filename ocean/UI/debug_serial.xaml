@@ -113,28 +113,96 @@
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5"/>
             <Grid Name="grdSend" Grid.Row="1" Grid.ColumnSpan="3">
                 <Grid.RowDefinitions>
-                    <RowDefinition/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="32"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="192"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox TextWrapping="Wrap" Name="tbSend" Text="{Binding SerialConfig.TbSendText, Mode=TwoWay}" Grid.Column="1" Margin="3,0,0,0" AcceptsReturn="True" TextChanged="tbSend_TextChanged" Grid.RowSpan="2"></TextBox>
+                <TextBox x:Name="tb16View"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        VerticalAlignment="Stretch"
+                         Height="22"
+                         Margin="3,0,0,0"
+                         IsReadOnly="True"
+                         IsEnabled="True"
+                         Text="{Binding SerialConfig.Tb16ViewText, Mode=OneWay}"
+                         Visibility="{Binding SerialConfig.Tb16ViewVisibility, Mode=OneWay}"/>
+                <!-- 发送框：通过Style触发器动态调整RowSpan -->
+                <TextBox x:Name="tbSend"
+                         Grid.Column="1"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         Text="{Binding SerialConfig.TbSendText, Mode=TwoWay}"
+                         TextChanged="tbSend_TextChanged">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <!-- 默认样式：tb16View显示时，tbSend占第2行，RowSpan=1 -->
+                                <Setter Property="Grid.Row" Value="1"/>
+                                <Setter Property="Grid.RowSpan" Value="1"/>
+                                <Setter Property="Margin" Value="3,0,0,0"/>
+                                <!-- 触发器：当tb16View隐藏时，tbSend占第0行，RowSpan=2 -->
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SerialConfig.Tb16ViewVisibility}" Value="Collapsed">
+                                        <Setter Property="Grid.Row" Value="0"/>
+                                        <Setter Property="Grid.RowSpan" Value="2"/>
+                                        <Setter Property="Margin" Value="3,0,0,0"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                </TextBox>
                 <Rectangle Fill="#FFACACAC" Width="1" HorizontalAlignment="Right" Grid.RowSpan="2"></Rectangle>
-                <Button Name="btSend" Content="发送" Margin="118,7,6,55" Click="btSend_Click" VerticalContentAlignment="Top"/>
-                <Button Name="btExpend" Content="扩展" Margin="118,37,6,25" VerticalContentAlignment="Top" Click="btExpend_Click"/>
-                <CheckBox Name="ck16Send" Content="16进制发送" IsChecked="{Binding SerialConfig.IsHexSend, Mode=TwoWay}" Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
-                <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
-                <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
-                <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click" IsChecked="{Binding SerialConfig.IsAutoSend}"/>
-                <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" 
-                           TextWrapping="Wrap" Text="间隔(s)" 
-                           VerticalAlignment="Top" Grid.RowSpan="2" 
+                <Button Name="btSend" 
+                        Content="发送" 
+                        Margin="118,7,6,55" 
+                        Click="btSend_Click" 
+                        VerticalContentAlignment="Top"/>
+                <Button Name="btExpend" 
+                        Content="扩展" 
+                        Margin="118,37,6,25" 
+                        VerticalContentAlignment="Top" 
+                        Click="btExpend_Click"/>
+                <CheckBox Name="ck16Send" 
+                          Content="16进制发送" 
+                          IsChecked="{Binding SerialConfig.IsHexSend, Mode=TwoWay}" 
+                          Margin="10,5,100,0" 
+                          VerticalAlignment="Top" 
+                          Click="ck16Send_Click"/>
+                <CheckBox Name="ckAsciiView" 
+                          Content="显示Ascii码"  
+                          Margin="10,22,90,0" 
+                          VerticalAlignment="Top" 
+                          Click="ckAsciiView_Click"/>
+                <CheckBox Name="ckAdvantechCmd" 
+                          Content="加回车符发送" 
+                          Margin="10,39,90,0" 
+                          VerticalAlignment="Top"
+                          IsChecked="{Binding SerialConfig.IsAdvantechCmdChecked, Mode=TwoWay}"
+                          Click="ckAdvantechCmd_Click"/>
+                <CheckBox Name="ckAutoSend" 
+                          Content="自动发送"  
+                          Margin="10,56,100,0" 
+                          VerticalAlignment="Top" 
+                          Click="ckAutoSend_Click" 
+                          IsChecked="{Binding SerialConfig.IsAutoSend}"/>
+                <TextBlock Name="tbkIntervalTime" 
+                           HorizontalAlignment="Left" 
+                           Margin="33,74,0,0" 
+                           TextWrapping="Wrap" 
+                           Text="间隔(s)" 
+                           VerticalAlignment="Top" 
+                           Grid.RowSpan="2" 
                            Visibility="{Binding SerialConfig.TbkIntervalTimeVisibility, Mode=TwoWay}"/>
-                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" 
+                <TextBox Name="tbIntervalTime" 
+                         HorizontalAlignment="Left" 
+                         Margin="83,72,0,0" 
                          Text="{Binding SerialConfig.TbIntervalTimeText,Mode=TwoWay}"
-                         VerticalAlignment="Top" Width="50" Grid.RowSpan="2" 
+                         VerticalAlignment="Top" 
+                         Width="50" 
+                         Grid.RowSpan="2" 
                          Visibility="{Binding SerialConfig.TbIntervalTimeVisibility, Mode=TwoWay}" 
                          TextChanged="tbIntervalTime_TextChanged"/>
             </Grid>
