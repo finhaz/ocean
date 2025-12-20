@@ -120,7 +120,7 @@
                     <ColumnDefinition Width="192"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox TextWrapping="Wrap" Name="tbSend" Text="{Binding tcom.tbSend.Text, Mode=TwoWay}" Grid.Column="1" Margin="3,0,0,0" AcceptsReturn="True" TextChanged="tbSend_TextChanged" Grid.RowSpan="2"></TextBox>
+                <TextBox TextWrapping="Wrap" Name="tbSend" Text="{Binding SerialConfig.TbSendText, Mode=TwoWay}" Grid.Column="1" Margin="3,0,0,0" AcceptsReturn="True" TextChanged="tbSend_TextChanged" Grid.RowSpan="2"></TextBox>
                 <Rectangle Fill="#FFACACAC" Width="1" HorizontalAlignment="Right" Grid.RowSpan="2"></Rectangle>
                 <Button Name="btSend" Content="发送" Margin="118,7,6,55" Click="btSend_Click" VerticalContentAlignment="Top"/>
                 <Button Name="btExpend" Content="扩展" Margin="118,37,6,25" VerticalContentAlignment="Top" Click="btExpend_Click"/>
@@ -128,20 +128,35 @@
                 <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
                 <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
                 <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click" IsChecked="{Binding SerialConfig.IsAutoSend}"/>
-                <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2" Visibility="{Binding tcom.tbkIntervalTime.Visibility, Mode=TwoWay}"/>
-                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="{Binding tcom.tbIntervalTime.Text,Mode=TwoWay}" VerticalAlignment="Top" Width="50" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}" TextChanged="tbIntervalTime_TextChanged"/>
+                <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" 
+                           TextWrapping="Wrap" Text="间隔(s)" 
+                           VerticalAlignment="Top" Grid.RowSpan="2" 
+                           Visibility="{Binding SerialConfig.TbkIntervalTimeVisibility, Mode=TwoWay}"/>
+                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" 
+                         Text="{Binding SerialConfig.TbIntervalTimeText,Mode=TwoWay}"
+                         VerticalAlignment="Top" Width="50" Grid.RowSpan="2" 
+                         Visibility="{Binding SerialConfig.TbIntervalTimeVisibility, Mode=TwoWay}" 
+                         TextChanged="tbIntervalTime_TextChanged"/>
             </Grid>
-            <TextBox VerticalScrollBarVisibility="Auto" IsReadOnly="True" Name="tbReceive" Grid.Column="2" Margin="0,1,0,0" TextWrapping="Wrap" Text="{Binding tcom.tbReceive.Text, Mode=TwoWay}" ></TextBox>
+            <TextBox VerticalScrollBarVisibility="Auto" 
+                     IsReadOnly="True" Name="tbReceive"
+                     Grid.Column="2" Margin="0,1,0,0" 
+                     TextWrapping="Wrap" Text="{Binding SerialConfig.TbReceiveText, Mode=TwoWay}" ></TextBox>
             <StatusBar Name="statusBar1"  Height="20" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="0">
                 <TextBlock Text="状态："></TextBlock>
-                <TextBlock Name="tbComState" Text="{Binding tcom.tbComState.Text,Mode=TwoWay}" MinWidth="150"></TextBlock>
+                <TextBlock Name="tbComState" 
+                           Text="{Binding SerialConfig.TbComStateText,Mode=TwoWay}"
+                           MinWidth="150"></TextBlock>
                 <Separator Background="#FFC9C6C6"/>
                 <TextBlock></TextBlock>
                 <TextBlock Text="接收："></TextBlock>
-                <TextBlock Name="txtRecive" Text="{Binding tcom.txtRecive.Text, Mode=TwoWay}" MinWidth="100"></TextBlock>
+                <TextBlock Name="txtRecive" 
+                           Text="{Binding SerialConfig.TxtReciveText, Mode=TwoWay}" 
+                           MinWidth="100"></TextBlock>
                 <Separator Background="#FFC9C6C6"/>
                 <TextBlock Text="发送："></TextBlock>
-                <TextBlock Name="txtSend" Text="{Binding tcom.txtSend.Text,Mode=TwoWay}"></TextBlock>
+                <TextBlock Name="txtSend" 
+                           Text="{Binding SerialConfig.TxtSendText,Mode=TwoWay}"></TextBlock>
             </StatusBar>
             <Separator Height="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,20" VerticalAlignment="Bottom"/>
             <Rectangle Fill="#FFACACAC" Grid.Row="1" Grid.ColumnSpan="3" VerticalAlignment="Top"  Height="1"/>

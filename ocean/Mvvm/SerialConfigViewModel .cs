@@ -399,5 +399,89 @@ namespace ocean.Mvvm
         #endregion
 
 
+        #region 新增：文本控件绑定属性（仅字符串/Visibility类型，初始值按要求设置）
+        /// <summary>
+        /// 发送框文本（tbSend.Text），初始值"0"
+        /// </summary>
+        private string _tbSendText = "0";
+        public string TbSendText
+        {
+            get => _tbSendText;
+            set => SetProperty(ref _tbSendText, value);
+        }
+
+        /// <summary>
+        /// 间隔时间输入框文本（tbIntervalTime.Text）
+        /// </summary>
+        private string _tbIntervalTimeText = string.Empty;
+        public string TbIntervalTimeText
+        {
+            get => _tbIntervalTimeText;
+            set => SetProperty(ref _tbIntervalTimeText, value);
+        }
+
+        /// <summary>
+        /// 间隔时间标签可见性（tbkIntervalTime.Visibility）
+        /// </summary>
+        private Visibility _tbkIntervalTimeVisibility = Visibility.Visible;
+        public Visibility TbkIntervalTimeVisibility
+        {
+            get => _tbkIntervalTimeVisibility;
+            set => SetProperty(ref _tbkIntervalTimeVisibility, value);
+        }
+
+        /// <summary>
+        /// 间隔时间输入框可见性（tbIntervalTime.Visibility）
+        /// </summary>
+        private Visibility _tbIntervalTimeVisibility = Visibility.Visible;
+        public Visibility TbIntervalTimeVisibility
+        {
+            get => _tbIntervalTimeVisibility;
+            set => SetProperty(ref _tbIntervalTimeVisibility, value);
+        }
+
+        /// <summary>
+        /// 串口状态文本（tbComState.Text），初始值"0"
+        /// </summary>
+        private string _tbComStateText = "0";
+        public string TbComStateText
+        {
+            get => _tbComStateText;
+            set => SetProperty(ref _tbComStateText, value);
+        }
+
+        /// <summary>
+        /// 接收统计文本（txtRecive.Text），初始值"0"
+        /// </summary>
+        private string _txtReciveText = "0";
+        public string TxtReciveText
+        {
+            get => _txtReciveText;
+            set => SetProperty(ref _txtReciveText, value);
+        }
+
+        /// <summary>
+        /// 发送统计文本（txtSend.Text），初始值"0"
+        /// </summary>
+        private string _txtSendText = "0";
+        public string TxtSendText
+        {
+            get => _txtSendText;
+            set => SetProperty(ref _txtSendText, value);
+        }
+        #endregion
+
+        #region 新增：接收文本框（tbReceive）绑定属性
+        /// <summary>
+        /// 串口接收内容文本（tbReceive.Text）
+        /// </summary>
+        private string _tbReceiveText = string.Empty; // 初始值为空，可按需修改
+        public string TbReceiveText
+        {
+            get => _tbReceiveText;
+            set => SetProperty(ref _tbReceiveText, value);
+        }
+        #endregion
+
     }
 }

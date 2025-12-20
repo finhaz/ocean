@@ -25,8 +25,13 @@ namespace ocean.UI
     public partial class debug_serial : Page
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
-        public Debugsera tcom { get; set; }
+
         public DispatcherTimer time1 = new DispatcherTimer();
+
+        //public Border bdExpend { get; set; }
+        //public Grid grdSend { get; set; }
+
+        public bool ckHexState;
 
 
         delegate void HanderInterfaceUpdataDelegate(string mySendData);
@@ -39,7 +44,6 @@ namespace ocean.UI
             // 将Page的DataContext绑定到全局ViewModel
             DataContext = _globalVM;
 
-            tcom = new Debugsera();
             time1.Tick += new EventHandler(time1_Tick);
             CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -186,13 +190,16 @@ namespace ocean.UI
 
         private void btClearView_Click(object sender, RoutedEventArgs e)
         {
-            tcom.tbReceive.Text = "";
-            tcom.txtRecive.Text = "0";
+            //tcom.tbReceive.Text = "";
+            //tcom.txtRecive.Text = "0";
+
+            _globalVM.SerialConfig.TxtReciveText = "";
+            _globalVM.SerialConfig.TbReceiveText = "0";
         }
 
         private void ck16View_Click(object sender, RoutedEventArgs e)
         {
-            tcom.ckHexState = (bool)ck16View.IsChecked;
+            ckHexState = (bool)ck16View.IsChecked;
         }
 
 
@@ -391,7 +398,7 @@ namespace ocean.UI
             txtGotoEndDelegate myGotoend = txtGotoEnd;
             HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
             string abc, abc1;
-            if (tcom.ckHexState == true)
+            if (ckHexState == true)
             {
                 abc = _globalVM.SerialConfig.ByteArrayToHexString(buf);
                 string hexStringView = "";
