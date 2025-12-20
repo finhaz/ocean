@@ -9,8 +9,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
 using System.Windows.Controls;
+using ocean.Mvvm;
 
-namespace ocean.Mvvm
+namespace ocean.ViewModels
 {
     /// <summary>
     /// 串口配置ViewModel（继承自自定义的ObservableObject）
@@ -124,7 +125,7 @@ namespace ocean.Mvvm
                 if (SetProperty(ref _selectedStopBit, value))
                 {
                     // 同步更新StopBits枚举：使用System.IO.Ports.StopBits
-                    SelectedStopBitEnum = value == 1 ? System.IO.Ports.StopBits.One : System.IO.Ports.StopBits.Two;
+                    SelectedStopBitEnum = value == 1 ? StopBits.One : StopBits.Two;
                 }
             }
         }
@@ -132,8 +133,8 @@ namespace ocean.Mvvm
         /// <summary>
         /// 选中的停止位枚举（SerialPort的StopBits类型）
         /// </summary>
-        private System.IO.Ports.StopBits _selectedStopBitEnum = System.IO.Ports.StopBits.One;
-        public System.IO.Ports.StopBits SelectedStopBitEnum
+        private StopBits _selectedStopBitEnum = StopBits.One;
+        public StopBits SelectedStopBitEnum
         {
             get => _selectedStopBitEnum;
             set => SetProperty(ref _selectedStopBitEnum, value);
@@ -323,14 +324,14 @@ namespace ocean.Mvvm
             try
             {
                 for (int i = 0; i < s.Length; i += 2)
-                    buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
+                    buffer[i / 2] = Convert.ToByte(s.Substring(i, 2), 16);
                 return buffer;
             }
             catch
             {
                 string errorString = "E4";
                 byte[] errorData = new byte[errorString.Length / 2];
-                errorData[0] = (byte)Convert.ToByte(errorString, 16);
+                errorData[0] = Convert.ToByte(errorString, 16);
                 return errorData;
             }
         }
@@ -351,6 +352,7 @@ namespace ocean.Mvvm
             }
             return buffer;
         }
+
         #endregion
 
 
@@ -453,21 +455,21 @@ namespace ocean.Mvvm
         /// <summary>
         /// 接收统计文本（txtRecive.Text），初始值"0"
         /// </summary>
-        private string _txtReciveText = "0";
-        public string TxtReciveText
-        {
-            get => _txtReciveText;
-            set => SetProperty(ref _txtReciveText, value);
+        private string _receiveCount = "0";
+        public string ReceiveCount 
+        { 
+            get => _receiveCount; 
+            set => SetProperty(ref _receiveCount, value); 
         }
 
         /// <summary>
         /// 发送统计文本（txtSend.Text），初始值"0"
         /// </summary>
-        private string _txtSendText = "0";
-        public string TxtSendText
+        private string _sendCount = "0";
+        public string SendCount
         {
-            get => _txtSendText;
-            set => SetProperty(ref _txtSendText, value);
+            get => _sendCount;
+            set => SetProperty(ref _sendCount, value);
         }
         #endregion
 
@@ -482,6 +484,7 @@ namespace ocean.Mvvm
             set => SetProperty(ref _tbReceiveText, value);
         }
         #endregion
+
 
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.Xaml.Behaviors;
 using Microsoft.Xaml.Behaviors;
 using ocean.Communication;
-using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,7 +29,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
 using Newtonsoft.Json; // 必须添加，否则JsonConvert识别不到
-using System.IO; // 操作文件的核心命名空间
+using System.IO;
+using ocean.ViewModels; // 操作文件的核心命名空间
 
 namespace ocean.UI
 {

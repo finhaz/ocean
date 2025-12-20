@@ -1,11 +1,12 @@
 ﻿using ocean.Communication;
+using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ocean.Mvvm
+namespace ocean.ViewModels
 {
     // 全局ViewModel
     public class AppViewModel : ObservableObject

@@ -126,20 +126,19 @@ namespace ocean.UI
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(ucom.mySerialPort_DataReceived);
-            CommonRes.CurrentDataHandler = _registeredHandler;
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 仅当当前处理者是本Page的MKlll时，才取消
+        { 
+             // 仅当当前处理者是本Page的MKlll时，才取消
             if (CommonRes.CurrentDataHandler == _registeredHandler)
             {
                 CommonRes.CurrentDataHandler = null;
             }
             // 释放MKlll资源
             //_globalVM.MKlll.Dispose();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            CommonRes.CurrentDataHandler = _registeredHandler;
         }
 
         public void Dispose()
