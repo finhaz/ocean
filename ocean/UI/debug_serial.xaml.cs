@@ -31,7 +31,7 @@ namespace ocean.UI
         {
             InitializeComponent();
             // 将Page的DataContext绑定到全局ViewModel
-            //DataContext = _globalVM;
+            DataContext = _globalVM;
 
             tcom = new Debugsera();
 
