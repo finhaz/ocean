@@ -1,8 +1,14 @@
-﻿using System;
+﻿using ocean.Communication;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO.Ports; // 必须引入：包含StopBits、Parity枚举
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Shapes;
+using System.Windows.Controls;
 
 namespace ocean.Mvvm
 {
@@ -161,11 +167,237 @@ namespace ocean.Mvvm
         }
         #endregion
 
+
+        #region 新增：复选框相关属性
+        /// <summary>
+        /// 16进制发送（对应ck16Send的IsChecked）
+        /// </summary>
+        private bool _isHexSend;
+        public bool IsHexSend
+        {
+            get => _isHexSend;
+            set => SetProperty(ref _isHexSend, value);
+        }
+
+        /// <summary>
+        /// 自动发送（对应ckAutoSend的IsChecked）
+        /// </summary>
+        private bool _isAutoSend;
+        public bool IsAutoSend
+        {
+            get => _isAutoSend;
+            set
+            {
+                if (SetProperty(ref _isAutoSend, value))
+                {
+                    // 自动发送状态变化时的额外逻辑（如启动/停止自动发送定时器）
+                    OnAutoSendStateChanged(value);
+                }
+            }
+        }
+        #endregion
+
+        #region 新增：复选框点击逻辑（替代Click事件）
+        /// <summary>
+        /// 16进制发送状态变化的处理逻辑
+        /// </summary>
+
+
+        /// <summary>
+        /// 自动发送状态变化的处理逻辑
+        /// </summary>
+        /// <param name="isAutoSend">是否开启自动发送</param>
+        private void OnAutoSendStateChanged(bool isAutoSend)
+        {
+            // 原ckAutoSend_Click中的逻辑可移至此处
+            // 示例：启动/停止自动发送定时器
+            if (isAutoSend)
+            {
+                // 启动自动发送定时器（需在ViewModel中定义定时器）
+                // _autoSendTimer?.Start();
+                Console.WriteLine("自动发送已开启");
+            }
+            else
+            {
+                // 停止自动发送定时器
+                // _autoSendTimer?.Stop();
+                Console.WriteLine("自动发送已关闭");
+            }
+        }
+        #endregion
+
+        #region 新增：16进制显示相关属性
+        /// <summary>
+        /// 16进制显示（对应ck16View的IsChecked）
+        /// </summary>
+        private bool _isHexView;
+        public bool IsHexView
+        {
+            get => _isHexView;
+            set => SetProperty(ref _isHexView, value);
+        }
+        #endregion
+
+        #region 命令属性（统一处理点击逻辑）
+        /// <summary>
+        /// 16进制发送复选框点击命令
+        /// </summary>
+        public ICommand HexSendClickCommand { get; }
+
+        /// <summary>
+        /// 自动发送复选框点击命令
+        /// </summary>
+        public ICommand AutoSendClickCommand { get; }
+
+        /// <summary>
+        /// 16进制显示复选框点击命令（新增）
+        /// </summary>
+        public ICommand HexViewClickCommand { get; }
+        #endregion
+
         #region 构造函数
         public SerialConfigViewModel()
         {
             InitPortNames();
+            InitComStateStyle();
+
+            // 初始化命令
+            //HexSendClickCommand = new RelayCommand(OnHexSendClicked);
+            //AutoSendClickCommand = new RelayCommand(OnAutoSendClicked);
+            //HexViewClickCommand = new RelayCommand(OnHexViewClicked); // 新增命令初始化
         }
         #endregion
+
+        #region 事件处理方法
+        /// <summary>
+        /// 16进制发送点击逻辑
+        /// </summary>
+        private void OnHexSendClicked()
+        {
+            // 原ck16Send_Click的逻辑
+            Console.WriteLine($"16进制发送状态切换：{IsHexSend}");
+        }
+
+        /// <summary>
+        /// 自动发送点击逻辑
+        /// </summary>
+        private void OnAutoSendClicked()
+        {
+            // 原ckAutoSend_Click的逻辑
+            Console.WriteLine($"自动发送状态切换：{IsAutoSend}");
+        }
+
+        /// <summary>
+        /// 16进制显示点击逻辑（新增：处理原ck16View_Click）
+        /// </summary>
+        private void OnHexViewClicked()
+        {
+            // 原ck16View_Click的业务逻辑移至此处
+            // 示例：切换接收数据的显示格式（字符串/16进制）
+            Console.WriteLine($"16进制显示状态切换：{IsHexView}");
+            // 可在此处添加显示格式切换的核心逻辑，比如通知串口接收模块切换解析方式
+        }
+        #endregion
+
+
+        #region //16进制处理
+        public string ByteArrayToHexString(byte[] data)
+        {
+            StringBuilder sb = new StringBuilder(data.Length * 3);
+            foreach (byte b in data)
+                sb.Append(Convert.ToString(b, 16).PadLeft(2, '0'));
+            return sb.ToString().ToUpper();
+        }
+
+        public byte[] HexStringToByteArray(string s)
+        {
+            //s=s.ToUpper();
+            s = s.Replace(" ", "");
+            if (s.Length % 2 != 0)
+            {
+                s = s.Substring(0, s.Length - 1) + "0" + s.Substring(s.Length - 1);
+            }
+            byte[] buffer = new byte[s.Length / 2];
+
+
+            try
+            {
+                for (int i = 0; i < s.Length; i += 2)
+                    buffer[i / 2] = (byte)Convert.ToByte(s.Substring(i, 2), 16);
+                return buffer;
+            }
+            catch
+            {
+                string errorString = "E4";
+                byte[] errorData = new byte[errorString.Length / 2];
+                errorData[0] = (byte)Convert.ToByte(errorString, 16);
+                return errorData;
+            }
+        }
+
+        public string StringToHexString(string s)
+        {
+            //s = s.ToUpper();
+            s = s.Replace(" ", "");
+
+            string buffer = "";
+            char[] myChar;
+            myChar = s.ToCharArray();
+            for (int i = 0; i < s.Length; i++)
+            {
+                //buffer = buffer + Convert.ToInt32(myChar[i]);
+                buffer = buffer + Convert.ToString(myChar[i], 16);
+                buffer = buffer.ToUpper();
+            }
+            return buffer;
+        }
+        #endregion
+
+
+
+        #region 新增：仅添加两个核心属性（无其他多余代码）
+        /// <summary>
+        /// 串口状态椭圆的样式（对应comState.Style）
+        /// </summary>
+        private Style _comStateStyle;
+        public Style ComStateStyle
+        {
+            get => _comStateStyle;
+            set => SetProperty(ref _comStateStyle, value);
+        }
+
+
+        /// <summary>
+        /// 打开串口按钮的内容（对应btOpenCom.Content）
+        /// </summary>
+        private object _openComButtonContent = "打开串口"; // 默认值
+        public object OpenComButtonContent
+        {
+            get => _openComButtonContent;
+            set => SetProperty(ref _openComButtonContent, value);
+        }
+
+
+        /// <summary>
+        /// 初始化串口状态样式（从全局资源获取）
+        /// </summary>
+        private void InitComStateStyle()
+        {
+            // 安全获取：先判断资源是否存在，避免空引用
+            if (Application.Current.Resources.Contains("EllipseStyleRed"))
+            {
+                _comStateStyle = Application.Current.Resources["EllipseStyleRed"] as Style;
+            }
+            else
+            {
+                // 兜底：若资源不存在，新建默认样式（防止空值）
+                _comStateStyle = new Style(typeof(Ellipse));
+                _comStateStyle.Setters.Add(new Setter(Shape.FillProperty, System.Windows.Media.Brushes.Red));
+            }
+        }
+
+        #endregion
+
+
     }
 }

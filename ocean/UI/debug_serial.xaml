@@ -81,11 +81,11 @@
                     Margin="2,1,10,1" FontSize="10"
                     ItemsSource="{Binding SerialConfig.StopBitValues, Mode=OneWay}"
                     SelectedItem="{Binding SerialConfig.SelectedStopBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/> 
-                    
-                    <Ellipse Name="comState" Style="{Binding tcom.comState.Style, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"
+                    IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
+
+                    <Ellipse Name="comState" Style="{Binding SerialConfig.ComStateStyle, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"
                              Width="20" Margin="15,8,0,7"/>
-                    <Button Name="btOpenCom" Content="{Binding tcom.btOpenCom.Content,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
+                    <Button Name="btOpenCom" Content="{Binding SerialConfig.OpenComButtonContent,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
                             Click="btOpenCom_Click" />
                 </Grid>
                 <Grid Grid.Row="1">
@@ -106,7 +106,8 @@
                     <Button Visibility="Hidden" Content="更改" Grid.Row="4" Margin="74,0,10,0"></Button>
                     <Button Visibility="Hidden" Content="搜索空闲串口" Grid.Row="6" Margin="10,2,30,2"></Button>
                     <CheckBox Visibility="Hidden" Name="ckAutoClear" Content="自动清空" Margin="10,2,0,0" Grid.Row="2" Height="16" VerticalAlignment="Top"/>
-                    <CheckBox Name="ck16View" Content="16进制显示" Margin="10,2,0,2" Grid.Row="3" Click="ck16View_Click" IsChecked="{Binding tcom.ck16View.IsChecked, Mode=TwoWay}" />
+                    <CheckBox Name="ck16View" Content="16进制显示" Margin="10,2,0,2" Grid.Row="3" 
+                              Click="ck16View_Click" IsChecked="{Binding SerialConfig.IsHexView, Mode=TwoWay}" />
                 </Grid>
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5"/>
@@ -123,12 +124,12 @@
                 <Rectangle Fill="#FFACACAC" Width="1" HorizontalAlignment="Right" Grid.RowSpan="2"></Rectangle>
                 <Button Name="btSend" Content="发送" Margin="118,7,6,55" Click="btSend_Click" VerticalContentAlignment="Top"/>
                 <Button Name="btExpend" Content="扩展" Margin="118,37,6,25" VerticalContentAlignment="Top" Click="btExpend_Click"/>
-                <CheckBox Name="ck16Send" Content="16进制发送" IsChecked="{Binding tcom.ck16Send.IsChecked, Mode=TwoWay}" Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
+                <CheckBox Name="ck16Send" Content="16进制发送" IsChecked="{Binding SerialConfig.IsHexSend, Mode=TwoWay}" Margin="10,5,100,0" VerticalAlignment="Top" Click="ck16Send_Click"/>
                 <CheckBox Name="ckAsciiView" Content="显示Ascii码"  Margin="10,22,90,0" VerticalAlignment="Top" Click="ckAsciiView_Click"/>
                 <CheckBox Name="ckAdvantechCmd" Content="加回车符发送"  Margin="10,39,90,0" VerticalAlignment="Top"   Click="ckAdvantechCmd_Click"/>
-                <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click" IsChecked="{Binding tcom.ckAutoSend.IsChecked}"/>
+                <CheckBox Name="ckAutoSend" Content="自动发送"  Margin="10,56,100,0" VerticalAlignment="Top" Click="ckAutoSend_Click" IsChecked="{Binding SerialConfig.IsAutoSend}"/>
                 <TextBlock Name="tbkIntervalTime" HorizontalAlignment="Left" Margin="33,74,0,0" TextWrapping="Wrap" Text="间隔(s)" VerticalAlignment="Top" Grid.RowSpan="2" Visibility="{Binding tcom.tbkIntervalTime.Visibility, Mode=TwoWay}"/>
-                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="{Binding tcom.tbIntervalTime.Text,Mode=TwoWay}" VerticalAlignment="Top" Width="50" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}"/>
+                <TextBox Name="tbIntervalTime" HorizontalAlignment="Left" Margin="83,72,0,0" Text="{Binding tcom.tbIntervalTime.Text,Mode=TwoWay}" VerticalAlignment="Top" Width="50" Grid.RowSpan="2" Visibility="{Binding tcom.tbIntervalTime.Visibility, Mode=TwoWay}" TextChanged="tbIntervalTime_TextChanged"/>
             </Grid>
             <TextBox VerticalScrollBarVisibility="Auto" IsReadOnly="True" Name="tbReceive" Grid.Column="2" Margin="0,1,0,0" TextWrapping="Wrap" Text="{Binding tcom.tbReceive.Text, Mode=TwoWay}" ></TextBox>
             <StatusBar Name="statusBar1"  Height="20" Grid.Row="3" Grid.ColumnSpan="3" VerticalAlignment="Bottom" Margin="0">

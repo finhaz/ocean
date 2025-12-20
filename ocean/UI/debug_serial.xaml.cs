@@ -26,6 +26,12 @@ namespace ocean.UI
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
         public Debugsera tcom { get; set; }
+        public DispatcherTimer time1 = new DispatcherTimer();
+
+
+        delegate void HanderInterfaceUpdataDelegate(string mySendData);
+        HanderInterfaceUpdataDelegate myUpdataHander;
+        delegate void txtGotoEndDelegate();
 
         public debug_serial()
         {
@@ -34,9 +40,44 @@ namespace ocean.UI
             DataContext = _globalVM;
 
             tcom = new Debugsera();
+            time1.Tick += new EventHandler(time1_Tick);
+            CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
+
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+
+                btOpenCom.Content = "关闭串口";
+                comState.Style = (Style)FindResource("EllipseStyleGreen");
+            }
 
         }
 
+        private void time1_Tick(object sender, EventArgs e)
+        {
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+                btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+            }
+        }
+
+        private void tbIntervalTime_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ckAutoSend.IsChecked == true)
+            {
+                if (Convert.ToDouble(tbIntervalTime.Text) == 0)
+                {
+                    time1.Stop();
+                }
+                else
+                {
+                    time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
+                    time1.Start();
+                }
+            }
+        }
 
 
         private void btOpenCom_Click(object sender, RoutedEventArgs e)
@@ -52,7 +93,7 @@ namespace ocean.UI
                 cbStopBits.IsEnabled = true;
                 btOpenCom.Content = "打开串口";
                 tbComState.Text = cbPortName.Text + "已关闭";
-                comState.Style = (Style)this.FindResource("EllipseStyleRed");
+                //comState.Style = (Style)this.FindResource("EllipseStyleRed");
             }
             else
             {
@@ -107,7 +148,38 @@ namespace ocean.UI
 
         private void btSend_Click(object sender, RoutedEventArgs e)
         {
-            tcom.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+            btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+        }
+
+
+        public void btSend_Event(string strSend, bool hexState)
+        {
+            if (CommonRes.mySerialPort.IsOpen)
+            {
+                if (hexState == false)
+                {
+                    //if (ckAdvantechCmd.IsChecked == true) { strSend = strSend.ToUpper(); }
+                    byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
+                    CommonRes.mySerialPort.Write(sendData, 0, sendData.Length);
+                    txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
+                    if (ckAdvantechCmd.IsChecked == true)
+                    {
+                        byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D");
+                        CommonRes.mySerialPort.Write(sendAdvCmd, 0, 1);
+                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
+                    }
+                }
+                else
+                {
+                    byte[] sendHexData = _globalVM.SerialConfig.HexStringToByteArray(strSend);
+                    CommonRes.mySerialPort.Write(sendHexData, 0, sendHexData.Length);
+                }
+            }
+            else
+            {
+                tbComState.Text = "串口未开";
+                MessageBox.Show("串口没有打开，请检查！");
+            }
         }
 
 
@@ -138,21 +210,21 @@ namespace ocean.UI
 
                 tbkIntervalTime.Visibility = Visibility.Visible;
                 tbIntervalTime.Visibility = Visibility.Visible;
-                tcom.time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
+                time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
                 if (Convert.ToDouble(tbIntervalTime.Text) == 0)
                 {
                     return;
                 }
                 else
                 {
-                    tcom.time1.Start();
+                    time1.Start();
                 }
             }
             else
             {
                 tbkIntervalTime.Visibility = Visibility.Hidden;
                 tbIntervalTime.Visibility = Visibility.Hidden;
-                tcom.time1.Stop();
+                time1.Stop();
             }
             tbReceive.ScrollToEnd();
         }
@@ -170,7 +242,7 @@ namespace ocean.UI
             {
                 //将字符器转为Ascii码
                 string hexString, hexStringView = "";
-                hexString = tcom.StringToHexString(tbSend.Text);
+                hexString = _globalVM.SerialConfig.StringToHexString(tbSend.Text);
                 for (int i = 0; i < hexString.Length; i += 2)
                 {
                     hexStringView += hexString.Substring(i, 2) + " ";
@@ -273,7 +345,7 @@ namespace ocean.UI
             str = Convert.ToString(bt1.Content);
             TextBox tb1 = gdExpend.FindName("expendTextBox" + str.Substring(str.Length - 1, 1)) as TextBox;
             CheckBox ck1 = gdExpend.FindName("ckExpend" + str.Substring(str.Length - 1, 1)) as CheckBox;
-            tcom.btSend_Event(tb1.Text, (bool)ck1.IsChecked);
+            btSend_Event(tb1.Text, (bool)ck1.IsChecked);
             //MessageBox.Show("点了确定！" + str.Substring(str.Length - 1, 1));
         }
 
@@ -290,9 +362,65 @@ namespace ocean.UI
             get16View((bool)ckAsciiView.IsChecked);
         }
 
+
+
+        private void getData(string sendData)
+        {
+            tbReceive.Text += sendData;
+        }
+
+        private void txtGotoEnd()
+        {
+            tbReceive.ScrollToEnd();
+        }
+
+        private void txtReciveEvent(string byteNum)
+        {
+            txtRecive.Text = Convert.ToString(Convert.ToInt32(txtRecive.Text) + Convert.ToInt32(byteNum));
+        }
+
+
+
+        public void mySerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+
+            int n = CommonRes.mySerialPort.BytesToRead;
+            byte[] buf = new byte[n];
+            CommonRes.mySerialPort.Read(buf, 0, n);
+            myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
+            txtGotoEndDelegate myGotoend = txtGotoEnd;
+            HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
+            string abc, abc1;
+            if (tcom.ckHexState == true)
+            {
+                abc = _globalVM.SerialConfig.ByteArrayToHexString(buf);
+                string hexStringView = "";
+                for (int i = 0; i < abc.Length; i += 2)
+                {
+                    hexStringView += abc.Substring(i, 2) + " ";
+                }
+                abc = hexStringView;
+                abc1 = abc.Replace(" ", "");
+                if (abc1.Substring(abc1.Length - 2, 2) == "0D")
+                {
+                    abc = abc + "\n";
+                }
+
+            }
+            else
+            {
+                abc = System.Text.Encoding.Default.GetString(buf);
+            }
+            Dispatcher.Invoke(myUpdataHander, new string[] { abc });
+            Dispatcher.Invoke(myGotoend);
+            Dispatcher.Invoke(myUpdata1, new string[] { n.ToString() });
+        }
+
+
+
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.mySerialPort.DataReceived-= new SerialDataReceivedEventHandler(tcom.mySerialPort_DataReceived);
+            CommonRes.mySerialPort.DataReceived-= new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
         }
     }
 }
