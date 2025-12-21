@@ -194,8 +194,7 @@
                              Grid.Column="0"  
                              Text="{Binding SerialConfig.TbIntervalTimeText,Mode=TwoWay}"
                              VerticalAlignment="Top" 
-                             Width="50" 
-                             Grid.RowSpan="2" 
+                             Width="50"                              
                              Visibility="{Binding SerialConfig.TbIntervalTimeVisibility, Mode=TwoWay}" 
                              TextChanged="tbIntervalTime_TextChanged"/>
                     
