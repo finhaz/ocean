@@ -114,7 +114,7 @@ namespace ocean.Communication
 
 
         // 核心：业务处理方法（适配CommonRes的委托）
-        public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len, int protocolNum)
+        public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len)
         {
             byte[] buffer = new byte[200];
             int i = 0;
@@ -135,7 +135,7 @@ namespace ocean.Communication
             });
 
             // 3. Modbus协议1的业务处理（原逻辑）
-            if (protocolNum == 1)
+            if (ProSelectedOption == "Modbus协议")
             {
                 Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
                 temp_Value = Monitor_Solve(buffer);

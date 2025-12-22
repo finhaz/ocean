@@ -363,7 +363,7 @@ namespace ocean.UI
         /// <param name="gb_last">缓冲区初始位置</param>
         /// <param name="buffer_len">读取的字节数</param>
         /// <param name="protocolNum">协议号</param>
-        private void DebugSerialDataHandler(byte[] gbuffer, int gb_last, int buffer_len, int protocolNum)
+        private void DebugSerialDataHandler(byte[] gbuffer, int gb_last, int buffer_len)
         {
 
             // 1. 从全局缓冲区中提取本次读取的数据（替代原有直接读取串口的逻辑）

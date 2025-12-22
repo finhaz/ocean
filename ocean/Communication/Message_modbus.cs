@@ -130,14 +130,9 @@ namespace ocean
             string txt = "TX:";
             for (int i = 0; i < send_num; i++)
             {
-                if (CommonRes.Protocol_num == 0)
-                {
-                    txt += Convert.ToString(abuffer[i], 16);
-                }
-                else if (CommonRes.Protocol_num == 1)
-                {
-                    txt += Convert.ToString(abuffer[i], 16);
-                }
+
+                txt += Convert.ToString(abuffer[i], 16);
+
                 txt += ' ';
             }
             txt += '\r';

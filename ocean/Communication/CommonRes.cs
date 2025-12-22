@@ -24,7 +24,7 @@ namespace ocean
         public static SerialPort mySerialPort = new SerialPort();
 
         // 注意：委托参数需包含业务处理所需的所有数据（如读取的字节、gb_last、buffer_len等）
-        public delegate void SerialDataReceivedHandler(byte[] gbuffer, int gb_last, int buffer_len, int protocolNum);
+        public delegate void SerialDataReceivedHandler(byte[] gbuffer, int gb_last, int buffer_len);
         //针对数据协议：
         public static byte[] gbuffer = new byte[4096];
         public static int gb_index = 0;//缓冲区注入位置
@@ -54,19 +54,11 @@ namespace ocean
             try
             {
                 // 1. 统一读取串口数据（原Modbusset中的读取逻辑移到这里）
-                if (Protocol_num == 0)
+                buffer_len = mySerialPort.Read(gbuffer, gb_index, gbuffer.Length - gb_index);
+                gb_index += buffer_len;
+                if (gb_index >= gbuffer.Length)
                 {
-                    buffer_len = mySerialPort.Read(gbuffer, 0, gbuffer.Length);
-                    gb_index = 0; // 协议0重置索引
-                }
-                else if (Protocol_num == 1)
-                {
-                    buffer_len = mySerialPort.Read(gbuffer, gb_index, gbuffer.Length - gb_index);
-                    gb_index += buffer_len;
-                    if (gb_index >= gbuffer.Length)
-                    {
-                        gb_index -= gbuffer.Length;
-                    }
+                    gb_index -= gbuffer.Length;
                 }
             }
             catch
@@ -75,7 +67,7 @@ namespace ocean
             }
 
             // 2. 若有活跃的业务处理委托，调用它（传递所需参数）
-            CurrentDataHandler?.Invoke(gbuffer, gb_last, buffer_len, Protocol_num);
+            CurrentDataHandler?.Invoke(gbuffer, gb_last, buffer_len);
         }
 
 
