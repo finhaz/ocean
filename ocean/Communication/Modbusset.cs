@@ -65,6 +65,13 @@ namespace ocean.Communication
             set => SetProperty(ref _dSelectedOption, value);
         }
 
+        private string _proSelectedOption = "Modbus协议";
+        public string ProSelectedOption
+        {
+            get => _proSelectedOption;
+            set => SetProperty(ref _proSelectedOption, value);
+        }
+
         private int _readpos;
         public int Readpos
         {
@@ -75,6 +82,9 @@ namespace ocean.Communication
         public ObservableCollection<string> Options { get; set; } = new ObservableCollection<string>
         { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
 
+        public ObservableCollection<string> ProOptions { get; set; } = new ObservableCollection<string>
+        { "Modbus协议", "FE协议" };
+        
 
         //针对数据协议：
         byte[] gbuffer = new byte[4096];
