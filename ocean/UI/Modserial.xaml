@@ -37,6 +37,24 @@
                 <RowDefinition Height="20*"/>
                 <RowDefinition Height="20*"/>
             </Grid.RowDefinitions>
+            <TextBlock 
+                      HorizontalAlignment="Left" 
+                      Grid.Row="0"
+                      Text="协议类型"
+                      FontSize="10" 
+                      Grid.ColumnSpan="2"  
+                      Margin="10,0,0,0"
+                      TextAlignment="Center"
+                      VerticalAlignment="Center"/>
+            <ComboBox
+                Name="cPro" 
+                FontSize="10" 
+                Grid.Row="0" 
+                Margin="60,1,0,1" 
+                Grid.ColumnSpan="2">
+                <ComboBoxItem >FE协议</ComboBoxItem>
+                <ComboBoxItem IsSelected="True">Modbus协议</ComboBoxItem>
+            </ComboBox>
             <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
             <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
             <Button Content="导出配置" Grid.Row="3" Grid.ColumnSpan="2" Click="ExportConfig_Click"/>
