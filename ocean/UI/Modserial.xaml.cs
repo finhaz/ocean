@@ -71,7 +71,7 @@ namespace ocean.UI
                 try
                 {
                     int anum = Convert.ToInt32(rowView["Command"]);
-                    AppViewModel.Instance.ModbusSet.Monitor_Set(addr, anum);
+                    _globalVM.ModbusSet.Monitor_Set(addr, anum);
                 }
                 catch
                 {
@@ -86,23 +86,23 @@ namespace ocean.UI
         private void setsure_click(object sender, RoutedEventArgs e)
         {
             Setadd.Visibility = Visibility.Collapsed;
-            int radd = Int32.Parse(AppViewModel.Instance.ModbusSet.Sadd);
-            int rsnum = Int32.Parse(AppViewModel.Instance.ModbusSet.Snum);
+            int radd = Int32.Parse(_globalVM.ModbusSet.Sadd);
+            int rsnum = Int32.Parse(_globalVM.ModbusSet.Snum);
             int i = 0;
             for (i = 0; i < rsnum; i++) {
                 // 创建新行并赋值
-                DataRow newRow = AppViewModel.Instance.ModbusSet.dtm.NewRow();
-                newRow["ID"] = AppViewModel.Instance.ModbusSet.dtm.Rows.Count + 1;
+                DataRow newRow = _globalVM.ModbusSet.dtm.NewRow();
+                newRow["ID"] = _globalVM.ModbusSet.dtm.Rows.Count + 1;
                 newRow["Value"] = radd;
-                newRow["SelectedOption"] = AppViewModel.Instance.ModbusSet.KindNum;
+                newRow["SelectedOption"] = _globalVM.ModbusSet.KindNum;
                 newRow["Addr"] = radd;
                 newRow["Number"] = 1;
                 newRow["NOffSet"] = 0;
                 newRow["NBit"] = 16;
-                AppViewModel.Instance.ModbusSet.dtm.Rows.Add(newRow);
+                _globalVM.ModbusSet.dtm.Rows.Add(newRow);
                 radd = radd + 1;
             }
-            AppViewModel.Instance.ModbusSet.Sadd = Convert.ToString(radd);
+            _globalVM.ModbusSet.Sadd = Convert.ToString(radd);
         }
 
         private void setcancel_click(object sender, RoutedEventArgs e)
@@ -115,11 +115,11 @@ namespace ocean.UI
             switch (cbProcho.SelectedIndex)
             {
                 
-                case 0: AppViewModel.Instance.ModbusSet.KindNum = "线圈状态(RW)"; break;
-                case 1: AppViewModel.Instance.ModbusSet.KindNum = "离散输入(RO)"; break;
-                case 2: AppViewModel.Instance.ModbusSet.KindNum = "保持寄存器(RW)"; break;
-                case 3: AppViewModel.Instance.ModbusSet.KindNum = "输入寄存器(RO)"; break;
-                default: AppViewModel.Instance.ModbusSet.KindNum = "保持寄存器(RW)"; break;
+                case 0: _globalVM.ModbusSet.KindNum = "线圈状态(RW)"; break;
+                case 1: _globalVM.ModbusSet.KindNum = "离散输入(RO)"; break;
+                case 2: _globalVM.ModbusSet.KindNum = "保持寄存器(RW)"; break;
+                case 3: _globalVM.ModbusSet.KindNum = "输入寄存器(RO)"; break;
+                default: _globalVM.ModbusSet.KindNum = "保持寄存器(RW)"; break;
                 
             }
         }
@@ -133,7 +133,7 @@ namespace ocean.UI
         {
             if (dataGrodx.SelectedItem is DataRowView selectedRowView)
             {
-                AppViewModel.Instance.ModbusSet.dtm.Rows.Remove(selectedRowView.Row);
+                _globalVM.ModbusSet.dtm.Rows.Remove(selectedRowView.Row);
             }
             else
             {
@@ -160,8 +160,8 @@ namespace ocean.UI
                     value = value == DBNull.Value ? "空值" : value;
                     MessageBox.Show($"当前数值：{value}", "数值详情");
                     int addr = Convert.ToInt32(rowView["Addr"]);
-                    AppViewModel.Instance.ModbusSet.Monitor_Get(addr, 1);
-                    AppViewModel.Instance.ModbusSet.Readpos = Convert.ToInt32(rowView["ID"]);
+                    _globalVM.ModbusSet.Monitor_Get(addr, 1);
+                    _globalVM.ModbusSet.Readpos = Convert.ToInt32(rowView["ID"]);
 
                 }
             }
@@ -214,11 +214,11 @@ namespace ocean.UI
                 try
                 {
                     //// 方式1：如果是ObservableCollection<ModbusConfigItem>
-                    //var configList = AppViewModel.Instance.ModbusSet.dtm.ToList();
+                    //var configList = _globalVM.ModbusSet.dtm.ToList();
                     //string json = JsonConvert.SerializeObject(configList, Formatting.Indented);
 
                     // 方式2：如果是DataTable
-                    string json = JsonConvert.SerializeObject(AppViewModel.Instance.ModbusSet.dtm, Newtonsoft.Json.Formatting.Indented);
+                    string json = JsonConvert.SerializeObject(_globalVM.ModbusSet.dtm, Newtonsoft.Json.Formatting.Indented);
 
                     // 写入文件
                     File.WriteAllText(saveFileDialog.FileName, json);
@@ -248,18 +248,18 @@ namespace ocean.UI
 
                     //// 方式1：如果是ObservableCollection<ModbusConfigItem>
                     //var configList = JsonConvert.DeserializeObject<List<ModbusConfigItem>>(json);
-                    //AppViewModel.Instance.ModbusSet.dtm.Clear(); // 清空原有数据
+                    //_globalVM.ModbusSet.dtm.Clear(); // 清空原有数据
                     //foreach (var item in configList)
                     //{
-                    //    AppViewModel.Instance.ModbusSet.dtm.Add(item);
+                    //    _globalVM.ModbusSet.dtm.Add(item);
                     //}
 
                     //方式2：如果是DataTable
                     DataTable importedDt = JsonConvert.DeserializeObject<DataTable>(json);
-                    AppViewModel.Instance.ModbusSet.dtm.Clear();
+                    _globalVM.ModbusSet.dtm.Clear();
                     foreach (DataRow row in importedDt.Rows)
                     {
-                         AppViewModel.Instance.ModbusSet.dtm.ImportRow(row);
+                         _globalVM.ModbusSet.dtm.ImportRow(row);
                     }
 
                     MessageBox.Show("导入成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
