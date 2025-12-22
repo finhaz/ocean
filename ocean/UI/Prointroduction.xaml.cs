@@ -18,23 +18,18 @@ using ocean.ViewModels;
 namespace ocean.UI
 {
     /// <summary>
-    /// Settings.xaml 的交互逻辑
+    /// Prointroduction.xaml 的交互逻辑
     /// </summary>
-    public partial class Settings : Page
+    public partial class Prointroduction : Page
     {
         public VM_PageTextBox Uvm { get; set; }
 
-        public Settings()
+        public Prointroduction()
         {
             InitializeComponent();
 
             Uvm = new VM_PageTextBox();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-         
-            int i = 1;
-        }
     }
 }
