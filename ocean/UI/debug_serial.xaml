@@ -12,8 +12,8 @@
     <Grid>
         <Grid >
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="118"/>
+                <RowDefinition Height="110*"/>
+                <RowDefinition Height="52*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="122"  MinWidth="122" MaxWidth="200"/>
@@ -39,7 +39,7 @@
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="32*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Text="串   口" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="1" Height="16" Width="35"/>
+                    <TextBlock Text="串   口" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="1" Height="16" Width="36"/>
                     <TextBlock Text="波特率" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="2" Height="16" Width="36"/>
                     <TextBlock Text="检验位" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="3" Height="16" Width="36"/>
                     <TextBlock Text="数据位" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,3,10,3" Grid.Row="4" Height="16" Width="36"/>
@@ -100,14 +100,49 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Button Name="btClearView" Content="清空显示" Margin="10,0,53,0" Grid.Row="0" Click="btClearView_Click"></Button>
-                    <Button Visibility="Hidden" Content="停止显示" Grid.Row="1" Margin="10,0,53,0"></Button>
-                    <Button Visibility="Hidden" Content="保存显示" Grid.Row="4" Margin="10,0,53,0"></Button>
-                    <Button Visibility="Hidden" Content="更改" Grid.Row="4" Margin="74,0,10,0"></Button>
-                    <Button Visibility="Hidden" Content="搜索空闲串口" Grid.Row="6" Margin="10,2,30,2"></Button>
-                    <CheckBox Visibility="Hidden" Name="ckAutoClear" Content="自动清空" Margin="10,2,0,0" Grid.Row="2" Height="16" VerticalAlignment="Top"/>
-                    <CheckBox Name="ck16View" Content="16进制显示" Margin="10,2,0,2" Grid.Row="3" 
-                              Click="ck16View_Click" IsChecked="{Binding SerialConfig.IsHexView, Mode=TwoWay}" />
+                    <Button 
+                        Name="btClearView" 
+                        Content="清空显示" 
+                        Margin="10,0,53,0" 
+                        Grid.Row="0" 
+                        Click="btClearView_Click"></Button>
+                    <Button 
+                        Visibility="Visible" 
+                        Content="停止显示" 
+                        Grid.Row="1" 
+                        Margin="10,0,53,0"></Button>
+                    <CheckBox 
+                        Visibility="Visible" 
+                        Name="ckAutoClear" 
+                        Content="自动清空" 
+                        Margin="10,2,0,0" 
+                        Grid.Row="2" 
+                        VerticalAlignment="Top"/>
+                    <CheckBox 
+                        Name="ck16View" 
+                        Content="16进制显示" 
+                        Margin="10,2,0,2" 
+                        Grid.Row="3" 
+                        Click="ck16View_Click" 
+                        IsChecked="{Binding SerialConfig.IsHexView, Mode=TwoWay}" />
+                    <Button 
+                        Visibility="Visible" 
+                        Content="保存显示" 
+                        Grid.Row="4" 
+                        Margin="10,0,60,0"></Button>
+                    <Button 
+                        Visibility="Visible" 
+                        Content="更改" 
+                        Grid.Row="4" 
+                        Margin="74,0,10,0"></Button>
+                    <Button 
+                        Visibility="Visible" 
+                        Content="搜索空闲串口" 
+                        Grid.Row="5"
+                        Margin="10,0,50,0"
+                        ></Button>
+
+
                 </Grid>
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Width="5"/>
@@ -145,31 +180,42 @@
                     <Button Name="btSend" 
                             Content="发送" 
                             Grid.Row="0"
-                            Grid.Column="1"                      
+                            Grid.RowSpan="2"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="10,5,20,5"
                             Click="btSend_Click"/>
                     <Button Name="btExpend" 
                             Content="扩展"
                             Grid.Row="2"
+                            Grid.RowSpan="2"
                             Grid.Column="1" 
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            Margin="10,5,20,5"
                             Click="btExpend_Click"/>
                     <CheckBox Name="ck16Send" 
                               Content="16进制发送" 
                               IsChecked="{Binding SerialConfig.IsHexSend, Mode=TwoWay}" 
                               Grid.Row="0"
-                              Grid.Column="0" 
+                              Grid.Column="0"
                               VerticalAlignment="Top" 
+                              Margin="3,3,0,0"
                               Click="ck16Send_Click"/>
                     <CheckBox Name="ckAsciiView" 
                               Content="显示Ascii码"  
                               Grid.Row="1"
                               Grid.Column="0" 
                               VerticalAlignment="Top" 
+                              Margin="3,3,0,0"
                               Click="ckAsciiView_Click"/>
                     <CheckBox Name="ckAdvantechCmd" 
                               Content="加回车符发送" 
                               Grid.Row="2"
                               Grid.Column="0" 
                               VerticalAlignment="Top"
+                              Margin="3,3,0,0"
                               IsChecked="{Binding SerialConfig.IsAdvantechCmdChecked, Mode=TwoWay}"
                               Click="ckAdvantechCmd_Click"/>
                     <CheckBox Name="ckAutoSend" 
@@ -177,7 +223,8 @@
                               Grid.Row="3"
                               Grid.Column="0" 
                               VerticalAlignment="Top" 
-                              Click="ckAutoSend_Click" 
+                              Click="ckAutoSend_Click"
+                              Margin="3,3,0,0"
                               IsChecked="{Binding SerialConfig.IsAutoSend}"/>
                     <TextBlock Name="tbkIntervalTime" 
                                HorizontalAlignment="Left" 
@@ -187,14 +234,16 @@
                                Text="间隔(s)" 
                                VerticalAlignment="Top" 
                                Grid.RowSpan="2" 
+                               Margin="3,0,0,0"
                                Visibility="{Binding SerialConfig.TbkIntervalTimeVisibility, Mode=TwoWay}"/>
                     <TextBox Name="tbIntervalTime" 
-                             HorizontalAlignment="Right"                               
+                             HorizontalAlignment="Right"
+                             VerticalAlignment="Stretch"
                              Grid.Row="4"
                              Grid.Column="0"  
                              Text="{Binding SerialConfig.TbIntervalTimeText,Mode=TwoWay}"
-                             VerticalAlignment="Top" 
-                             Width="50"                              
+                             Margin="0,1,0,1"
+                             Width="60"                              
                              Visibility="{Binding SerialConfig.TbIntervalTimeVisibility, Mode=TwoWay}" 
                              TextChanged="tbIntervalTime_TextChanged"/>
                     
@@ -202,10 +251,10 @@
                 
                 
                 <TextBox x:Name="tb16View"
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        VerticalAlignment="Stretch"
-                         Height="15"
+                         Grid.Row="0"
+                         Grid.Column="1"
+                         VerticalAlignment="Stretch"
+                         HorizontalAlignment="Stretch"
                          Margin="3,0,0,0"
                          IsReadOnly="True"
                          IsEnabled="True"
@@ -217,7 +266,8 @@
                          TextWrapping="Wrap"
                          AcceptsReturn="True"
                          Text="{Binding SerialConfig.TbSendText, Mode=TwoWay}"
-                         TextChanged="tbSend_TextChanged">
+                         TextChanged="tbSend_TextChanged"
+                         Margin="3,1,0,1">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
                                 <!-- 默认样式：tb16View显示时，tbSend占第2行，RowSpan=1 -->
