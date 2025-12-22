@@ -73,11 +73,20 @@ namespace ocean.Communication
         }
 
 
+
         private string _intoSelectedOption = "Modbus协议";
         public string IntoSelectedOption
         {
             get => _intoSelectedOption;
-            set => SetProperty(ref _intoSelectedOption, value);
+            set
+            {
+                // 调用基类的SetProperty赋值，若值变化则触发通知
+                if (SetProperty(ref _intoSelectedOption, value))
+                {
+                    // 关键：当选中的协议名称变更时，主动通知SelectedProtocol属性变更
+                    OnPropertyChanged(nameof(SelectedProtocol));
+                }
+            }
         }
 
         private int _readpos;
@@ -113,7 +122,15 @@ namespace ocean.Communication
             }
         };
 
-
+        // 新增：筛选后的当前协议（核心属性）
+        public ProtocolInfo SelectedProtocol
+        {
+            get
+            {
+                // 根据选中的协议名称，从ProtocolList中筛选对应对象
+                return ProtocolList.FirstOrDefault(p => p.Name == IntoSelectedOption);
+            }
+        }
 
         //针对数据协议：
         byte[] gbuffer = new byte[4096];
