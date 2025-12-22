@@ -22,13 +22,12 @@ namespace ocean.UI
     /// </summary>
     public partial class Prointroduction : Page
     {
-        public VM_PageTextBox Uvm { get; set; }
+        private AppViewModel _globalVM = AppViewModel.Instance;
 
         public Prointroduction()
         {
             InitializeComponent();
-
-            Uvm = new VM_PageTextBox();
+            DataContext = _globalVM;
         }
 
     }

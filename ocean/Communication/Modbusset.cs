@@ -26,7 +26,7 @@ namespace ocean.Communication
             AddDataTableColumns(dtm);
 
             zcom = new Message_modbus();
-            //CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
+
         }
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
@@ -72,6 +72,14 @@ namespace ocean.Communication
             set => SetProperty(ref _proSelectedOption, value);
         }
 
+
+        private string _intoSelectedOption = "Modbus协议";
+        public string IntoSelectedOption
+        {
+            get => _intoSelectedOption;
+            set => SetProperty(ref _intoSelectedOption, value);
+        }
+
         private int _readpos;
         public int Readpos
         {
@@ -84,7 +92,28 @@ namespace ocean.Communication
 
         public ObservableCollection<string> ProOptions { get; set; } = new ObservableCollection<string>
         { "Modbus协议", "FE协议" };
-        
+
+
+        // 协议信息集合
+        public ObservableCollection<ProtocolInfo> ProtocolList { get; set; } = new ObservableCollection<ProtocolInfo>
+        {
+            new ProtocolInfo
+            {
+                Name = "Modbus协议",
+                FrameStructure = "地址域(1字节) + 功能码(1字节) + 数据域(N字节) + CRC校验(2字节)",
+                Transport = "RTU/ASCII/TCP三种，RTU为二进制格式，效率更高",
+                Features = "常用功能码：03（读保持寄存器）、06（写单个寄存器）"
+            },
+            new ProtocolInfo
+            {
+                Name = "FE协议",
+                FrameStructure = "帧头(2字节: 0xFE 0x01) + 设备地址(1字节) + 数据长度(2字节) + 数据域(N字节) + 校验和(1字节)",
+                Transport = "基于串口的私有协议，波特率默认9600，8N1格式",
+                Features = "支持广播帧，数据域采用小端序存储"
+            }
+        };
+
+
 
         //针对数据协议：
         byte[] gbuffer = new byte[4096];
