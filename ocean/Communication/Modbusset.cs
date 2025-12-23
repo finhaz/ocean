@@ -222,7 +222,7 @@ namespace ocean.Communication
             CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
 
             string txt = "";
-            txt = zcom.TX_showstr(zcom.sendbf, send_num);
+            txt = SerialDataProcessor.Instance.FormatTxDataToHexString(zcom.sendbf, send_num, true);
             BoxStr += txt;
         }
 
@@ -234,7 +234,7 @@ namespace ocean.Communication
             CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
 
             string txt = "";
-            txt = zcom.TX_showstr(zcom.sendbf, send_num);
+            txt = SerialDataProcessor.Instance.FormatTxDataToHexString(zcom.sendbf, send_num, true);
             BoxStr += txt;
         }
 

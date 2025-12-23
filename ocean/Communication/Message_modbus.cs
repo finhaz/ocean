@@ -125,21 +125,5 @@ namespace ocean
             return crc;
         }
 
-        public string TX_showstr(byte[]abuffer, int send_num )
-        {
-            string txt = "TX:";
-            for (int i = 0; i < send_num; i++)
-            {
-
-                txt += Convert.ToString(abuffer[i], 16);
-
-                txt += ' ';
-            }
-            txt += '\r';
-            txt += '\n';
-            return txt;
-        }
-
-
     }
 }
