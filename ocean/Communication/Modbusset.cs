@@ -169,6 +169,7 @@ namespace ocean.Communication
             byte[] buffer = new byte[200];
             int i = 0;
             int temp_Value = 0;
+            int checkresult = 0;
 
             string str = "";
             str = SerialDataProcessor.Instance.FormatSerialDataToHexString(gbuffer, buffer_len, "RX:", gb_last, true);
@@ -182,14 +183,25 @@ namespace ocean.Communication
             if (ProSelectedOption == "Modbus协议")
             {
                 Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
-                temp_Value = Monitor_Solve(buffer);
+                checkresult = COMModbus.Instance.Monitor_check(buffer, buffer.Length);
 
-                if (buffer[1] == 3 && dtm.Rows.Count > 0)
+                if (checkresult == 1)
                 {
-                    // 跨线程更新DataTable（避免UI线程异常）
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (buffer[1] == 3 && dtm.Rows.Count > 0)
                     {
-                        dtm.Rows[Readpos - 1]["Value"] = temp_Value;
+                        temp_Value = Monitor_Solve(buffer);
+                        // 跨线程更新DataTable（避免UI线程异常）
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            dtm.Rows[Readpos - 1]["Value"] = temp_Value;
+                        });
+                    }
+                }
+                else
+                {
+                    UiDispatcherHelper.ExecuteOnUiThread(() =>
+                    {
+                        BoxStr += "RX:Wrong";
                     });
                 }
             }
@@ -197,18 +209,21 @@ namespace ocean.Communication
 
         public int Monitor_Solve(byte[] buffer)
         {
+
             int Value = 0;
-            if (buffer[1]==3)
+
+            if (buffer[1] == 3)
             {
                 byte[] typeBytes = new byte[buffer[2]];
                 Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
                 Array.Reverse(typeBytes);
                 Value = BitConverter.ToInt16(typeBytes, 0);
             }
-            else if (buffer[1]==6)
+            else if (buffer[1] == 6)
             {
 
             }
+
             return Value;
         }
 

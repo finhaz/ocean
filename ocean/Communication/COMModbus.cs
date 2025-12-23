@@ -90,7 +90,7 @@ namespace ocean
         }
 
 
-        public int monitor_check(byte[] buffer,int len)
+        public int Monitor_check(byte[] buffer,int len)
         {
             int crc;
             int crc_g;
