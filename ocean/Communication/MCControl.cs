@@ -96,26 +96,34 @@ namespace ocean.Communication
         {
 
             SerialTextBlock = new TextBlock<string>();
-
             // 初始化命令：执行逻辑 + 可执行判断
             ButtonIncrease = new MyCommand(
                 execAction: ButtonIncreaseAction,
                 changeFunc: parameter => true     // 可选：可执行条件（始终返回true）
             );
-
-
-            dtrun = CommonRes.dt1;
-
-            dtset = CommonRes.dt2;
-
-            dtfactor = CommonRes.dt3;
-
             rText = "128";
-
-            DB_Com.runnum = dtrun.Rows.Count;
-
             InitTimer();
+            LoadDataFromDatabase();
+            DB_Com.runnum = dtrun.Rows.Count;
         }
+
+
+        /// <summary>
+        /// 从数据库加载数据的核心方法（内聚初始化逻辑）
+        /// </summary>
+        public void LoadDataFromDatabase()
+        {
+            // 读取数据库表，赋值给对应属性
+            dtrun = DB_sqlite.GetDBTable("PARAMETER_RUN");
+            dtset = DB_sqlite.GetDBTable("PARAMETER_SET");
+            dtfactor = DB_sqlite.GetDBTable("PARAMETER_FACTOR");
+
+            // 可选：处理空表情况（避免后续操作空引用）
+            dtrun ??= new DataTable("PARAMETER_RUN");
+            dtset ??= new DataTable("PARAMETER_SET");
+            dtfactor ??= new DataTable("PARAMETER_FACTOR");
+        }
+
 
         public void show_stop()
         {
@@ -156,10 +164,7 @@ namespace ocean.Communication
             {
                 Thread.Sleep(80); // 照顾粒子群的非环形缓冲读取法
             }
-
-            byte[] buffer = new byte[200];
-            int i = 0;
-            
+            byte[] buffer = new byte[200];        
             int n_dsp = 0;
             int check_result = 0;
 
@@ -169,7 +174,7 @@ namespace ocean.Communication
             UiDispatcherHelper.ExecuteOnUiThread(() =>
             {
                 SerialTextBlock.Text += str;
-                //SerialTextBlock.ScrollToEnd();
+                //ShowTextBox.ScrollToEnd();
             });
 
             // 4. Protocol_num=0的业务处理（原核心逻辑）
@@ -215,8 +220,8 @@ namespace ocean.Communication
                         if (gbuffer[5] < 44)
                         {
                             DB_Com.data[gbuffer[5]].VALUE = temp_val;
-                            // 跨线程更新DataTable（避免UI线程异常）
-                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            // 跨线程更新DataTable和数据库，同步操作，异步用UiDispatcherHelper.ExecuteOnUiThreadAsync
+                            UiDispatcherHelper.ExecuteOnUiThread(() =>
                             {
                                 dtrun.Rows[DB_Com.data[gbuffer[5]].SN][5] = DB_Com.data[gbuffer[5]].VALUE;
                             });
@@ -245,8 +250,9 @@ namespace ocean.Communication
                                 }
                                 else
                                 {
-                                    // 跨线程更新DataTable和数据库
-                                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+
+                                    // 跨线程更新DataTable和数据库，同步操作，异步用UiDispatcherHelper.ExecuteOnUiThreadAsync
+                                    UiDispatcherHelper.ExecuteOnUiThread(() =>
                                     {
                                         if (gbuffer[5] < 90)
                                         {

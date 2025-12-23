@@ -64,13 +64,7 @@ namespace ocean.Navigation
 
         public void load_table()
         {
-            //CommonRes.dt1 = DB_Access.GetDBTable("PARAMETER_RUN");
-            //CommonRes.dt2 = DB_Access.GetDBTable("PARAMETER_SET");
-            //CommonRes.dt3 = DB_Access.GetDBTable("PARAMETER_FACTOR");
 
-            //CommonRes.dt1 = DB_sqlite.GetDBTable("PARAMETER_RUN");
-            //CommonRes.dt2 = DB_sqlite.GetDBTable("PARAMETER_SET");
-            //CommonRes.dt3 = DB_sqlite.GetDBTable("PARAMETER_FACTOR");
         }
         public void WindowClosing()
         {

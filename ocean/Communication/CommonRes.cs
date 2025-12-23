@@ -70,23 +70,6 @@ namespace ocean
         }
 
 
-
-
-
-
-        public static DataTable dt1 = new DataTable();
-        public static DataTable dt2 = new DataTable();
-        public static DataTable dt3 = new DataTable();
-
-
-
-
-
-
-
-
-
-
         public CommonRes()
         {
 

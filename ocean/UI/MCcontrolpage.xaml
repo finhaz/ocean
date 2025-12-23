@@ -52,7 +52,7 @@
                     Name="runAddr"  
                     Grid.Row="1"  
                     Grid.ColumnSpan="2" 
-                    Text="{Binding ucom.rText, Mode=TwoWay}"></TextBox>
+                    Text="{Binding McController.rText, Mode=TwoWay}"></TextBox>
                 <Button 
                     Name="btRUN" 
                     Content="运行" 
@@ -108,7 +108,7 @@
                         <DataGrid x:Name="datashow" 
                                   CellEditEnding="datashow_CellEditEnding" 
                                   BeginningEdit="datashow_BeginningEdit"
-                                  ItemsSource="{Binding ucom.dtrun, Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.dtrun, Mode=TwoWay}">
 
                         </DataGrid>
                     </TabItem>
@@ -116,7 +116,7 @@
                     <TabItem Header="调试参数">
                         <DataGrid x:Name="dataset"
                                   CellEditEnding="dataset_CellEditEnding"
-                                  ItemsSource="{Binding ucom.dtset,Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.dtset,Mode=TwoWay}">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
@@ -134,7 +134,7 @@
                     <TabItem Header="修正系数">
                         <DataGrid x:Name="datafactor"
                                   CellEditEnding="datafactor_CellEditEnding"
-                                  ItemsSource="{Binding ucom.dtfactor,Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.dtfactor,Mode=TwoWay}">
 
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
@@ -154,7 +154,7 @@
 
                 <TextBox 
                     TextWrapping="Wrap" 
-                    Name="show_text"  
+                    Name="ShowTextBox"  
                     Grid.Row="2" 
                     Margin="3,0,0,0" 
                     AcceptsReturn="True" 

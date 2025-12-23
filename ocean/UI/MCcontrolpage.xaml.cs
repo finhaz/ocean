@@ -97,7 +97,7 @@ namespace ocean.UI
         private void dataset_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
-            CommonRes.dt2 = _globalVM.McController.dtset;
+            
         }
 
 
@@ -111,7 +111,7 @@ namespace ocean.UI
         private void datafactor_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
-            CommonRes.dt3 = _globalVM.McController.dtfactor;
+            
         }
 
 
