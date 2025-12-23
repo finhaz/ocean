@@ -30,7 +30,8 @@ using System.Windows.Shapes;
 using System.Xml;
 using Newtonsoft.Json; // 必须添加，否则JsonConvert识别不到
 using System.IO;
-using ocean.ViewModels; // 操作文件的核心命名空间
+using ocean.ViewModels; 
+using ocean.Mvvm;
 
 namespace ocean.UI
 {
@@ -42,46 +43,14 @@ namespace ocean.UI
     public partial class Modserial
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
-        public ICommand ButtonCommand { get; }
 
         public Modserial()
         {
 
             InitializeComponent();
             DataContext = _globalVM;
-            // 初始化命令
-            ButtonCommand = new RelayCommand(OnButtonClick);
  
         }
-
-        private void OnButtonClick(object parameter)
-        {
-
-            if (parameter is DataRowView rowView)
-            {
-                // 处理按钮点击逻辑（例如弹出对话框）
-                //MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
-                int addr = Convert.ToInt32(rowView["Addr"]);
-
-                if (!CommonRes.mySerialPort.IsOpen)
-                {
-                    MessageBox.Show("请打开串口！");
-                    return;
-                }
-                try
-                {
-                    int anum = Convert.ToInt32(rowView["Command"]);
-                    _globalVM.ModbusSet.Monitor_Set(addr, anum);
-                }
-                catch
-                {
-                    MessageBox.Show("输入命令不能为空！");
-                }
-
-            }
-
-        }
-
 
         private void setsure_click(object sender, RoutedEventArgs e)
         {

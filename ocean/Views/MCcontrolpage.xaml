@@ -48,11 +48,19 @@
                     HorizontalAlignment="Left" 
                     Grid.ColumnSpan="2" 
                     Margin="25,0,0,0" />
+                <Label 
+                    Content="地址："
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Margin="25,0,0,0">
+                    
+                </Label>
                 <TextBox 
+                    HorizontalAlignment="Right" 
                     Name="runAddr"  
                     Grid.Row="1"  
                     Grid.ColumnSpan="2" 
-                    Text="{Binding McController.rText, Mode=TwoWay}"></TextBox>
+                    Text="{Binding McController.RaddText, Mode=TwoWay}"></TextBox>
                 <Button 
                     Name="btRUN" 
                     Content="运行" 

@@ -21,28 +21,28 @@ namespace ocean.ViewModels
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                 Label = "串口调试界面",
                 NavigationType = typeof(BugsPage),
-                NavigationDestination = new Uri("UI/debug_serial.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/debug_serial.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "通用调试界面",
                 NavigationType = typeof(UserPage),
-                NavigationDestination = new Uri("UI/Modserial.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/Modserial.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserDoctorSolid },
                 Label = "控制界面",
                 NavigationType = typeof(BreakPage),
-                NavigationDestination = new Uri("UI/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FontAwesomeBrands },
                 Label = "协议说明",
                 NavigationType = typeof(AwesomePage),
-                NavigationDestination = new Uri("UI/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
             });
 
             this.OptionsMenu.Add(new MenuItem()

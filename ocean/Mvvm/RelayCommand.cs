@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace ocean.Communication
+namespace ocean.Mvvm
 {
     public class RelayCommand : ICommand
     {

@@ -1,18 +1,19 @@
 ﻿using ocean.Mvvm;
 using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel;
+using System.Data;
 using System.Data;
 using System.IO.Ports;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using System;
-using System.Data;
 using System.Windows;
+using System.Windows.Input;
 
 namespace ocean.Communication
 
@@ -25,8 +26,12 @@ namespace ocean.Communication
         {
             dtm = new DataTable();
             AddDataTableColumns(dtm);
+            ButtonCommand = new RelayCommand(OnButtonClick);
 
         }
+
+        public ICommand ButtonCommand { get; }
+
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
         private string _sadd = "0"; // 初始值可根据你的业务调整
@@ -230,6 +235,37 @@ namespace ocean.Communication
             txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num,"TX:",true);
             BoxStr += txt;
         }
+
+
+        private void OnButtonClick(object parameter)
+        {
+
+            if (parameter is DataRowView rowView)
+            {
+                // 处理按钮点击逻辑（例如弹出对话框）
+                //MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
+                int addr = Convert.ToInt32(rowView["Addr"]);
+
+                if (!CommonRes.mySerialPort.IsOpen)
+                {
+                    MessageBox.Show("请打开串口！");
+                    return;
+                }
+                try
+                {
+                    int anum = Convert.ToInt32(rowView["Command"]);
+                    Monitor_Set(addr, anum);
+                }
+                catch
+                {
+                    MessageBox.Show("输入命令不能为空！");
+                }
+
+            }
+
+        }
+
+
 
         public void Dispose()
         {

@@ -20,7 +20,14 @@ namespace ocean.Communication
     public class MCControl:ObservableObject
     {
         //自定义运行界面的地址
-        public string rText { get; set; }
+
+        private string raddText = "128";
+        public string RaddText
+        {
+            get => raddText;
+            set => SetProperty(ref raddText, value);
+        }
+
 
         //控件绑定相关
 
@@ -95,10 +102,10 @@ namespace ocean.Communication
                 execAction: ButtonIncreaseAction,
                 changeFunc: parameter => true     // 可选：可执行条件（始终返回true）
             );
-            rText = "128";
+
             InitTimer();
             LoadDataFromDatabase();
-            runnum = dtrun.Rows.Count;
+            
         }
 
 
@@ -116,6 +123,7 @@ namespace ocean.Communication
             dtrun ??= new DataTable("PARAMETER_RUN");
             dtset ??= new DataTable("PARAMETER_SET");
             dtfactor ??= new DataTable("PARAMETER_FACTOR");
+            runnum = dtrun.Rows.Count;
         }
 
 
@@ -154,10 +162,7 @@ namespace ocean.Communication
         // 核心：业务处理方法（适配CommonRes的委托）
         public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len)
         {           
-            if (ProtocolNum == "FE协议")
-            {
-                Thread.Sleep(80); // 照顾粒子群的非环形缓冲读取法
-            }
+
             byte[] buffer = new byte[200];        
             int n_dsp = 0;
             int check_result = 0;
@@ -211,30 +216,23 @@ namespace ocean.Communication
                     // 处理数据库数据更新
                     if (data[gbuffer[5]].SN == gbuffer[5])
                     {
-                        if (gbuffer[5] < 44)
+                        // 提取核心索引变量，减少重复取值
+                        int bufferVal = gbuffer[5];
+                        if (bufferVal < 44)
                         {
-                            data[gbuffer[5]].VALUE = temp_val;
-                            // 跨线程更新DataTable和数据库，同步操作，异步用UiDispatcherHelper.ExecuteOnUiThreadAsync
-                            UiDispatcherHelper.ExecuteOnUiThread(() =>
-                            {
-                                dtrun.Rows[data[gbuffer[5]].SN][5] = data[gbuffer[5]].VALUE;
-                            });
+                            int dataIndex = bufferVal;
+                            data[dataIndex].VALUE = temp_val;
+                            // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
+                            UpdateUiForRunTable(dataIndex);
                         }
                         else
                         {
-                            float ovla;
-                            int vindex;
-
-                            if (gbuffer[5] < 90)
+                            // 扁平化嵌套：合并vindex和ovla的赋值逻辑
+                            (int vindex, float ovla, string dbTable) = bufferVal switch
                             {
-                                vindex = data[gbuffer[5]].SN - 44;
-                                ovla = Convert.ToSingle(dtset.Rows[vindex][5]);
-                            }
-                            else
-                            {
-                                vindex = data[gbuffer[5]].SN - 90;
-                                ovla = Convert.ToSingle(dtfactor.Rows[vindex][2]);
-                            }
+                                < 90 => (data[bufferVal].SN - 44, Convert.ToSingle(dtset.Rows[data[bufferVal].SN - 44][5]), "PARAMETER_SET"),
+                                _ => (data[bufferVal].SN - 90, Convert.ToSingle(dtfactor.Rows[data[bufferVal].SN - 90][2]), "PARAMETER_FACTOR")
+                            };
 
                             if (temp_val != ovla)
                             {
@@ -244,21 +242,8 @@ namespace ocean.Communication
                                 }
                                 else
                                 {
-
-                                    // 跨线程更新DataTable和数据库，同步操作，异步用UiDispatcherHelper.ExecuteOnUiThreadAsync
-                                    UiDispatcherHelper.ExecuteOnUiThread(() =>
-                                    {
-                                        if (gbuffer[5] < 90)
-                                        {
-                                            dtset.Rows[vindex][5] = temp_val;
-                                            DB_SQLlite.Instance.DataBase_SET_Save("PARAMETER_SET", temp_val, (byte)gbuffer[5]);
-                                        }
-                                        else
-                                        {
-                                            dtfactor.Rows[vindex][2] = temp_val;
-                                            DB_SQLlite.Instance.DataBase_SET_Save("PARAMETER_FACTOR", temp_val, (byte)gbuffer[5]);
-                                        }
-                                    });
+                                    // 抽取UI更新+数据库保存逻辑，避免重复判断bufferVal
+                                    UpdateUiAndSaveDb(bufferVal, vindex, temp_val, dbTable);
                                 }
                             }
                         }
@@ -269,9 +254,42 @@ namespace ocean.Communication
         }
 
 
+        /// --------------- 抽取的辅助方法（可放在当前类中） ---------------
+        /// <summary>
+        /// 更新运行表UI
+        /// </summary>
+        private void UpdateUiForRunTable(int dataIndex)
+        {
+            UiDispatcherHelper.ExecuteOnUiThread(() =>
+            {
+                dtrun.Rows[data[dataIndex].SN][5] = data[dataIndex].VALUE;
+            });
+        }
+
+        /// <summary>
+        /// 跨线程更新UI并保存数据库
+        /// </summary>
+        private void UpdateUiAndSaveDb(int bufferVal, int vindex, float tempVal, string dbTable)
+        {
+            UiDispatcherHelper.ExecuteOnUiThread(() =>
+            {
+                if (bufferVal < 90)
+                {
+                    dtset.Rows[vindex][5] = tempVal;
+                }
+                else
+                {
+                    dtfactor.Rows[vindex][2] = tempVal;
+                }
+                DB_SQLlite.Instance.DataBase_SET_Save(dbTable, tempVal, (byte)bufferVal);
+            });
+        }
+
+
+
         public void runstop_cotnrol(int addr, bool pbrun)
         {
-            //bool brun;
+
             int send_num = 0;
             brun = pbrun;
             //textBox1.Text = "系统停止运行";
@@ -279,27 +297,19 @@ namespace ocean.Communication
             {
                 COMFE.Instance.Monitor_Run(sendbf,brun);
                 send_num = sendbf[4] + 5;
-                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }
             else if (ProtocolNum == "Modbus协议")//modbus
             {
                 //1号机1通道
                 COMModbus.Instance.Monitor_Run(sendbf,1, addr, brun);
-                send_num = 8;
-                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+                send_num = 8;                
             }
+
+            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+            string txt = "TX:";
+            txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
 
             
-
-            string txt = "TX:";
-            if (ProtocolNum == "FE协议")
-            {
-                txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
-            }
-            else if (ProtocolNum == "Modbus协议")
-            {
-                txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
-            }
             // 线程安全更新UI
             UiDispatcherHelper.ExecuteOnUiThread(() =>
             {
@@ -315,6 +325,7 @@ namespace ocean.Communication
             int tempsn;
             string val;
             float value;
+            int send_num = 0;
 
             if (table == "PARAMETER_FACTOR")
             {
@@ -346,13 +357,15 @@ namespace ocean.Communication
                 if (ProtocolNum == "FE协议")
                 {
                     COMFE.Instance.Monitor_Set(sendbf,(byte)tempsn, (byte)(data[tempsn].COMMAND), value);
-                    CommonRes.mySerialPort.Write(sendbf, 0, sendbf[4] + 5);
+                    send_num = sendbf[4] + 5;
+                    
                 }
                 else if (ProtocolNum == "Modbus协议")
                 {
                     COMModbus.Instance.Monitor_Set_06(sendbf, tempsn, value);
-                    CommonRes.mySerialPort.Write(sendbf, 0, 8);
+                    send_num = 8;
                 }
+                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }
             else
             {

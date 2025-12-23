@@ -57,14 +57,14 @@ namespace ocean.UI
                 MessageBox.Show("请打开串口！");
                 return;
             }
-            int addr = Int32.Parse(_globalVM.McController.rText);
+            int addr = Int32.Parse(_globalVM.McController.RaddText);
             _globalVM.McController.runstop_cotnrol(addr,true);
             textBox1.Text= "系统正在运行";
         }
 
         private void btSTOP_Click(object sender, RoutedEventArgs e)
         {
-            int addr = Int32.Parse(_globalVM.McController.rText);
+            int addr = Int32.Parse(_globalVM.McController.RaddText);
             _globalVM.McController.runstop_cotnrol(addr,false);
             textBox1.Text = "系统停止运行";
            

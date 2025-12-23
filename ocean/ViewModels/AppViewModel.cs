@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ocean.ViewModels
 {
     // 全局ViewModel
-    public class AppViewModel : ObservableObject
+    public class AppViewModel: ObservableObject
     {
         // *************************
         // 单例核心实现（懒加载+线程安全）
