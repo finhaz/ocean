@@ -11,13 +11,17 @@ using System.IO.Ports;
 
 namespace ocean
 {
-    public class Message_modbus//计划设计modbus协议版本
+    public class COMModbus//计划设计modbus协议版本
     {
-        public byte[] sendbf = new byte[128];
+        //public byte[] sendbf = new byte[128];
         byte[] revbuffer = new byte[256];
 
+        // 单例模式（保持不变）
+        private COMModbus() { }
+        private static readonly Lazy<COMModbus> _instance = new Lazy<COMModbus>(() => new COMModbus());
+        public static COMModbus Instance => _instance.Value;
 
-        public void Monitor_Get_03(int sn,int num)
+        public void Monitor_Get_03(byte[] sendbf,int sn,int num)
         {
             int crc;
             Array.Clear(sendbf, 0, sendbf.Length);
@@ -39,7 +43,7 @@ namespace ocean
             sendbf[7] = temp_i[1];
         }
 
-        public void Monitor_Set_06(int sn,float send_value)
+        public void Monitor_Set_06(byte[] sendbf, int sn,float send_value)
         {
             int crc = 0;
             Int16 svalue = (short)send_value;
@@ -61,7 +65,7 @@ namespace ocean
             sendbf[7] = temp_i[1];
         }
 
-        public void Monitor_Run(byte machine,int adr, bool brun)
+        public void Monitor_Run(byte[] sendbf,byte machine,int adr, bool brun)
         {
             int crc;
             Array.Clear(sendbf, 0, sendbf.Length);

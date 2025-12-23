@@ -19,13 +19,12 @@ namespace ocean.Communication
 {
     public class Modbusset : ObservableObject
     {
-  
+        public byte[] sendbf = new byte[128];
+
         public Modbusset()
         {
             dtm = new DataTable();
             AddDataTableColumns(dtm);
-
-            zcom = new Message_modbus();
 
         }
 
@@ -140,7 +139,7 @@ namespace ocean.Communication
         public DataTable dtm { get; set; }
 
 
-        public Message_modbus zcom { get; set; }
+        //public Message_modbus zcom { get; set; }
         // 提取列初始化的通用方法（便于复用，可选）
         private void AddDataTableColumns(DataTable dt)
         {
@@ -212,11 +211,11 @@ namespace ocean.Communication
         public void Monitor_Get(int addr,int value)
         {
             int send_num = 8;
-            zcom.Monitor_Get_03(addr, value);
-            CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
+            COMModbus.Instance.Monitor_Get_03(sendbf, addr, value);
+            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
 
             string txt = "";
-            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(zcom.sendbf, send_num,"TX:",true);
+            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num,"TX:",true);
             BoxStr += txt;
         }
 
@@ -224,11 +223,11 @@ namespace ocean.Communication
         public void Monitor_Set(int addr,int value)
         {
             int send_num = 8;
-            zcom.Monitor_Set_06(addr, value);
-            CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
+            COMModbus.Instance.Monitor_Set_06(sendbf, addr, value);
+            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
 
             string txt = "";
-            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(zcom.sendbf, send_num,"TX:",true);
+            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num,"TX:",true);
             BoxStr += txt;
         }
 

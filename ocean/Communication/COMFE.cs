@@ -7,11 +7,17 @@ using System.IO.Ports;
 
 namespace ocean
 {
-    public class Message
+    public class COMFE
     {
-        public byte[] sendbf = new byte[24];
+        // 单例模式（保持不变）
+        private COMFE() { }
+        private static readonly Lazy<COMFE> _instance = new Lazy<COMFE>(() => new COMFE());
+        public static COMFE Instance => _instance.Value;
+
+
+        //public byte[] sendbf = new byte[24];
         byte[] revbuffer = new byte[256];
-        public void PSO_send(float []u_g)
+        public void PSO_send(byte[] sendbf,float []u_g)
         {
             //将计算完成的数据存入发送数组中
             //回发数据为了保持两台机子同步接收，不区分逆变器，数据同时下发，逆变器侧自行根据位置进行接收
@@ -38,7 +44,7 @@ namespace ocean
             //serialPort1.Write(sendbf, 0, sendbf[4] + 5);
         }
 
-        public void PSO_request(byte Num_DSP)
+        public void PSO_request(byte[] sendbf,byte Num_DSP)
         {
             int crc = 0;
             Array.Clear(sendbf, 0, sendbf.Length);
@@ -54,7 +60,7 @@ namespace ocean
         }
 
 
-        public void Monitor_Get(byte sn, byte COMMAND)
+        public void Monitor_Get(byte[] sendbf, byte sn, byte COMMAND)
         {
             int crc;
             Array.Clear(sendbf, 0, sendbf.Length);
@@ -68,7 +74,7 @@ namespace ocean
             sendbf[7] = (byte)(0 - crc);
         }
 
-        public void Monitor_Set(byte sn,byte COMMAND,float send_value)
+        public void Monitor_Set(byte[] sendbf, byte sn,byte COMMAND,float send_value)
         {
             int crc = 0;
             Array.Clear(sendbf, 0, sendbf.Length);
@@ -89,7 +95,7 @@ namespace ocean
             sendbf[11] = (byte)(0 - crc);
         }
 
-        public void Monitor_Initial(int sn1, float send_value)
+        public void Monitor_Initial(byte[] sendbf,int sn1, float send_value)
         {
             int crc = 0;
             sendbf[0] = 0xfe;
@@ -115,7 +121,7 @@ namespace ocean
             sendbf[11] = (byte)(0 - crc);
         }
 
-        public void Monitor_Run(bool brun)
+        public void Monitor_Run(byte[] sendbf, bool brun)
         {
             int crc = 0;
             sendbf[0] = 0xfe;
@@ -139,7 +145,7 @@ namespace ocean
             sendbf[9] = (byte)crc;
         }
 
-        public void MakeCommand(int sn, byte command, float data)
+        public void MakeCommand(byte[] sendbf, int sn, byte command, float data)
         {
 
             int crc;
@@ -183,7 +189,7 @@ namespace ocean
             }
         }
 
-        private void RceCommand(int start, Data_r[] data)
+        private void RceCommand(byte[] sendbf, int start, Data_r[] data)
         {
             int crc;
 

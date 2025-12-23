@@ -76,11 +76,7 @@ namespace ocean.Communication
 
         public Data_r[] data = new Data_r[200];
         public int runnum;
-
-
-        //通讯协议
-        public Message NYS_com = new Message();
-        public Message_modbus FCOM2 = new Message_modbus();
+        public byte[] sendbf = new byte[128];
 
         //定时器
         private DispatcherTimer mDataTimer = null; //定时器
@@ -135,9 +131,9 @@ namespace ocean.Communication
                         //DB_Com.DataBase_RUN_Save();
                     }
 
-                    NYS_com.Monitor_Get((byte)sn, (byte)data[sn].COMMAND);
+                    COMFE.Instance.Monitor_Get(sendbf,(byte)sn, (byte)data[sn].COMMAND);
 
-                    CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
+                    CommonRes.mySerialPort.Write(sendbf, 0, sendbf[4] + 5);
 
                     sn = sn + 1;
 
@@ -146,9 +142,9 @@ namespace ocean.Communication
                 {
                     //DB_Com.DataBase_RUN_Save();
 
-                    FCOM2.Monitor_Get_03(0, runnum);
+                    COMModbus.Instance.Monitor_Get_03(sendbf,0, runnum);
 
-                    CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
+                    CommonRes.mySerialPort.Write(sendbf, 0, 8);
                 }
 
             }
@@ -185,7 +181,7 @@ namespace ocean.Communication
                 }
 
                 // 校验数据
-                check_result = NYS_com.monitor_check(gbuffer);
+                check_result = COMFE.Instance.monitor_check(gbuffer);
 
                 // 校验成功=1的处理
                 if (check_result == 1)
@@ -281,16 +277,16 @@ namespace ocean.Communication
             //textBox1.Text = "系统停止运行";
             if (ProtocolNum == "FE协议")//FE协议
             {
-                NYS_com.Monitor_Run(brun);
-                send_num = NYS_com.sendbf[4] + 5;
-                CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, send_num);
+                COMFE.Instance.Monitor_Run(sendbf,brun);
+                send_num = sendbf[4] + 5;
+                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }
             else if (ProtocolNum == "Modbus协议")//modbus
             {
                 //1号机1通道
-                FCOM2.Monitor_Run(1, addr, brun);
+                COMModbus.Instance.Monitor_Run(sendbf,1, addr, brun);
                 send_num = 8;
-                CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, send_num);
+                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }
 
             
@@ -298,11 +294,11 @@ namespace ocean.Communication
             string txt = "TX:";
             if (ProtocolNum == "FE协议")
             {
-                txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(NYS_com.sendbf, send_num, "TX:", true);
+                txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
             }
             else if (ProtocolNum == "Modbus协议")
             {
-                txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(FCOM2.sendbf, send_num, "TX:", true);
+                txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
             }
             // 线程安全更新UI
             UiDispatcherHelper.ExecuteOnUiThread(() =>
@@ -349,13 +345,13 @@ namespace ocean.Communication
             {
                 if (ProtocolNum == "FE协议")
                 {
-                    NYS_com.Monitor_Set((byte)tempsn, (byte)(data[tempsn].COMMAND), value);
-                    CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
+                    COMFE.Instance.Monitor_Set(sendbf,(byte)tempsn, (byte)(data[tempsn].COMMAND), value);
+                    CommonRes.mySerialPort.Write(sendbf, 0, sendbf[4] + 5);
                 }
                 else if (ProtocolNum == "Modbus协议")
                 {
-                    FCOM2.Monitor_Set_06(tempsn, value);
-                    CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
+                    COMModbus.Instance.Monitor_Set_06(sendbf, tempsn, value);
+                    CommonRes.mySerialPort.Write(sendbf, 0, 8);
                 }
             }
             else
