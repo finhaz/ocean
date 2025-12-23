@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ocean.Communication
 {
@@ -116,25 +117,6 @@ namespace ocean.Communication
             InitTimer();
         }
 
-
-        // 供串口事件调用：线程安全更新TextBlock的Text属性
-        public void UpdateSerialText(string newText)
-        {
-            // 判断当前是否为UI线程，若非则通过Dispatcher切换（WPF特有）
-            if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
-            {
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    // 追加数据（也可直接覆盖：SerialTextBlock.Text = newText）
-                    SerialTextBlock.Text += newText;
-                });
-            }
-            else
-            {
-                SerialTextBlock.Text += newText;
-            }
-        }
-
         public void show_stop()
         {
             if (bshow == true)
@@ -169,8 +151,7 @@ namespace ocean.Communication
 
         // 核心：业务处理方法（适配CommonRes的委托）
         public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len)
-        {
-            // 1. 处理Protocol_num=0时的延迟（原逻辑）
+        {           
             if (ProtocolNum == "FE协议")
             {
                 Thread.Sleep(80); // 照顾粒子群的非环形缓冲读取法
@@ -178,19 +159,18 @@ namespace ocean.Communication
 
             byte[] buffer = new byte[200];
             int i = 0;
-            string str = "RX:";
+            
             int n_dsp = 0;
             int check_result = 0;
 
-            // 2. 拼接串口数据字符串（原逻辑）
-            for (i = 0; i < buffer_len; i++)
+            string str = "";
+            str = SerialDataProcessor.Instance.FormatSerialDataToHexString(gbuffer, buffer_len, "RX:", gb_last, true);
+            // 线程安全更新UI
+            UiDispatcherHelper.ExecuteOnUiThread(() =>
             {
-                str += Convert.ToString(gbuffer[(gb_last + i) % gbuffer.Length], 16) + ' ';
-            }
-            str += '\r';
-
-            // 3. 输出到textbox
-            UpdateSerialText(str);
+                SerialTextBlock.Text += str;
+                //SerialTextBlock.ScrollToEnd();
+            });
 
             // 4. Protocol_num=0的业务处理（原核心逻辑）
             if (ProtocolNum == "FE协议")
@@ -236,7 +216,7 @@ namespace ocean.Communication
                         {
                             DB_Com.data[gbuffer[5]].VALUE = temp_val;
                             // 跨线程更新DataTable（避免UI线程异常）
-                            Application.Current.Dispatcher.Invoke(() =>
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
                             {
                                 dtrun.Rows[DB_Com.data[gbuffer[5]].SN][5] = DB_Com.data[gbuffer[5]].VALUE;
                             });
@@ -266,7 +246,7 @@ namespace ocean.Communication
                                 else
                                 {
                                     // 跨线程更新DataTable和数据库
-                                    Application.Current.Dispatcher.Invoke(() =>
+                                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
                                     {
                                         if (gbuffer[5] < 90)
                                         {
@@ -309,22 +289,23 @@ namespace ocean.Communication
                 CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, send_num);
             }
 
+            
+
             string txt = "TX:";
-            for (int i = 0; i < send_num; i++)
+            if (ProtocolNum == "FE协议")
             {
-                if (ProtocolNum == "FE协议")
-                {
-                    txt += Convert.ToString(NYS_com.sendbf[i], 16);
-                }
-                else if (ProtocolNum == "Modbus协议")
-                {
-                    txt += Convert.ToString(FCOM2.sendbf[i], 16);
-                }
-                txt += ' ';
+                txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(NYS_com.sendbf, send_num, "TX:", true);
             }
-            txt += '\r';
-            txt += '\n';
-            UpdateSerialText(txt);
+            else if (ProtocolNum == "Modbus协议")
+            {
+                txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(FCOM2.sendbf, send_num, "TX:", true);
+            }
+            // 线程安全更新UI
+            UiDispatcherHelper.ExecuteOnUiThread(() =>
+            {
+                SerialTextBlock.Text += txt;
+                //txtSerialLog.ScrollToEnd();
+            });
         }
 
         public void mbutton_set(string table, int x)

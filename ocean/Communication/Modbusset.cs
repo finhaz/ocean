@@ -164,20 +164,14 @@ namespace ocean.Communication
         {
             byte[] buffer = new byte[200];
             int i = 0;
-            string str = "RX:";
             int temp_Value = 0;
 
-            // 1. 拼接串口数据字符串（原逻辑）
-            for (i = 0; i < buffer_len; i++)
+            string str = "";
+            str = SerialDataProcessor.Instance.FormatSerialDataToHexString(gbuffer, buffer_len, "RX:", gb_last, true);
+            // 线程安全更新UI
+            UiDispatcherHelper.ExecuteOnUiThread(() =>
             {
-                str += Convert.ToString(gbuffer[(gb_last + i) % gbuffer.Length], 16) + ' ';
-            }
-            str += '\r';
-
-            // 2. 跨线程更新UI属性（BoxStr）
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                BoxStr += str;
+                BoxStr += str;               
             });
 
             // 3. Modbus协议1的业务处理（原逻辑）
@@ -222,7 +216,7 @@ namespace ocean.Communication
             CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
 
             string txt = "";
-            txt = SerialDataProcessor.Instance.FormatTxDataToHexString(zcom.sendbf, send_num, true);
+            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(zcom.sendbf, send_num,"TX:",true);
             BoxStr += txt;
         }
 
@@ -234,7 +228,7 @@ namespace ocean.Communication
             CommonRes.mySerialPort.Write(zcom.sendbf, 0, send_num);
 
             string txt = "";
-            txt = SerialDataProcessor.Instance.FormatTxDataToHexString(zcom.sendbf, send_num, true);
+            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(zcom.sendbf, send_num,"TX:",true);
             BoxStr += txt;
         }
 
