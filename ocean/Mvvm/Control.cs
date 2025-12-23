@@ -120,6 +120,17 @@ namespace ocean.Mvvm
         {
             this.execAction.Invoke(parameter);
         }
+
+        //public bool CanExecute(object parameter) => changeFunc(parameter);
+
+        //public void Execute(object parameter) => execAction(parameter);
+
+        // 手动触发方法（非WPF框架使用）
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested(); // WPF中也可用此方法手动刷新
+        }
+
     }
 
 

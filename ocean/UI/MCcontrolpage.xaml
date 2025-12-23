@@ -73,7 +73,7 @@
                     Width="80"/>
                 <Button 
                     Name="btShow" 
-                    Content="{Binding McController.btShow.Content, Mode=TwoWay}" 
+                    Content="{Binding McController.BshowContent, Mode=TwoWay}" 
                     Grid.Row="4" 
                     Grid.ColumnSpan="2"
                     HorizontalAlignment="Center" 
@@ -94,7 +94,7 @@
                     Margin="0,1,0,1" 
                     Grid.ColumnSpan="2" 
                     ItemsSource="{Binding ModbusSet.ProOptions}"
-                    SelectedItem="{Binding McController.protocolNum, Mode=TwoWay}" />
+                    SelectedItem="{Binding McController.ProtocolNum, Mode=TwoWay}" />
             </Grid>
 
             <Grid Grid.Column="2">

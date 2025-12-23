@@ -35,6 +35,7 @@
         <TextBlock 
                 HorizontalAlignment="Left" 
                 Grid.Row="1"
+                Grid.Column="1"
                 Text="协议类型"
                 FontSize="10" 
                 Margin="10,0,0,0"
@@ -44,8 +45,9 @@
         <ComboBox
                 Name="cPro" 
                 FontSize="10" 
-                Grid.Row="1" 
-                Margin="60,20,0,20" 
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="60,20,360,20" 
                 ItemsSource="{Binding ModbusSet.ProOptions}"
                 SelectedItem="{Binding ModbusSet.IntoSelectedOption, Mode=TwoWay}"/>
 
@@ -53,7 +55,7 @@
         <!-- 协议详情展示区域（绑定选中的单个协议） -->
         <StackPanel 
             Grid.Column="1" 
-            Grid.Row="1"
+            Grid.Row="2"
             Grid.RowSpan="4"
             Margin="5"
             DataContext="{Binding ModbusSet.SelectedProtocol}">  <!-- 绑定到筛选后的协议对象 -->

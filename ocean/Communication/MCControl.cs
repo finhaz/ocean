@@ -22,30 +22,27 @@ namespace ocean.Communication
         public string rText { get; set; }
 
         //控件绑定相关
-        public TextBox textmain { get; set; }
-        //按键
-        public Button btShow { get; set; }
-
 
         //泛型控件
         // 定义TextBlock<string>实例（供XAML绑定）
         public TextBlock<string> SerialTextBlock { get; set; }
 
+        private string bshowcontet = "数据采集";
+        public string BshowContent
+        {
+            get => bshowcontet;
+            set => SetProperty(ref bshowcontet, value); // 一行搞定，无需重复逻辑
+        }
+
+        private string protocolNum = "Modbus协议";
+        public string ProtocolNum
+        {
+            get => protocolNum;
+            set => SetProperty(ref protocolNum, value);
+        }
+
 
         public ICommand ButtonIncrease { get; }
-        // 用于测试CanExecute的状态变量
-        private bool _isCommandEnabled = true;
-        public bool IsCommandEnabled
-        {
-            get => _isCommandEnabled;
-            set
-            {
-                _isCommandEnabled = value;
-                OnPropertyChanged();
-                // 若使用方式1，需手动触发事件
-                // ((MyCommand)TestCommand).RaiseCanExecuteChanged();
-            }
-        }
 
         //数据处理
         public DataTable dtrun { get; set; }
@@ -83,7 +80,7 @@ namespace ocean.Communication
         public Message NYS_com = new Message();
         public Message_modbus FCOM2 = new Message_modbus();
 
-        public int protocolNum = 1;
+        
 
 
         //定时器
@@ -96,21 +93,15 @@ namespace ocean.Communication
 
         public MCControl() 
         {
-            textmain = new TextBox();
-
-            btShow = new Button();
-
 
             SerialTextBlock = new TextBlock<string>();
 
             // 初始化命令：执行逻辑 + 可执行判断
             ButtonIncrease = new MyCommand(
-                execAction: ButtonIncreaseAction,             
-                parameter => IsCommandEnabled // 可执行条件：IsCommandEnabled为true
+                execAction: ButtonIncreaseAction,
+                changeFunc: parameter => true     // 可选：可执行条件（始终返回true）
             );
 
-
-            btShow.Content = "数据采集";
 
             dtrun = CommonRes.dt1;
 
@@ -148,7 +139,7 @@ namespace ocean.Communication
         {
             if (bshow == true)
             {
-                if (protocolNum == 0)
+                if (ProtocolNum == "FE协议")
                 {
                     if (sn == DB_Com.runnum)
                     {
@@ -163,7 +154,7 @@ namespace ocean.Communication
                     sn = sn + 1;
 
                 }
-                else if (protocolNum == 1)
+                else if (ProtocolNum == "Modbus协议")
                 {
                     //DB_Com.DataBase_RUN_Save();
 
@@ -180,7 +171,7 @@ namespace ocean.Communication
         public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len)
         {
             // 1. 处理Protocol_num=0时的延迟（原逻辑）
-            if (protocolNum == 0)
+            if (ProtocolNum == "FE协议")
             {
                 Thread.Sleep(80); // 照顾粒子群的非环形缓冲读取法
             }
@@ -202,7 +193,7 @@ namespace ocean.Communication
             UpdateSerialText(str);
 
             // 4. Protocol_num=0的业务处理（原核心逻辑）
-            if (protocolNum == 0)
+            if (ProtocolNum == "FE协议")
             {
                 // 数据区未接收完整，直接返回
                 if (buffer_len < gbuffer[4] + 5)
@@ -304,13 +295,13 @@ namespace ocean.Communication
             int send_num = 0;
             brun = pbrun;
             //textBox1.Text = "系统停止运行";
-            if (protocolNum == 0)//FE协议
+            if (ProtocolNum == "FE协议")//FE协议
             {
                 NYS_com.Monitor_Run(brun);
                 send_num = NYS_com.sendbf[4] + 5;
                 CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, send_num);
             }
-            else if (protocolNum == 1)//modbus
+            else if (ProtocolNum == "Modbus协议")//modbus
             {
                 //1号机1通道
                 FCOM2.Monitor_Run(1, addr, brun);
@@ -321,11 +312,11 @@ namespace ocean.Communication
             string txt = "TX:";
             for (int i = 0; i < send_num; i++)
             {
-                if (protocolNum == 0)
+                if (ProtocolNum == "FE协议")
                 {
                     txt += Convert.ToString(NYS_com.sendbf[i], 16);
                 }
-                else if (protocolNum == 1)
+                else if (ProtocolNum == "Modbus协议")
                 {
                     txt += Convert.ToString(FCOM2.sendbf[i], 16);
                 }
@@ -371,12 +362,12 @@ namespace ocean.Communication
 
             if (CommonRes.mySerialPort.IsOpen == true)
             {
-                if (protocolNum == 0)
+                if (ProtocolNum == "FE协议")
                 {
                     NYS_com.Monitor_Set((byte)tempsn, (byte)(DB_Com.data[tempsn].COMMAND), value);
                     CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
                 }
-                else if (protocolNum == 1)
+                else if (ProtocolNum == "Modbus协议")
                 {
                     FCOM2.Monitor_Set_06(tempsn, value);
                     CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
@@ -428,18 +419,18 @@ namespace ocean.Communication
 
         private void ButtonIncreaseAction(object parameter)
         {
-            //MessageBox.Show("h!");
+            MessageBox.Show("h!");
             if (CommonRes.mySerialPort.IsOpen == true)
             {
                 bshow = !bshow;
                 if (bshow)
                 {
-                    btShow.Content = "停止采集";
+                    BshowContent = "停止采集";
                     StartTimer();
                 }
                 else
                 {
-                    btShow.Content = "开始采集";
+                    BshowContent = "开始采集";
                     StopTimer();
                 }
             }

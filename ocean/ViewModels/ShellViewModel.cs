@@ -33,16 +33,16 @@ namespace ocean.ViewModels
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserDoctorSolid },
-                Label = "break",
+                Label = "控制界面",
                 NavigationType = typeof(BreakPage),
-                NavigationDestination = new Uri("UI/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("UI/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FontAwesomeBrands },
-                Label = "Awesome",
+                Label = "协议说明",
                 NavigationType = typeof(AwesomePage),
-                NavigationDestination = new Uri("UI/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("UI/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
             });
 
             this.OptionsMenu.Add(new MenuItem()
