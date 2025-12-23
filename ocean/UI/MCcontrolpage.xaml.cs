@@ -1,4 +1,5 @@
 ﻿using ocean.Communication;
+using ocean.ViewModels;
 using SomeNameSpace;
 using System;
 using System.Collections.Generic;
@@ -29,16 +30,15 @@ namespace ocean.UI
     /// <summary>
     /// DataAnal.xaml 的交互逻辑
     /// </summary>
-    public partial class DataAnal : Page
+    public partial class MCcontrolpage : Page
     {
-        // 保存委托实例引用，用于卸载时比较
-        private CommonRes.SerialDataReceivedHandler _registeredHandler;
-        public MKlll ucom { get; set; }
 
-        public DataAnal()
+        private AppViewModel _globalVM = AppViewModel.Instance;
+
+        public MCcontrolpage()
         {
-            ucom = new MKlll();
-            InitializeComponent();        
+            InitializeComponent();
+            DataContext = _globalVM;
         }
 
 
@@ -57,15 +57,15 @@ namespace ocean.UI
                 MessageBox.Show("请打开串口！");
                 return;
             }
-            int addr = Int32.Parse(ucom.rText);
-            ucom.runstop_cotnrol(addr,true);
+            int addr = Int32.Parse(_globalVM.McController.rText);
+            _globalVM.McController.runstop_cotnrol(addr,true);
             textBox1.Text= "系统正在运行";
         }
 
         private void btSTOP_Click(object sender, RoutedEventArgs e)
         {
-            int addr = Int32.Parse(ucom.rText);
-            ucom.runstop_cotnrol(addr,false);
+            int addr = Int32.Parse(_globalVM.McController.rText);
+            _globalVM.McController.runstop_cotnrol(addr,false);
             textBox1.Text = "系统停止运行";
            
         }
@@ -73,14 +73,14 @@ namespace ocean.UI
 
         private void datashow_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
-            ucom.select_index = datashow.SelectedIndex;
+            _globalVM.McController.select_index = datashow.SelectedIndex;
         }
 
 
         private void datashow_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            ucom.newValue = (e.EditingElement as TextBox).Text;
-            ucom.DB_Com.runnum=ucom.dtrun.Rows.Count;
+            _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
+            _globalVM.McController.DB_Com.runnum= _globalVM.McController.dtrun.Rows.Count;
         }
 
 
@@ -88,7 +88,7 @@ namespace ocean.UI
         {
             //读取选中行
             var x = dataset.SelectedIndex;
-            ucom.mbutton_set("PARAMETER_SET", (int)x);
+            _globalVM.McController.mbutton_set("PARAMETER_SET", (int)x);
         }
 
 
@@ -96,39 +96,29 @@ namespace ocean.UI
 
         private void dataset_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            ucom.newValue = (e.EditingElement as TextBox).Text;
-            CommonRes.dt2 = ucom.dtset;
+            _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
+            CommonRes.dt2 = _globalVM.McController.dtset;
         }
 
 
         private void MButton3_Click(object sender, RoutedEventArgs e)
         {
             //读取选中行
-            var x = datafactor.SelectedIndex; 
-            ucom.mbutton_set("PARAMETER_FACTOR", (int)x);
+            var x = datafactor.SelectedIndex;
+            _globalVM.McController.mbutton_set("PARAMETER_FACTOR", (int)x);
         }
 
         private void datafactor_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-            ucom.newValue = (e.EditingElement as TextBox).Text;
-            CommonRes.dt3 = ucom.dtfactor;
+            _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
+            CommonRes.dt3 = _globalVM.McController.dtfactor;
         }
 
-
-        private void cbProcho_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {   
-            switch (cbProcho.SelectedIndex)
-            {
-                case 0: CommonRes.Protocol_num = 0; break;
-                case 1: CommonRes.Protocol_num = 1; break;
-                default: CommonRes.Protocol_num = 1; break;
-            }                 
-        }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         { 
              // 仅当当前处理者是本Page的MKlll时，才取消
-            if (CommonRes.CurrentDataHandler == _registeredHandler)
+            if (CommonRes.CurrentDataHandler == _globalVM.McController.HandleSerialData)
             {
                 CommonRes.CurrentDataHandler = null;
             }
@@ -138,7 +128,7 @@ namespace ocean.UI
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.CurrentDataHandler = _registeredHandler;
+            CommonRes.CurrentDataHandler = _globalVM.McController.HandleSerialData;
         }
 
         public void Dispose()

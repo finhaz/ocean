@@ -18,7 +18,7 @@ using System.Windows.Input;
 
 namespace ocean
 {
-    public class CommonRes : ObservableObject
+    public class CommonRes
     {
         //静态字段
         public static SerialPort mySerialPort = new SerialPort();
@@ -29,7 +29,6 @@ namespace ocean
         public static byte[] gbuffer = new byte[4096];
         public static int gb_index = 0;//缓冲区注入位置
         public static int get_index = 0;// 缓冲区捕捉位置
-        public static int Protocol_num { get; set; }
 
         // 当前活跃Page的处理方法引用（初始为null）
         public static SerialDataReceivedHandler CurrentDataHandler { get; set; }

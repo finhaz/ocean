@@ -1,4 +1,4 @@
-﻿<Page x:Class="ocean.UI.DataAnal"
+﻿<Page x:Class="ocean.UI.MCcontrolpage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:ocean.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="DataAnal" Unloaded="Page_Unloaded" Loaded="Page_Loaded"
+      Title="MCcontrolpage" Unloaded="Page_Unloaded" Loaded="Page_Loaded"
       >
 
     <Grid>
@@ -41,20 +41,60 @@
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="100*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Name="textBox1" Text="系统停止运行" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.ColumnSpan="2" Margin="25,0,0,0" />
-                <TextBox Name="runAddr"  Grid.Row="1"  Grid.ColumnSpan="2" Text="{Binding ucom.rText, Mode=TwoWay}"></TextBox>
-                <Button Name="btRUN" Content="运行" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Click="btRUN_Click" Width="80"/>
-                <Button Name="btSTOP" Content="停止" Grid.Row="3" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Click="btSTOP_Click" Width="80"/>
-                <Button Name="btShow" Content="{Binding ucom.btShow.Content, Mode=TwoWay}" Grid.Row="4" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="80" Command="{Binding ucom.ButtonIncrease}"/>
-                <TextBlock Text="通讯协议选择" VerticalAlignment="Center" HorizontalAlignment="Left" Grid.Row="5" Grid.ColumnSpan="2" Margin="25,0,0,0" />
-                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="6" Margin="0,1,0,1" Grid.ColumnSpan="2" SelectionChanged="cbProcho_SelectionChanged">
-                    <ComboBoxItem >FE协议</ComboBoxItem>
-                    <ComboBoxItem IsSelected="True">Modbus协议</ComboBoxItem>
-                </ComboBox>
-
-
+                <TextBlock 
+                    Name="textBox1" 
+                    Text="系统停止运行" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Left" 
+                    Grid.ColumnSpan="2" 
+                    Margin="25,0,0,0" />
+                <TextBox 
+                    Name="runAddr"  
+                    Grid.Row="1"  
+                    Grid.ColumnSpan="2" 
+                    Text="{Binding ucom.rText, Mode=TwoWay}"></TextBox>
+                <Button 
+                    Name="btRUN" 
+                    Content="运行" 
+                    Grid.Row="2" 
+                    Grid.ColumnSpan="2" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"
+                    Click="btRUN_Click" 
+                    Width="80"/>
+                <Button 
+                    Name="btSTOP" 
+                    Content="停止" 
+                    Grid.Row="3" 
+                    Grid.ColumnSpan="2" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"
+                    Click="btSTOP_Click" 
+                    Width="80"/>
+                <Button 
+                    Name="btShow" 
+                    Content="{Binding McController.btShow.Content, Mode=TwoWay}" 
+                    Grid.Row="4" 
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    Width="80" 
+                    Command="{Binding McController.ButtonIncrease}"/>
+                <TextBlock 
+                    Text="通讯协议选择" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Left" 
+                    Grid.Row="5" 
+                    Grid.ColumnSpan="2" 
+                    Margin="25,0,0,0" />
+                <ComboBox 
+                    Name="cbProcho" 
+                    FontSize="10" 
+                    Grid.Row="6" 
+                    Margin="0,1,0,1" 
+                    Grid.ColumnSpan="2" 
+                    ItemsSource="{Binding ModbusSet.ProOptions}"
+                    SelectedItem="{Binding McController.protocolNum, Mode=TwoWay}" />
             </Grid>
 
             <Grid Grid.Column="2">
@@ -112,7 +152,14 @@
                     </TabItem>
                 </TabControl>
 
-                <TextBox TextWrapping="Wrap" Name="show_text"  Grid.Row="2" Margin="3,0,0,0" AcceptsReturn="True" Grid.RowSpan="2" Text="{Binding ucom.textmain.Text,Mode=TwoWay}"></TextBox>
+                <TextBox 
+                    TextWrapping="Wrap" 
+                    Name="show_text"  
+                    Grid.Row="2" 
+                    Margin="3,0,0,0" 
+                    AcceptsReturn="True" 
+                    Grid.RowSpan="2" 
+                    Text="{Binding McController.SerialTextBlock.Text,Mode=TwoWay}"></TextBox>
 
             </Grid>
 

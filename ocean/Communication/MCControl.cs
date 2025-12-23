@@ -16,23 +16,37 @@ using System.Windows.Threading;
 
 namespace ocean.Communication
 {
-    public class MKlll
+    public class MCControl:ObservableObject
     {
-
-
-
+        //自定义运行界面的地址
         public string rText { get; set; }
 
         //控件绑定相关
         public TextBox textmain { get; set; }
-
         //按键
         public Button btShow { get; set; }
 
-        bool isCanExec = true;
-        public ICommand ButtonIncrease => new MyCommand(ButtonIncreaseAction, MyCanExec);
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        //泛型控件
+        // 定义TextBlock<string>实例（供XAML绑定）
+        public TextBlock<string> SerialTextBlock { get; set; }
+
+
+        public ICommand ButtonIncrease { get; }
+        // 用于测试CanExecute的状态变量
+        private bool _isCommandEnabled = true;
+        public bool IsCommandEnabled
+        {
+            get => _isCommandEnabled;
+            set
+            {
+                _isCommandEnabled = value;
+                OnPropertyChanged();
+                // 若使用方式1，需手动触发事件
+                // ((MyCommand)TestCommand).RaiseCanExecuteChanged();
+            }
+        }
+
         //数据处理
         public DataTable dtrun { get; set; }
         public DataTable dtset { get; set; }
@@ -44,7 +58,6 @@ namespace ocean.Communication
         //DataBase_Interface DB_Com = new DataBase_Interface();
         public DB_sqlite DB_Com = new DB_sqlite();
         public string newValue;
-
         public bool brun = false;
         public bool bshow = false;
         //bool bmodify = false;
@@ -63,13 +76,14 @@ namespace ocean.Communication
         public int mrow;
         public int Num_time = 0;
         public int Num_DSP = 0;
-
         static int Set_Num_DSP = 2;//代表有机子数
 
 
         //通讯协议
         public Message NYS_com = new Message();
         public Message_modbus FCOM2 = new Message_modbus();
+
+        public int protocolNum = 1;
 
 
         //定时器
@@ -80,11 +94,21 @@ namespace ocean.Communication
 
 
 
-        public MKlll() 
+        public MCControl() 
         {
             textmain = new TextBox();
 
             btShow = new Button();
+
+
+            SerialTextBlock = new TextBlock<string>();
+
+            // 初始化命令：执行逻辑 + 可执行判断
+            ButtonIncrease = new MyCommand(
+                execAction: ButtonIncreaseAction,             
+                parameter => IsCommandEnabled // 可执行条件：IsCommandEnabled为true
+            );
+
 
             btShow.Content = "数据采集";
 
@@ -94,13 +118,7 @@ namespace ocean.Communication
 
             dtfactor = CommonRes.dt3;
 
-            CommonRes.Protocol_num = 1;
-
             rText = "128";
-
-            //CommonRes.mySerialPort.DataReceived -= new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
-
-            //CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
 
             DB_Com.runnum = dtrun.Rows.Count;
 
@@ -108,40 +126,58 @@ namespace ocean.Communication
         }
 
 
-            public void show_stop()
+        // 供串口事件调用：线程安全更新TextBlock的Text属性
+        public void UpdateSerialText(string newText)
+        {
+            // 判断当前是否为UI线程，若非则通过Dispatcher切换（WPF特有）
+            if (Application.Current != null && !Application.Current.Dispatcher.CheckAccess())
             {
-                if (bshow == true)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    if (CommonRes.Protocol_num == 0)
+                    // 追加数据（也可直接覆盖：SerialTextBlock.Text = newText）
+                    SerialTextBlock.Text += newText;
+                });
+            }
+            else
+            {
+                SerialTextBlock.Text += newText;
+            }
+        }
+
+        public void show_stop()
+        {
+            if (bshow == true)
+            {
+                if (protocolNum == 0)
+                {
+                    if (sn == DB_Com.runnum)
                     {
-                        if (sn == DB_Com.runnum)
-                        {
-                            sn = 0;
-                            //    DB_Com.DataBase_RUN_Save();
-                        }
-
-                        NYS_com.Monitor_Get((byte)sn, (byte)DB_Com.data[sn].COMMAND);
-
-                        CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
-
-                        sn = sn + 1;
-
-                    }
-                    else if (CommonRes.Protocol_num == 1)
-                    {
+                        sn = 0;
                         //DB_Com.DataBase_RUN_Save();
-
-                        FCOM2.Monitor_Get_03(0, DB_Com.runnum);
-
-                        CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
                     }
+
+                    NYS_com.Monitor_Get((byte)sn, (byte)DB_Com.data[sn].COMMAND);
+
+                    CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
+
+                    sn = sn + 1;
 
                 }
+                else if (protocolNum == 1)
+                {
+                    //DB_Com.DataBase_RUN_Save();
+
+                    FCOM2.Monitor_Get_03(0, DB_Com.runnum);
+
+                    CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
+                }
+
             }
+        }
 
 
         // 核心：业务处理方法（适配CommonRes的委托）
-        public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len, int protocolNum)
+        public void HandleSerialData(byte[] gbuffer, int gb_last, int buffer_len)
         {
             // 1. 处理Protocol_num=0时的延迟（原逻辑）
             if (protocolNum == 0)
@@ -162,11 +198,8 @@ namespace ocean.Communication
             }
             str += '\r';
 
-            // 3. 调用output方法（注意跨线程：若output更新UI，需用Dispatcher）
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                output(str);
-            });
+            // 3. 输出到textbox
+            UpdateSerialText(str);
 
             // 4. Protocol_num=0的业务处理（原核心逻辑）
             if (protocolNum == 0)
@@ -265,30 +298,19 @@ namespace ocean.Communication
         }
 
 
-
-            private delegate void outputDelegate(string para);
-        private void output(string para)
-        {
-            textmain.Dispatcher.Invoke(new outputDelegate(outputAction), para);
-        }
-        private void outputAction(string para)
-        {
-            textmain.Text += para;
-        }
-
         public void runstop_cotnrol(int addr, bool pbrun)
         {
             //bool brun;
             int send_num = 0;
             brun = pbrun;
             //textBox1.Text = "系统停止运行";
-            if (CommonRes.Protocol_num == 0)//FE协议
+            if (protocolNum == 0)//FE协议
             {
                 NYS_com.Monitor_Run(brun);
                 send_num = NYS_com.sendbf[4] + 5;
                 CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, send_num);
             }
-            else if (CommonRes.Protocol_num == 1)//modbus
+            else if (protocolNum == 1)//modbus
             {
                 //1号机1通道
                 FCOM2.Monitor_Run(1, addr, brun);
@@ -299,11 +321,11 @@ namespace ocean.Communication
             string txt = "TX:";
             for (int i = 0; i < send_num; i++)
             {
-                if (CommonRes.Protocol_num == 0)
+                if (protocolNum == 0)
                 {
                     txt += Convert.ToString(NYS_com.sendbf[i], 16);
                 }
-                else if (CommonRes.Protocol_num == 1)
+                else if (protocolNum == 1)
                 {
                     txt += Convert.ToString(FCOM2.sendbf[i], 16);
                 }
@@ -311,8 +333,7 @@ namespace ocean.Communication
             }
             txt += '\r';
             txt += '\n';
-            //show_text.Text+=txt;
-            textmain.Text += txt;
+            UpdateSerialText(txt);
         }
 
         public void mbutton_set(string table, int x)
@@ -350,12 +371,12 @@ namespace ocean.Communication
 
             if (CommonRes.mySerialPort.IsOpen == true)
             {
-                if (CommonRes.Protocol_num == 0)
+                if (protocolNum == 0)
                 {
                     NYS_com.Monitor_Set((byte)tempsn, (byte)(DB_Com.data[tempsn].COMMAND), value);
                     CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
                 }
-                else if (CommonRes.Protocol_num == 1)
+                else if (protocolNum == 1)
                 {
                     FCOM2.Monitor_Set_06(tempsn, value);
                     CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
@@ -404,10 +425,6 @@ namespace ocean.Communication
             }
         }
 
-        private bool MyCanExec(object parameter)
-        {
-            return isCanExec;
-        }
 
         private void ButtonIncreaseAction(object parameter)
         {

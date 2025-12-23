@@ -18,7 +18,7 @@ namespace ocean.ViewModels
             // Build the menus
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.BugSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                 Label = "串口调试界面",
                 NavigationType = typeof(BugsPage),
                 NavigationDestination = new Uri("UI/debug_serial.xaml", UriKind.RelativeOrAbsolute)
@@ -42,20 +42,19 @@ namespace ocean.ViewModels
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FontAwesomeBrands },
                 Label = "Awesome",
                 NavigationType = typeof(AwesomePage),
-                NavigationDestination = new Uri("Views/AwesomePage.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("UI/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
             });
 
             this.OptionsMenu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.AnchorSolid },
                 Label = "Settings",
                 NavigationType = typeof(SettingsPage),
-                //NavigationDestination = new Uri("Views/SettingsPage.xaml", UriKind.RelativeOrAbsolute)
-                NavigationDestination = new Uri("UI/Settings.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/SettingsPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.OptionsMenu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.AndroidBrands },
                 Label = "About",
                 NavigationType = typeof(AboutPage),
                 NavigationDestination = new Uri("Views/AboutPage.xaml", UriKind.RelativeOrAbsolute)

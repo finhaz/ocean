@@ -25,6 +25,7 @@ namespace ocean.ViewModels
         {
             // 初始化Modbusset实例
             _modbusSet = new Modbusset();
+            _mcctronller = new MCControl();
         }
 
         // *************************
@@ -39,6 +40,13 @@ namespace ocean.ViewModels
 
         // 全局串口配置实例（所有页面共享）
         public SerialConfigViewModel SerialConfig { get; } = new SerialConfigViewModel();
+
+        private MCControl _mcctronller;
+        public MCControl McController
+        {
+            get => _mcctronller;
+            set => SetProperty(ref _mcctronller, value);
+        }
 
         // 可添加其他全局共享属性（如之前的CommonRes、Debugsera等）
         // private CommonRes _ucom;

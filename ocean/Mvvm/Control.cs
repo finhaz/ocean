@@ -18,20 +18,35 @@ namespace ocean.Mvvm
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // 数据内容
         public T _DataContent;
-        public T DataContent { get { return _DataContent; } set { _DataContent = value; OnPropertyChanged(); } }
-
+        public T DataContent 
+        { 
+            get { return _DataContent; } 
+            set { _DataContent = value; OnPropertyChanged(); } 
+        }
+        // 可见性
         public Visibility _Visibility;
-        public Visibility Visibility { get { return _Visibility; } set { _Visibility = value; OnPropertyChanged(); } }
-
+        public Visibility Visibility 
+        { 
+            get { return _Visibility; } 
+            set { _Visibility = value; OnPropertyChanged(); } 
+        }
+        // 只读状态
         public bool _IsReadOnly;
-        public bool IsReadOnly { get { return _IsReadOnly; } set { _IsReadOnly = value; OnPropertyChanged(); } }
-
+        public bool IsReadOnly 
+        { 
+            get { return _IsReadOnly; } 
+            set { _IsReadOnly = value; OnPropertyChanged(); } 
+        }
+        // 启用状态
         public bool _IsEnabled;
-        public bool IsEnabled { get { return _IsEnabled; } set { _IsEnabled = value; OnPropertyChanged(); } }
-
-
-
+        public bool IsEnabled 
+        { 
+            get { return _IsEnabled; } 
+            set { _IsEnabled = value; OnPropertyChanged(); } 
+        }
+        // 触发属性变更通知（优化空值调用）
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
@@ -83,11 +98,18 @@ namespace ocean.Mvvm
 
         public MyCommand(Action<object> execAction, Func<object, bool> changeFunc)
         {
-            this.execAction = execAction;
-            this.changeFunc = changeFunc;
+            this.execAction = execAction ?? throw new ArgumentNullException(nameof(execAction));
+            this.changeFunc = changeFunc ?? (o => true); // 默认可执行
         }
 
-        public event EventHandler CanExecuteChanged;
+        //public event EventHandler CanExecuteChanged;
+        // 关联CommandManager，实现自动重新查询
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
 
         public bool CanExecute(object parameter)
         {
