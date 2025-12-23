@@ -53,8 +53,6 @@ namespace ocean.Communication
 
         //数据库对接
         public int select_index;
-        //DataBase_Interface DB_Com = new DataBase_Interface();
-        public DB_sqlite DB_Com = new DB_sqlite();
         public string newValue;
         public bool brun = false;
         public bool bshow = false;
@@ -76,13 +74,13 @@ namespace ocean.Communication
         public int Num_DSP = 0;
         static int Set_Num_DSP = 2;//代表有机子数
 
+        public Data_r[] data = new Data_r[200];
+        public int runnum;
+
 
         //通讯协议
         public Message NYS_com = new Message();
         public Message_modbus FCOM2 = new Message_modbus();
-
-        
-
 
         //定时器
         private DispatcherTimer mDataTimer = null; //定时器
@@ -104,7 +102,7 @@ namespace ocean.Communication
             rText = "128";
             InitTimer();
             LoadDataFromDatabase();
-            DB_Com.runnum = dtrun.Rows.Count;
+            runnum = dtrun.Rows.Count;
         }
 
 
@@ -114,9 +112,9 @@ namespace ocean.Communication
         public void LoadDataFromDatabase()
         {
             // 读取数据库表，赋值给对应属性
-            dtrun = DB_sqlite.GetDBTable("PARAMETER_RUN");
-            dtset = DB_sqlite.GetDBTable("PARAMETER_SET");
-            dtfactor = DB_sqlite.GetDBTable("PARAMETER_FACTOR");
+            dtrun = DB_SQLlite.GetDBTable("PARAMETER_RUN");
+            dtset = DB_SQLlite.GetDBTable("PARAMETER_SET");
+            dtfactor = DB_SQLlite.GetDBTable("PARAMETER_FACTOR");
 
             // 可选：处理空表情况（避免后续操作空引用）
             dtrun ??= new DataTable("PARAMETER_RUN");
@@ -131,13 +129,13 @@ namespace ocean.Communication
             {
                 if (ProtocolNum == "FE协议")
                 {
-                    if (sn == DB_Com.runnum)
+                    if (sn == runnum)
                     {
                         sn = 0;
                         //DB_Com.DataBase_RUN_Save();
                     }
 
-                    NYS_com.Monitor_Get((byte)sn, (byte)DB_Com.data[sn].COMMAND);
+                    NYS_com.Monitor_Get((byte)sn, (byte)data[sn].COMMAND);
 
                     CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
 
@@ -148,7 +146,7 @@ namespace ocean.Communication
                 {
                     //DB_Com.DataBase_RUN_Save();
 
-                    FCOM2.Monitor_Get_03(0, DB_Com.runnum);
+                    FCOM2.Monitor_Get_03(0, runnum);
 
                     CommonRes.mySerialPort.Write(FCOM2.sendbf, 0, 8);
                 }
@@ -215,15 +213,15 @@ namespace ocean.Communication
                     float temp_val = BitConverter.ToSingle(gbuffer, 8);
 
                     // 处理数据库数据更新
-                    if (DB_Com.data[gbuffer[5]].SN == gbuffer[5])
+                    if (data[gbuffer[5]].SN == gbuffer[5])
                     {
                         if (gbuffer[5] < 44)
                         {
-                            DB_Com.data[gbuffer[5]].VALUE = temp_val;
+                            data[gbuffer[5]].VALUE = temp_val;
                             // 跨线程更新DataTable和数据库，同步操作，异步用UiDispatcherHelper.ExecuteOnUiThreadAsync
                             UiDispatcherHelper.ExecuteOnUiThread(() =>
                             {
-                                dtrun.Rows[DB_Com.data[gbuffer[5]].SN][5] = DB_Com.data[gbuffer[5]].VALUE;
+                                dtrun.Rows[data[gbuffer[5]].SN][5] = data[gbuffer[5]].VALUE;
                             });
                         }
                         else
@@ -233,12 +231,12 @@ namespace ocean.Communication
 
                             if (gbuffer[5] < 90)
                             {
-                                vindex = DB_Com.data[gbuffer[5]].SN - 44;
+                                vindex = data[gbuffer[5]].SN - 44;
                                 ovla = Convert.ToSingle(dtset.Rows[vindex][5]);
                             }
                             else
                             {
-                                vindex = DB_Com.data[gbuffer[5]].SN - 90;
+                                vindex = data[gbuffer[5]].SN - 90;
                                 ovla = Convert.ToSingle(dtfactor.Rows[vindex][2]);
                             }
 
@@ -257,19 +255,19 @@ namespace ocean.Communication
                                         if (gbuffer[5] < 90)
                                         {
                                             dtset.Rows[vindex][5] = temp_val;
-                                            DB_Com.DataBase_SET_Save("PARAMETER_SET", temp_val, (byte)gbuffer[5]);
+                                            DB_SQLlite.Instance.DataBase_SET_Save("PARAMETER_SET", temp_val, (byte)gbuffer[5]);
                                         }
                                         else
                                         {
                                             dtfactor.Rows[vindex][2] = temp_val;
-                                            DB_Com.DataBase_SET_Save("PARAMETER_FACTOR", temp_val, (byte)gbuffer[5]);
+                                            DB_SQLlite.Instance.DataBase_SET_Save("PARAMETER_FACTOR", temp_val, (byte)gbuffer[5]);
                                         }
                                     });
                                 }
                             }
                         }
                     }
-                    DB_Com.data[gbuffer[5]].ACK = gbuffer[7];
+                    data[gbuffer[5]].ACK = gbuffer[7];
                 }
             }
         }
@@ -345,13 +343,13 @@ namespace ocean.Communication
 
 
 
-            DB_Com.DataBase_SET_Save(table, value, (byte)tempsn);
+            DB_SQLlite.Instance.DataBase_SET_Save(table, value, (byte)tempsn);
 
             if (CommonRes.mySerialPort.IsOpen == true)
             {
                 if (ProtocolNum == "FE协议")
                 {
-                    NYS_com.Monitor_Set((byte)tempsn, (byte)(DB_Com.data[tempsn].COMMAND), value);
+                    NYS_com.Monitor_Set((byte)tempsn, (byte)(data[tempsn].COMMAND), value);
                     CommonRes.mySerialPort.Write(NYS_com.sendbf, 0, NYS_com.sendbf[4] + 5);
                 }
                 else if (ProtocolNum == "Modbus协议")
