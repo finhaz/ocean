@@ -1,4 +1,5 @@
-﻿using ocean.Mvvm;
+﻿using ocean.database;
+using ocean.Mvvm;
 using System;
 using System;
 using System.Collections.Generic;
@@ -226,6 +227,7 @@ namespace ocean.Communication
 
             return Value;
         }
+
 
 
         public void Monitor_Get(int addr,int value)

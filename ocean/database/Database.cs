@@ -1,17 +1,12 @@
-﻿using System;
-using System.Data.OleDb;
+﻿using ocean.database;
+using System;
 using System.Data;
 using System.Data.Odbc;
+using System.Data.OleDb;
 using System.Windows;
 
 namespace ocean
 {
-    public struct Data_r
-    {
-        public int SN, COMMAND, LENG, NO, TYP, ACK;
-        public float VALUE, FACTOR;
-        public string NAME, UNITor;
-    }
     public class DataBase_Interface
     {
         /*
@@ -30,7 +25,7 @@ namespace ocean
 
         public static string ConnString2 = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=./fruit.mdb;";
 
-        public Data_r[] data = new Data_r[200];
+        public DataR[] data = new DataR[200];
         public int u = 0;
         public int j = 0;
 

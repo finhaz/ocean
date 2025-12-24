@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ocean.database;
+using ocean.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO.Ports;
-using ocean.Interfaces;
 
 namespace ocean
 {
@@ -191,7 +192,7 @@ namespace ocean
             }
         }
 
-        private void RceCommand(byte[] sendbf, int start, Data_r[] data)
+        private void RceCommand(byte[] sendbf, int start, DataR[] data)
         {
             int crc;
 
@@ -264,6 +265,16 @@ namespace ocean
             
         }
 
+        public DataR Monitor_Solve(byte[] buffer)
+        {
+            DataR data = new DataR();
+            data.SN = buffer[5];
+            data.VALUE = BitConverter.ToSingle(buffer, 8);
+
+            return data;
+        }
+
+
         // 新增：实现IProtocol接口的MonitorRun（适配统一调用）
         public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
         {
@@ -283,7 +294,7 @@ namespace ocean
             return sendbf[4] + 5;
         }
 
-        public int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn, dynamic data = null, object num=null)
         {
             byte index = (byte)(int)tempsn;
             byte command = (byte)data[index].COMMAND;
@@ -301,5 +312,13 @@ namespace ocean
             CheckResult=this.monitor_check(buffer);
             return CheckResult;
         }
+
+        public DataR MonitorSolve(byte[] buffer, object Readpos = null)
+        {
+            DataR data = new DataR();
+            data = this.Monitor_Solve(buffer);
+            return data;
+        }
+
     }
 }

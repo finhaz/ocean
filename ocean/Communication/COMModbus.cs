@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ocean.database;
+using ocean.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO.Ports;
-using ocean.Interfaces;
 
 //RTU格式
 //地址 功能码	数据	CRC校验
@@ -107,6 +108,30 @@ namespace ocean
             return 0X03;     
         }
 
+
+
+        public DataR Monitor_Solve(byte[] buffer, int Readpos)
+        {
+            DataR data=new DataR();
+            data.COMMAND = buffer[1];
+            data.SN = Readpos;
+
+            if (data.COMMAND == 3)
+            {
+                byte[] typeBytes = new byte[buffer[2]];
+                Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
+                Array.Reverse(typeBytes);
+                data.VALUE = BitConverter.ToInt16(typeBytes, 0);
+            }
+            else if (data.COMMAND == 6)
+            {
+
+            }
+
+            return data;
+        }
+
+
         public UInt16 crc16_ccitt(byte[] data, int len,UInt16 StartIndex)
         {
             UInt16 ccitt16 = 0xA001;
@@ -150,9 +175,9 @@ namespace ocean
             return 8;
         }
 
-        public int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn, dynamic data = null, object num=null)
         {
-            this.Monitor_Get_03(sendbf, 0, (int)num);
+            this.Monitor_Get_03(sendbf, tempsn, 1);
             return 8;
         }
 
@@ -162,6 +187,13 @@ namespace ocean
             int CheckResult = 0;
             CheckResult = this.Monitor_check(buffer,(int)len);
             return CheckResult;
+        }
+
+        public DataR MonitorSolve(byte[] buffer, object Readpos = null)
+        {
+            DataR data = new DataR();
+            data = this.Monitor_Solve(buffer, (int)Readpos);
+            return data;
         }
     }
 }

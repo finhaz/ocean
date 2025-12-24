@@ -1,4 +1,5 @@
-﻿using ocean.Interfaces;
+﻿using ocean.database;
+using ocean.Interfaces;
 using ocean.Mvvm;
 using SomeNameSpace;
 using System;
@@ -82,7 +83,7 @@ namespace ocean.Communication
         public int Num_DSP = 0;
         static int Set_Num_DSP = 2;//代表有机子数
 
-        public Data_r[] data = new Data_r[200];
+        public DataR[] data = new DataR[200];
         public int runnum;
         public byte[] sendbf = new byte[128];
 
@@ -178,32 +179,20 @@ namespace ocean.Communication
             Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
             check_result = _currentProtocol.MonitorCheck(buffer, buffer.Length);
             
-            // 数据区未接收完整，直接返回
-            //if (buffer_len < gbuffer[4] + 5)
-            //  return;
-
             // 校验成功=1的处理
             if (check_result == 1)
             {
-                float temp_val = BitConverter.ToSingle(buffer, 8);
-
-                // 处理数据库数据更新
-                if (data[gbuffer[5]].SN == gbuffer[5])
+                DataR datax= new DataR();
+                datax = _currentProtocol.MonitorSolve(buffer, sn-1);
+                if (datax.SN < 44)
                 {
-                    // 提取核心索引变量，减少重复取值
-                    int bufferVal = gbuffer[5];
-                    if (bufferVal < 44)
+                    data[datax.SN].VALUE = datax.VALUE;
+                    // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
+                    UiDispatcherHelper.ExecuteOnUiThread(() =>
                     {
-                        int dataIndex = bufferVal;
-                        data[dataIndex].VALUE = temp_val;
-                        // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
-                        UiDispatcherHelper.ExecuteOnUiThread(() =>
-                        {
-                            dtrun.Rows[data[dataIndex].SN][5] = data[dataIndex].VALUE;
-                        });
-                    }
-                }
-                data[gbuffer[5]].ACK = gbuffer[7];
+                        dtrun.Rows[datax.SN][5] = data[datax.SN].VALUE;
+                    });
+                }                
             }
             
         }

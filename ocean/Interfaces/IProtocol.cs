@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ocean.database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,12 +37,14 @@ namespace ocean.Interfaces
         /// <param name="data">数据对象（FE协议专用，可选）</param>
         /// <param name="num">总长度（Modbus协议需要）</param>
         /// <returns>发送长度</returns>
-        int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null);
+        int MonitorGet(byte[] sendbf, int tempsn , dynamic data = null, object num = null);
 
         /// </summary>
         /// <param name="buffer">接收字节数组</param>
         /// <param name="len">总长度（Modbus协议需要）</param>
         int MonitorCheck(byte[] buffer, object len = null);
 
+
+        DataR MonitorSolve(byte[] buffer,  object Readpos=null);
     }
 }
