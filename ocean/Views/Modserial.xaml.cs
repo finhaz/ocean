@@ -99,47 +99,6 @@ namespace ocean.UI
 
 
 
-        private void DataGrodx_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            // 1. 查找点击的单元格（核心：通过可视化树找DataGridCell）
-            var cell = FindVisualParent<DataGridCell>(e.OriginalSource as DependencyObject);
-            if (cell == null) return;
-
-            // 2. 判断是否是数值列
-            if (cell.Column.Header.ToString() == "数值")
-            {
-                // 3. 提取数值
-                var rowView = cell.DataContext as DataRowView;
-                if (rowView != null)
-                {
-                    object value = rowView["Value"];
-                    value = value == DBNull.Value ? "空值" : value;
-                    MessageBox.Show($"当前数值：{value}", "数值详情");
-                    int addr = Convert.ToInt32(rowView["Addr"]);
-                    _globalVM.ModbusSet.ReadButtonHander(addr, 1);
-                    _globalVM.ModbusSet.Readpos = Convert.ToInt32(rowView["ID"]);
-
-                }
-            }
-        }
-
-        // 辅助方法：向上查找可视化树中的指定类型元素（必须有这个方法！）
-        private T FindVisualParent<T>(DependencyObject obj) where T : DependencyObject
-        {
-            while (obj != null)
-            {
-                if (obj is T target)
-                {
-                    return target;
-                }
-                obj = VisualTreeHelper.GetParent(obj);
-            }
-            return null;
-        }
-
-
-
-
         private void ShowText_TextChanged(object sender, TextChangedEventArgs e)
         {
             var textBox = sender as TextBox;

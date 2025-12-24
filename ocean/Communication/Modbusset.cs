@@ -15,7 +15,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ocean.Communication
 
@@ -23,15 +25,16 @@ namespace ocean.Communication
     public class Modbusset : ObservableObject
     {
         public byte[] sendbf = new byte[128];
+        //针对数据协议：
+        byte[] gbuffer = new byte[4096];
+        int gb_index = 0;//缓冲区注入位置
+        int get_index = 0;// 缓冲区捕捉位置
 
-        public Modbusset()
-        {
-            dtm = new DataTable();
-            AddDataTableColumns(dtm);
-            ButtonCommand = new RelayCommand(OnButtonClick);
+        public DataTable dtm { get; set; }
 
-        }
 
+        // 控件命令（供XAML绑定）
+        public ICommand DataGridDoubleClickCommand { get; }
         public ICommand ButtonCommand { get; }
 
 
@@ -134,6 +137,21 @@ namespace ocean.Communication
         // 核心：当前选中的协议实例（直接复用原有单例）
         private IProtocol _currentProtocol;
 
+
+
+
+
+        public Modbusset()
+        {
+            dtm = new DataTable();
+            AddDataTableColumns(dtm);
+            ButtonCommand = new RelayCommand(OnButtonClick);
+            DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
+        }
+
+
+
+
         // 协议切换（选择框事件调用）
         public void InitProtocol(string protocolNum)
         {
@@ -145,14 +163,6 @@ namespace ocean.Communication
                 _ => throw new ArgumentException($"不支持的协议类型：{protocolNum}")
             };
         }
-
-
-        //针对数据协议：
-        byte[] gbuffer = new byte[4096];
-        int gb_index = 0;//缓冲区注入位置
-        int get_index = 0;// 缓冲区捕捉位置
-
-        public DataTable dtm { get; set; }
 
 
         //public Message_modbus zcom { get; set; }
@@ -238,19 +248,6 @@ namespace ocean.Communication
         }
 
 
-
-        public void ReadButtonHander(int addr,int length)
-        {
-            int send_num =_currentProtocol.MonitorGet(sendbf,addr, length);
-            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
-
-            string txt = "";
-            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num,"TX:",true);
-            BoxStr += txt;
-        }
-
-
-
         private void OnButtonClick(object parameter)
         {
 
@@ -282,6 +279,72 @@ namespace ocean.Communication
             }
 
         }
+
+
+
+        // 双击事件核心逻辑（参数为DataGrid，适配你的RelayCommand<T>）
+        private void ExecuteDataGridDoubleClick(DataGrid dataGrid)
+        {
+            if (dataGrid == null) return;
+
+            // 捕获当前鼠标位置的元素（替代原e.OriginalSource）
+            var mousePosition = Mouse.GetPosition(dataGrid);
+            var hitTestResult = VisualTreeHelper.HitTest(dataGrid, mousePosition);
+            if (hitTestResult == null) return;
+
+            // 1. 查找点击的单元格（复用FindVisualParent）
+            var cell = FindVisualParent<DataGridCell>(hitTestResult.VisualHit as DependencyObject);
+            if (cell == null) return;
+
+            // 2. 判断是否是数值列
+            if (cell.Column.Header.ToString() == "数值")
+            {
+                // 3. 提取数值、地址、ID等信息
+                var rowView = cell.DataContext as DataRowView;
+                if (rowView != null)
+                {
+                    // 提取Value列值
+                    object value = rowView["Value"];
+                    value = value == DBNull.Value ? "空值" : value;
+                    MessageBox.Show($"当前数值：{value}", "数值详情");
+
+                    // 提取Addr并调用ReadButtonHander（增加类型安全判断）
+                    if (int.TryParse(rowView["Addr"].ToString(), out int addr))
+                    {
+                        // 执行读取逻辑
+                        int send_num = _currentProtocol.MonitorGet(sendbf, addr, 1);
+                        CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+
+                        string txt = "";
+                        txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
+                        BoxStr += txt;
+
+                    }
+
+                    // 提取ID并赋值给Readpos
+                    if (int.TryParse(rowView["ID"].ToString(), out int readpos))
+                    {
+                        Readpos = readpos; // 绑定属性，外部可通过ModbusSet.Readpos访问
+                    }
+                }
+            }
+        }
+
+        // 辅助方法：向上查找可视化树中的指定类型元素（必须有这个方法！）
+        private T FindVisualParent<T>(DependencyObject obj) where T : DependencyObject
+        {
+            while (obj != null)
+            {
+                if (obj is T target)
+                {
+                    return target;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
+            }
+            return null;
+        }
+
+
 
 
 

@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:ocean.ViewModels" 
+      xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Modserial" Unloaded="Page_Unloaded" Loaded="Page_Loaded">
@@ -111,52 +112,60 @@
                 <DataGrid x:Name="dataGrodx"
                                 ItemsSource="{Binding ModbusSet.dtm, Mode=TwoWay}"
                                 AutoGenerateColumns="False"
-                          CanUserAddRows="False" 
-                          MouseDoubleClick="DataGrodx_MouseDoubleClick">
+                                CanUserAddRows="False">
+                        <!-- 使用Interactivity行为绑定命令（替代传统事件） -->
+                    <interactivity:Interaction.Triggers>
+                        <interactivity:EventTrigger EventName="MouseDoubleClick">
+                            <interactivity:InvokeCommandAction 
+                            Command="{Binding ModbusSet.DataGridDoubleClickCommand}"
+                            CommandParameter="{Binding ElementName=dataGrodx}"/>
+                            <!-- 直接传DataGrid控件 -->
+                        </interactivity:EventTrigger>
+                    </interactivity:Interaction.Triggers>
                     <DataGrid.Columns>
-                        <!-- 前四列：普通文本 -->
-                        <DataGridTextColumn Header="序号" Binding="{Binding ID}"/>
-                        <DataGridTextColumn Header="名称" Binding="{Binding Name}"/>
-                        <DataGridTemplateColumn Header="数值" IsReadOnly="True">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <!-- 给TextBlock绑定双击事件 -->
-                                    <TextBlock Text="{Binding Value}"
-                                               Background="LightSkyBlue"  />
-                                    <!-- 鼠标悬浮显示手型，提升体验 -->
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="指令" Binding="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        <!-- 第五列：按钮列 -->
-                        <DataGridTemplateColumn Header="写" Width="100">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="写" 
-                                    Command="{Binding Source={x:Static vm:AppViewModel.Instance}, Path=ModbusSet.ButtonCommand}"
-                                    CommandParameter="{Binding}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="单位" Binding="{Binding Unit}"/>
-                        <DataGridTextColumn Header="范围" Binding="{Binding Rangle}"/>
-                        <!-- ：选择框列 -->
-                        <DataGridTemplateColumn Header="区块" Width="120">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox FontSize="10" 
-                                              SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
-                                              ItemsSource="{Binding DataContext.ModbusSet.Options, 
-                          RelativeSource={RelativeSource AncestorType=DataGrid}}" />
-                                    <!-- 若选项是对象，需指定显示字段 -->
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
-                        <DataGridTextColumn Header="数量" Binding="{Binding Number}"/>
-                        <DataGridTextColumn Header="偏移" Binding="{Binding NOffSet}"/>
-                        <DataGridTextColumn Header="位数" Binding="{Binding NBit}"/>
-                    </DataGrid.Columns>
+                            <!-- 前四列：普通文本 -->
+                            <DataGridTextColumn Header="序号" Binding="{Binding ID}"/>
+                            <DataGridTextColumn Header="名称" Binding="{Binding Name}"/>
+                            <DataGridTemplateColumn Header="数值" IsReadOnly="True">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <!-- 给TextBlock绑定双击事件 -->
+                                        <TextBlock Text="{Binding Value}"
+                                                   Background="LightSkyBlue"  />
+                                        <!-- 鼠标悬浮显示手型，提升体验 -->
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="指令" Binding="{Binding Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <!-- 第五列：按钮列 -->
+                            <DataGridTemplateColumn Header="写" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="写" 
+                                        Command="{Binding Source={x:Static vm:AppViewModel.Instance}, Path=ModbusSet.ButtonCommand}"
+                                        CommandParameter="{Binding}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="单位" Binding="{Binding Unit}"/>
+                            <DataGridTextColumn Header="范围" Binding="{Binding Rangle}"/>
+                            <!-- ：选择框列 -->
+                            <DataGridTemplateColumn Header="区块" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox FontSize="10" 
+                                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                                  ItemsSource="{Binding DataContext.ModbusSet.Options, 
+                              RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                                        <!-- 若选项是对象，需指定显示字段 -->
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
+                            <DataGridTextColumn Header="数量" Binding="{Binding Number}"/>
+                            <DataGridTextColumn Header="偏移" Binding="{Binding NOffSet}"/>
+                            <DataGridTextColumn Header="位数" Binding="{Binding NBit}"/>
+                        </DataGrid.Columns>
                 </DataGrid>
             </TabControl>
             <TextBox TextWrapping="Wrap" 
