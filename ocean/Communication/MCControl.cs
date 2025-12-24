@@ -145,29 +145,14 @@ namespace ocean.Communication
         {
             if (bshow == true)
             {
-                if (ProtocolNum == "FE协议")
+                int send_num = 0;
+                if (sn == runnum)
                 {
-                    if (sn == runnum)
-                    {
-                        sn = 0;
-                        //DB_Com.DataBase_RUN_Save();
-                    }
-
-                    COMFE.Instance.Monitor_Get(sendbf,(byte)sn, (byte)data[sn].COMMAND);
-
-                    CommonRes.mySerialPort.Write(sendbf, 0, sendbf[4] + 5);
-
-                    sn = sn + 1;
-
+                    sn = 0;
                 }
-                else if (ProtocolNum == "Modbus协议")
-                {
-                    //DB_Com.DataBase_RUN_Save();
-
-                    COMModbus.Instance.Monitor_Get_03(sendbf,0, runnum);
-
-                    CommonRes.mySerialPort.Write(sendbf, 0, 8);
-                }
+                send_num = _currentProtocol.MonitorGet(sendbf, sn, data, runnum);
+                sn = sn + 1;
+                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
 
             }
         }

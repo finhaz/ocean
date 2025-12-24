@@ -150,10 +150,10 @@ namespace ocean
             return 8;
         }
 
-        public void MonitorGet(byte[] sendbf, byte tempsn, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null)
         {
-            this.Monitor_Get_03(sendbf, tempsn, (int)num);
-            //throw new NotImplementedException();
+            this.Monitor_Get_03(sendbf, 0, (int)num);
+            return 8;
         }
     }
 }

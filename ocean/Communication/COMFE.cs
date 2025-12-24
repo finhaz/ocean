@@ -284,12 +284,15 @@ namespace ocean
             return sendbf[4] + 5;
         }
 
-        public void MonitorGet(byte[] sendbf, byte tempsn, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null)
         {
-            byte command = (byte)data[tempsn].COMMAND;
+            byte index = (byte)(int)tempsn;
+            byte command = (byte)data[index].COMMAND;
+
+
             // 直接调用原有方法
-            this.Monitor_Get(sendbf, tempsn, command);
-            //throw new NotImplementedException();
+            this.Monitor_Get(sendbf, index, command);
+            return sendbf[4] + 5;
         }
     }
 }
