@@ -239,7 +239,7 @@ namespace ocean.Communication
 
 
 
-        public void Monitor_Get(int addr,int length)
+        public void ReadButtonHander(int addr,int length)
         {
             int send_num =_currentProtocol.MonitorGet(sendbf,addr, length);
             CommonRes.mySerialPort.Write(sendbf, 0, send_num);

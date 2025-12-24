@@ -116,7 +116,7 @@ namespace ocean.UI
                     value = value == DBNull.Value ? "空值" : value;
                     MessageBox.Show($"当前数值：{value}", "数值详情");
                     int addr = Convert.ToInt32(rowView["Addr"]);
-                    _globalVM.ModbusSet.Monitor_Get(addr, 1);
+                    _globalVM.ModbusSet.ReadButtonHander(addr, 1);
                     _globalVM.ModbusSet.Readpos = Convert.ToInt32(rowView["ID"]);
 
                 }
