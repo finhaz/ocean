@@ -63,7 +63,7 @@ namespace ocean.UI
                 DataRow newRow = _globalVM.ModbusSet.dtm.NewRow();
                 newRow["ID"] = _globalVM.ModbusSet.dtm.Rows.Count + 1;
                 newRow["Value"] = radd;
-                newRow["SelectedOption"] = _globalVM.ModbusSet.KindNum;
+                newRow["SelectedOption"] = _globalVM.ModbusSet.DSelectedOption;
                 newRow["Addr"] = radd;
                 newRow["Number"] = 1;
                 newRow["NOffSet"] = 0;
@@ -79,19 +79,6 @@ namespace ocean.UI
             Setadd.Visibility = Visibility.Collapsed;
         }
 
-        private void cbProcho_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            switch (cbProcho.SelectedIndex)
-            {
-                
-                case 0: _globalVM.ModbusSet.KindNum = "线圈状态(RW)"; break;
-                case 1: _globalVM.ModbusSet.KindNum = "离散输入(RO)"; break;
-                case 2: _globalVM.ModbusSet.KindNum = "保持寄存器(RW)"; break;
-                case 3: _globalVM.ModbusSet.KindNum = "输入寄存器(RO)"; break;
-                default: _globalVM.ModbusSet.KindNum = "保持寄存器(RW)"; break;
-                
-            }
-        }
 
         private void ButtonAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -261,6 +248,15 @@ namespace ocean.UI
         public void Dispose()
         {
             Page_Unloaded(null, null);
+        }
+
+        private void cPro_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox?.SelectedItem == null) return;
+
+            string selectedProtocol = comboBox.SelectedItem.ToString();
+            _globalVM.ModbusSet.InitProtocol(selectedProtocol);
         }
     }
 

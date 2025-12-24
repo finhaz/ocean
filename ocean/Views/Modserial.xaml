@@ -54,7 +54,7 @@
                 Margin="60,1,0,1" 
                 Grid.ColumnSpan="2"
                 ItemsSource="{Binding ModbusSet.ProOptions}"
-                SelectedItem="{Binding ModbusSet.ProSelectedOption, Mode=TwoWay}"/>
+                SelectedItem="{Binding ModbusSet.ProSelectedOption, Mode=TwoWay}" SelectionChanged="cPro_SelectionChanged"/>
 
             <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
             <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
@@ -81,13 +81,19 @@
                 <TextBox Text="{Binding ModbusSet.Snum, Mode=TwoWay}" 
                          Grid.Row="1" Grid.Column="1"></TextBox>
                 <TextBox Text="类型" Grid.Row="2"></TextBox>
-                <ComboBox Name="cbProcho" FontSize="10" Grid.Row="2" Grid.Column="1"  Margin="0,1,0,1" 
+                <ComboBox Name="cbProcho" 
+                          FontSize="10" 
+                          Grid.Row="2" 
+                          Grid.Column="1"  
+                          Margin="0,1,0,1" 
                           Grid.ColumnSpan="2" 
-                          SelectionChanged="cbProcho_SelectionChanged" 
                           ItemsSource="{Binding ModbusSet.Options}"
                           SelectedItem="{Binding ModbusSet.DSelectedOption, Mode=TwoWay}"/>
-                <TextBox Text="起始地址" Grid.Row="3"></TextBox>
-                <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"></TextBox>
+                <TextBox Text="起始地址"
+                         Grid.Row="3"/>
+                <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}"
+                         Grid.Row="3" 
+                         Grid.Column="1"/>
                 <Button Content="确定" Grid.Row="5" Grid.Column="0" 
                         Click="setsure_click" ></Button>
                 <Button Content="取消" Grid.Row="5" Grid.Column="1" 

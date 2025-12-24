@@ -1,4 +1,5 @@
 ﻿using ocean.database;
+using ocean.Interfaces;
 using ocean.Mvvm;
 using System;
 using System;
@@ -47,13 +48,6 @@ namespace ocean.Communication
         {
             get => _boxStr;
             set => SetProperty(ref _boxStr, value); // 一行搞定，无需重复逻辑
-        }
-
-        private string _kindNum = "保持寄存器(RW)";
-        public string KindNum
-        {
-            get => _kindNum;
-            set => SetProperty(ref _kindNum, value); // 一行搞定，无需重复逻辑
         }
 
         private string _snum = "1";
@@ -137,6 +131,22 @@ namespace ocean.Communication
             }
         }
 
+        // 核心：当前选中的协议实例（直接复用原有单例）
+        private IProtocol _currentProtocol;
+
+        // 协议切换（选择框事件调用）
+        public void InitProtocol(string protocolNum)
+        {
+            // 直接赋值原有单例，无需新建对象
+            _currentProtocol = protocolNum switch
+            {
+                "FE协议" => COMFE.Instance,       // COMFE实现了IProtocol
+                "Modbus协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                _ => throw new ArgumentException($"不支持的协议类型：{protocolNum}")
+            };
+        }
+
+
         //针对数据协议：
         byte[] gbuffer = new byte[4096];
         int gb_index = 0;//缓冲区注入位置
@@ -169,7 +179,7 @@ namespace ocean.Communication
         {
             byte[] buffer = new byte[200];
             int i = 0;
-            int temp_Value = 0;
+            DataR temp_Value = new DataR();
             int checkresult = 0;
 
             string str = "";
@@ -180,32 +190,31 @@ namespace ocean.Communication
                 BoxStr += str;               
             });
 
-            // 3. Modbus协议1的业务处理（原逻辑）
-            if (ProSelectedOption == "Modbus协议")
-            {
-                Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
-                checkresult = COMModbus.Instance.Monitor_check(buffer, buffer.Length);
 
-                if (checkresult == 1)
+            Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
+
+            checkresult=_currentProtocol.MonitorCheck(buffer, buffer.Length);
+
+            if (checkresult == 1)
+            {
+                if (buffer[1] == 3 && dtm.Rows.Count > 0)
                 {
-                    if (buffer[1] == 3 && dtm.Rows.Count > 0)
+                    temp_Value = _currentProtocol.MonitorSolve(buffer,Readpos-1);
+                    // 跨线程更新DataTable（避免UI线程异常）
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        temp_Value = Monitor_Solve(buffer);
-                        // 跨线程更新DataTable（避免UI线程异常）
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            dtm.Rows[Readpos - 1]["Value"] = temp_Value;
-                        });
-                    }
-                }
-                else
-                {
-                    UiDispatcherHelper.ExecuteOnUiThread(() =>
-                    {
-                        BoxStr += "RX:Wrong";
+                        dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
                     });
                 }
             }
+            else
+            {
+                UiDispatcherHelper.ExecuteOnUiThread(() =>
+                {
+                    BoxStr += "RX:Wrong";
+                });
+            }
+            
         }
 
         public int Monitor_Solve(byte[] buffer)
@@ -230,10 +239,9 @@ namespace ocean.Communication
 
 
 
-        public void Monitor_Get(int addr,int value)
+        public void Monitor_Get(int addr,int length)
         {
-            int send_num = 8;
-            COMModbus.Instance.Monitor_Get_03(sendbf, addr, value);
+            int send_num =_currentProtocol.MonitorGet(sendbf,addr, length);
             CommonRes.mySerialPort.Write(sendbf, 0, send_num);
 
             string txt = "";
@@ -241,17 +249,6 @@ namespace ocean.Communication
             BoxStr += txt;
         }
 
-
-        public void Monitor_Set(int addr,int value)
-        {
-            int send_num = 8;
-            COMModbus.Instance.Monitor_Set_06(sendbf, addr, value);
-            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
-
-            string txt = "";
-            txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num,"TX:",true);
-            BoxStr += txt;
-        }
 
 
         private void OnButtonClick(object parameter)
@@ -270,8 +267,12 @@ namespace ocean.Communication
                 }
                 try
                 {
-                    int anum = Convert.ToInt32(rowView["Command"]);
-                    Monitor_Set(addr, anum);
+                    int value = Convert.ToInt32(rowView["Command"]);
+                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value);
+                    CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+                    string txt = "";
+                    txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
+                    BoxStr += txt;
                 }
                 catch
                 {
