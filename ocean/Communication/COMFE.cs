@@ -237,12 +237,11 @@ namespace ocean
                 {
                     if(buffer[7]==1|| buffer[7]==2)
                     {
-                        return 1;
+                        return 2;
                     }
                 }
                 else
                 {
-                    //richTextBox1.Text += str;
                     j = buffer[4] + 5;//理论长度
                     k = 0;
                     for (i = 0; i <= buffer[4]; i++)
@@ -255,12 +254,12 @@ namespace ocean
                     {
                         if (j == 13)//长度准确
                         {
-                            return 2;
+                            return 1;
                         }
                     }
                 }
             }
-            return 0;
+            return 3;
 
             
         }
@@ -293,6 +292,14 @@ namespace ocean
             // 直接调用原有方法
             this.Monitor_Get(sendbf, index, command);
             return sendbf[4] + 5;
+        }
+
+
+        public int MonitorCheck(byte[] buffer, object len = null)
+        {
+            int CheckResult=0;
+            CheckResult=this.monitor_check(buffer);
+            return CheckResult;
         }
     }
 }

@@ -155,5 +155,13 @@ namespace ocean
             this.Monitor_Get_03(sendbf, 0, (int)num);
             return 8;
         }
+
+
+        public int MonitorCheck(byte[] buffer, object len = null)
+        {
+            int CheckResult = 0;
+            CheckResult = this.Monitor_check(buffer,(int)len);
+            return CheckResult;
+        }
     }
 }

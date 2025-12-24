@@ -38,5 +38,10 @@ namespace ocean.Interfaces
         /// <returns>发送长度</returns>
         int MonitorGet(byte[] sendbf, object tempsn=null, dynamic data = null, object num=null);
 
+        /// </summary>
+        /// <param name="buffer">接收字节数组</param>
+        /// <param name="len">总长度（Modbus协议需要）</param>
+        int MonitorCheck(byte[] buffer, object len = null);
+
     }
 }

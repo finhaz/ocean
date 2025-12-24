@@ -175,114 +175,39 @@ namespace ocean.Communication
                 //ShowTextBox.ScrollToEnd();
             });
 
-            // 4. Protocol_num=0的业务处理（原核心逻辑）
-            if (ProtocolNum == "FE协议")
+            Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
+            check_result = _currentProtocol.MonitorCheck(buffer, buffer.Length);
+            
+            // 数据区未接收完整，直接返回
+            //if (buffer_len < gbuffer[4] + 5)
+            //  return;
+
+            // 校验成功=1的处理
+            if (check_result == 1)
             {
-                // 数据区未接收完整，直接返回
-                if (buffer_len < gbuffer[4] + 5)
+                float temp_val = BitConverter.ToSingle(buffer, 8);
+
+                // 处理数据库数据更新
+                if (data[gbuffer[5]].SN == gbuffer[5])
                 {
-                    return;
-                }
-
-                // 校验数据
-                check_result = COMFE.Instance.monitor_check(gbuffer);
-
-                // 校验成功=1的处理
-                if (check_result == 1)
-                {
-                    n_dsp = gbuffer[7];
-                    // 字节拼接为浮点数（原逻辑）
-                    for (int i_k = 0; i_k < 9; i_k++)
+                    // 提取核心索引变量，减少重复取值
+                    int bufferVal = gbuffer[5];
+                    if (bufferVal < 44)
                     {
-                        // PSO_v.u_dsp[n_dsp - 1, i_k] = BitConverter.ToSingle(gbuffer, 8 + 4 * i_k);
-                        // IPSO_v.u_dsp[n_dsp - 1, i_k] = BitConverter.ToSingle(gbuffer, 8 + 4 * i_k);
-                        // Fish_v.u_dsp[n_dsp - 1, i_k] = BitConverter.ToSingle(gbuffer, 8 + 4 * i_k);
-                    }
-
-                    // 达到设定DSP数量的处理
-                    if (n_dsp == Set_Num_DSP)
-                    {
-                        // 原线程逻辑：建议用Task替代Thread，避免线程创建开销
-                        // Task.Run(() => PSO_v.cale_pso());
-                        // Task.Run(() => update_UI_PSO());
-                    }
-                }
-                // 校验成功=2的处理
-                else if (check_result == 2)
-                {
-                    float temp_val = BitConverter.ToSingle(gbuffer, 8);
-
-                    // 处理数据库数据更新
-                    if (data[gbuffer[5]].SN == gbuffer[5])
-                    {
-                        // 提取核心索引变量，减少重复取值
-                        int bufferVal = gbuffer[5];
-                        if (bufferVal < 44)
+                        int dataIndex = bufferVal;
+                        data[dataIndex].VALUE = temp_val;
+                        // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
+                        UiDispatcherHelper.ExecuteOnUiThread(() =>
                         {
-                            int dataIndex = bufferVal;
-                            data[dataIndex].VALUE = temp_val;
-                            // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
-                            UpdateUiForRunTable(dataIndex);
-                        }
-                        else
-                        {
-                            // 扁平化嵌套：合并vindex和ovla的赋值逻辑
-                            (int vindex, float ovla, string dbTable) = bufferVal switch
-                            {
-                                < 90 => (data[bufferVal].SN - 44, Convert.ToSingle(dtset.Rows[data[bufferVal].SN - 44][5]), "PARAMETER_SET"),
-                                _ => (data[bufferVal].SN - 90, Convert.ToSingle(dtfactor.Rows[data[bufferVal].SN - 90][2]), "PARAMETER_FACTOR")
-                            };
-
-                            if (temp_val != ovla)
-                            {
-                                if (!flag_under_first)
-                                {
-                                    flag_uncon = true; // 上下参数不一致
-                                }
-                                else
-                                {
-                                    // 抽取UI更新+数据库保存逻辑，避免重复判断bufferVal
-                                    UpdateUiAndSaveDb(bufferVal, vindex, temp_val, dbTable);
-                                }
-                            }
-                        }
+                            dtrun.Rows[data[dataIndex].SN][5] = data[dataIndex].VALUE;
+                        });
                     }
-                    data[gbuffer[5]].ACK = gbuffer[7];
                 }
+                data[gbuffer[5]].ACK = gbuffer[7];
             }
+            
         }
 
-
-        /// --------------- 抽取的辅助方法（可放在当前类中） ---------------
-        /// <summary>
-        /// 更新运行表UI
-        /// </summary>
-        private void UpdateUiForRunTable(int dataIndex)
-        {
-            UiDispatcherHelper.ExecuteOnUiThread(() =>
-            {
-                dtrun.Rows[data[dataIndex].SN][5] = data[dataIndex].VALUE;
-            });
-        }
-
-        /// <summary>
-        /// 跨线程更新UI并保存数据库
-        /// </summary>
-        private void UpdateUiAndSaveDb(int bufferVal, int vindex, float tempVal, string dbTable)
-        {
-            UiDispatcherHelper.ExecuteOnUiThread(() =>
-            {
-                if (bufferVal < 90)
-                {
-                    dtset.Rows[vindex][5] = tempVal;
-                }
-                else
-                {
-                    dtfactor.Rows[vindex][2] = tempVal;
-                }
-                DB_SQLlite.Instance.DataBase_SET_Save(dbTable, tempVal, (byte)bufferVal);
-            });
-        }
 
 
 
