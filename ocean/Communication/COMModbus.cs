@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
+using ocean.Interfaces;
 
 //RTU格式
 //地址 功能码	数据	CRC校验
@@ -11,7 +12,8 @@ using System.IO.Ports;
 
 namespace ocean
 {
-    public class COMModbus//计划设计modbus协议版本
+    //计划设计modbus协议版本
+    public class COMModbus:IProtocol
     {
         //public byte[] sendbf = new byte[128];
         byte[] revbuffer = new byte[256];
@@ -43,7 +45,7 @@ namespace ocean
             sendbf[7] = temp_i[1];
         }
 
-        public void Monitor_Set_06(byte[] sendbf, int sn,float send_value)
+        public void Monitor_Set_06(byte[] sendbf, int sn, float send_value)
         {
             int crc = 0;
             Int16 svalue = (short)send_value;
@@ -129,5 +131,29 @@ namespace ocean
             return crc;
         }
 
+
+        // 新增：实现IProtocol接口的MonitorRun（适配统一调用）
+        public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
+        {
+            // 直接调用原有方法（param1固定为1）
+            this.Monitor_Run(sendbf, 1, addr, brun);
+            // 返回Modbus固定发送长度
+            return 8;
+        }
+
+        // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
+        public int MonitorSet(byte[] sendbf, int tempsn, dynamic data = null, object value = null)
+        {
+            // 直接调用原有方法
+            this.Monitor_Set_06(sendbf, tempsn, (float)value);
+            // 返回Modbus固定发送长度
+            return 8;
+        }
+
+        public void MonitorGet(byte[] sendbf, byte tempsn, dynamic data = null, object num=null)
+        {
+            this.Monitor_Get_03(sendbf, tempsn, (int)num);
+            //throw new NotImplementedException();
+        }
     }
 }

@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
+using ocean.Interfaces;
 
 namespace ocean
 {
-    public class COMFE
+    //FE协议
+    public class COMFE:IProtocol
     {
         // 单例模式（保持不变）
         private COMFE() { }
@@ -263,6 +265,31 @@ namespace ocean
             
         }
 
+        // 新增：实现IProtocol接口的MonitorRun（适配统一调用）
+        public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
+        {
+            // 直接调用原有方法
+            this.Monitor_Run(sendbf, brun);
+            // 返回FE协议的发送长度
+            return sendbf[4] + 5;
+        }
 
+        // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
+        public int MonitorSet(byte[] sendbf, int tempsn, dynamic data = null, object value = null)
+        {
+            byte command = (byte)data[tempsn].COMMAND;
+            // 直接调用原有方法
+            this.Monitor_Set(sendbf, (byte)tempsn, command, (float)value);
+            // 返回FE协议的发送长度
+            return sendbf[4] + 5;
+        }
+
+        public void MonitorGet(byte[] sendbf, byte tempsn, dynamic data = null, object num=null)
+        {
+            byte command = (byte)data[tempsn].COMMAND;
+            // 直接调用原有方法
+            this.Monitor_Get(sendbf, tempsn, command);
+            //throw new NotImplementedException();
+        }
     }
 }

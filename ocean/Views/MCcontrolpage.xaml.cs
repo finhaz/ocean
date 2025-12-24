@@ -135,5 +135,14 @@ namespace ocean.UI
         {
             Page_Unloaded(null, null);
         }
+
+        private void cbProcho_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            if (comboBox?.SelectedItem == null) return;
+
+            string selectedProtocol = comboBox.SelectedItem.ToString();
+            _globalVM.McController.InitProtocol(selectedProtocol);
+        }
     }
 }

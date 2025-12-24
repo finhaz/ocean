@@ -102,7 +102,7 @@
                     Margin="0,1,0,1" 
                     Grid.ColumnSpan="2" 
                     ItemsSource="{Binding ModbusSet.ProOptions}"
-                    SelectedItem="{Binding McController.ProtocolNum, Mode=TwoWay}" />
+                    SelectedItem="{Binding McController.ProtocolNum, Mode=TwoWay}" SelectionChanged="cbProcho_SelectionChanged" />
             </Grid>
 
             <Grid Grid.Column="2">

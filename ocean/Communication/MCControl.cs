@@ -1,4 +1,5 @@
-﻿using ocean.Mvvm;
+﻿using ocean.Interfaces;
+using ocean.Mvvm;
 using SomeNameSpace;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,8 @@ namespace ocean.Communication
         DateTime s1;
         DateTime s2;
 
-
+        // 核心：当前选中的协议实例（直接复用原有单例）
+        private IProtocol _currentProtocol;
 
         public MCControl() 
         {
@@ -106,6 +108,18 @@ namespace ocean.Communication
             InitTimer();
             LoadDataFromDatabase();
             
+        }
+
+        // 协议切换（选择框事件调用）
+        public void InitProtocol(string protocolNum)
+        {
+            // 直接赋值原有单例，无需新建对象
+            _currentProtocol = protocolNum switch
+            {
+                "FE协议" => COMFE.Instance,       // COMFE实现了IProtocol
+                "Modbus协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                _ => throw new ArgumentException($"不支持的协议类型：{protocolNum}")
+            };
         }
 
 
@@ -293,17 +307,11 @@ namespace ocean.Communication
             int send_num = 0;
             brun = pbrun;
             //textBox1.Text = "系统停止运行";
-            if (ProtocolNum == "FE协议")//FE协议
-            {
-                COMFE.Instance.Monitor_Run(sendbf,brun);
-                send_num = sendbf[4] + 5;
-            }
-            else if (ProtocolNum == "Modbus协议")//modbus
-            {
-                //1号机1通道
-                COMModbus.Instance.Monitor_Run(sendbf,1, addr, brun);
-                send_num = 8;                
-            }
+
+            if (_currentProtocol == null)
+                throw new InvalidOperationException("请先选择协议！");
+
+            send_num = _currentProtocol.MonitorRun(sendbf, brun, addr);
 
             CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             string txt = "TX:";
@@ -354,17 +362,12 @@ namespace ocean.Communication
 
             if (CommonRes.mySerialPort.IsOpen == true)
             {
-                if (ProtocolNum == "FE协议")
-                {
-                    COMFE.Instance.Monitor_Set(sendbf,(byte)tempsn, (byte)(data[tempsn].COMMAND), value);
-                    send_num = sendbf[4] + 5;
-                    
-                }
-                else if (ProtocolNum == "Modbus协议")
-                {
-                    COMModbus.Instance.Monitor_Set_06(sendbf, tempsn, value);
-                    send_num = 8;
-                }
+
+                if (_currentProtocol == null)
+                    throw new InvalidOperationException("请先选择协议！");
+
+                send_num = _currentProtocol.MonitorSet(sendbf, tempsn, data, value);
+
                 CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }
             else
