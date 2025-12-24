@@ -144,5 +144,20 @@ namespace ocean.UI
             string selectedProtocol = comboBox.SelectedItem.ToString();
             _globalVM.McController.InitProtocol(selectedProtocol);
         }
+
+        private void ShowText_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+
+            // 滚动到内容末尾（常用）
+            textBox.ScrollToEnd();
+
+            // 可选：滚动到顶部
+            // textBox.ScrollToHome();
+
+            // 可选：滚动到水平末尾
+            // textBox.ScrollToRightEnd();
+        }
     }
 }

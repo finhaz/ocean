@@ -29,7 +29,7 @@ namespace ocean.Interfaces
         /// <param name="data">数据对象（FE协议专用，可选）</param>
         /// <param name="value">设置值</param>
         /// <returns>发送长度</returns>
-        int MonitorSet(byte[] sendbf, int tempsn, dynamic data = null, object value = null);
+        int MonitorSet(byte[] sendbf, int tempsn, object value = null);
 
         /// </summary>
         /// <param name="sendbf">发送字节数组</param>
@@ -37,7 +37,7 @@ namespace ocean.Interfaces
         /// <param name="data">数据对象（FE协议专用，可选）</param>
         /// <param name="num">总长度（Modbus协议需要）</param>
         /// <returns>发送长度</returns>
-        int MonitorGet(byte[] sendbf, int tempsn , dynamic data = null, object num = null);
+        int MonitorGet(byte[] sendbf, int tempsn, object num = null);
 
         /// </summary>
         /// <param name="buffer">接收字节数组</param>

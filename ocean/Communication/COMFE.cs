@@ -285,19 +285,19 @@ namespace ocean
         }
 
         // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
-        public int MonitorSet(byte[] sendbf, int tempsn, dynamic data = null, object value = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null)
         {
-            byte command = (byte)data[tempsn].COMMAND;
+            byte command = 06;
             // 直接调用原有方法
             this.Monitor_Set(sendbf, (byte)tempsn, command, (float)value);
             // 返回FE协议的发送长度
             return sendbf[4] + 5;
         }
 
-        public int MonitorGet(byte[] sendbf, int tempsn, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn,object num=null)
         {
             byte index = (byte)(int)tempsn;
-            byte command = (byte)data[index].COMMAND;
+            byte command = 03;
 
 
             // 直接调用原有方法

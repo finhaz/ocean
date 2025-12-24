@@ -83,7 +83,6 @@ namespace ocean.Communication
         public int Num_DSP = 0;
         static int Set_Num_DSP = 2;//代表有机子数
 
-        public DataR[] data = new DataR[200];
         public int runnum;
         public byte[] sendbf = new byte[128];
 
@@ -151,9 +150,18 @@ namespace ocean.Communication
                 {
                     sn = 0;
                 }
-                send_num = _currentProtocol.MonitorGet(sendbf, sn, data, runnum);
+                send_num = _currentProtocol.MonitorGet(sendbf, sn,runnum);
                 sn = sn + 1;
                 CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+
+
+                string str = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", 0, true);
+                // 线程安全更新UI
+                UiDispatcherHelper.ExecuteOnUiThread(() =>
+                {
+                    SerialTextBlock.Text += str;
+                    //ShowTextBox.ScrollToEnd();
+                });
 
             }
         }
@@ -186,11 +194,10 @@ namespace ocean.Communication
                 datax = _currentProtocol.MonitorSolve(buffer, sn-1);
                 if (datax.SN < 44)
                 {
-                    data[datax.SN].VALUE = datax.VALUE;
                     // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
                     UiDispatcherHelper.ExecuteOnUiThread(() =>
                     {
-                        dtrun.Rows[datax.SN][5] = data[datax.SN].VALUE;
+                        dtrun.Rows[datax.SN][5] = datax.VALUE;
                     });
                 }                
             }
@@ -211,10 +218,10 @@ namespace ocean.Communication
                 throw new InvalidOperationException("请先选择协议！");
 
             send_num = _currentProtocol.MonitorRun(sendbf, brun, addr);
+            sn=addr;
 
             CommonRes.mySerialPort.Write(sendbf, 0, send_num);
-            string txt = "TX:";
-            txt= SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
+            string txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
 
             
             // 线程安全更新UI
@@ -265,7 +272,7 @@ namespace ocean.Communication
                 if (_currentProtocol == null)
                     throw new InvalidOperationException("请先选择协议！");
 
-                send_num = _currentProtocol.MonitorSet(sendbf, tempsn, data, value);
+                send_num = _currentProtocol.MonitorSet(sendbf, tempsn,value);
 
                 CommonRes.mySerialPort.Write(sendbf, 0, send_num);
             }

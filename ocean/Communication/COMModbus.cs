@@ -167,7 +167,7 @@ namespace ocean
         }
 
         // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
-        public int MonitorSet(byte[] sendbf, int tempsn, dynamic data = null, object value = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null)
         {
             // 直接调用原有方法
             this.Monitor_Set_06(sendbf, tempsn, (float)value);
@@ -175,7 +175,7 @@ namespace ocean
             return 8;
         }
 
-        public int MonitorGet(byte[] sendbf, int tempsn, dynamic data = null, object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn, object num=null)
         {
             this.Monitor_Get_03(sendbf, tempsn, 1);
             return 8;

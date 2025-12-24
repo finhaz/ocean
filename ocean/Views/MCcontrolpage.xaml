@@ -167,7 +167,9 @@
                     Margin="3,0,0,0" 
                     AcceptsReturn="True" 
                     Grid.RowSpan="2" 
-                    Text="{Binding McController.SerialTextBlock.Text,Mode=TwoWay}"></TextBox>
+                    Text="{Binding McController.SerialTextBlock.Text,Mode=TwoWay}"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    TextChanged="ShowText_TextChanged"></TextBox>
 
             </Grid>
 
