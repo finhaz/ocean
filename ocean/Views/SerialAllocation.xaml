@@ -129,7 +129,8 @@
                         Visibility="Visible" 
                         Content="保存显示" 
                         Grid.Row="4" 
-                        Margin="10,0,60,0"></Button>
+                        Margin="10,0,60,0"
+                        Command="{Binding SaveReceiveDataCommand}"/>
                     <Button 
                         Visibility="Visible" 
                         Content="更改" 
