@@ -19,9 +19,9 @@ namespace ocean.ViewModels
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
-                Label = "串口调试界面",
+                Label = "串口配置界面",
                 NavigationType = typeof(BugsPage),
-                NavigationDestination = new Uri("Views/debug_serial.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/SerialAllocation.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {

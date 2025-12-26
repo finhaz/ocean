@@ -1,4 +1,4 @@
-﻿<Page x:Class="ocean.UI.debug_serial"
+﻿<Page x:Class="ocean.UI.SerialAllocation"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:ocean.UI"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="debug_serial" Unloaded="Page_Unloaded" Loaded="Page_Loaded"
+      Title="SerialAllocation" Unloaded="Page_Unloaded" Loaded="Page_Loaded"
       >
     
     <Grid>

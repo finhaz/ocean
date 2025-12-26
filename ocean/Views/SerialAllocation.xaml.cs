@@ -22,9 +22,9 @@ using static System.Data.Odbc.ODBC32;
 namespace ocean.UI
 {
     /// <summary>
-    /// debug_serial.xaml 的交互逻辑
+    /// SerialAllocation.xaml 的交互逻辑
     /// </summary>
-    public partial class debug_serial : Page
+    public partial class SerialAllocation : Page
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
 
@@ -34,7 +34,7 @@ namespace ocean.UI
         HanderInterfaceUpdataDelegate myUpdataHander;
         delegate void txtGotoEndDelegate();
 
-        public debug_serial()
+        public SerialAllocation()
         {
             InitializeComponent();
             // 将Page的DataContext绑定到全局ViewModel
