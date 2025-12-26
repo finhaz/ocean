@@ -16,6 +16,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using static System.Data.Odbc.ODBC32;
+
 
 namespace ocean.UI
 {
@@ -326,9 +328,48 @@ namespace ocean.UI
 
         private void tbSend_TextChanged(object sender, TextChangedEventArgs e)
         {
+
             if (ckAsciiView.IsChecked == true)
             {
-                get16View((bool)ckAsciiView.IsChecked);
+                //get16View((bool)ckAsciiView.IsChecked);
+                StringBuilder asciiBuilder = new StringBuilder();
+                // 清空原有值
+                _globalVM.SerialConfig.Tb16ViewText = string.Empty;
+
+                // 遍历每个字符转换为ASCII码
+                foreach (char c in tbSend.Text)
+                {
+                    // 核心修改：忽略空格字符
+                    if (char.IsWhiteSpace(c))
+                    {
+                        continue; // 跳过空格，不处理
+                    }
+
+
+                    // 获取字符的ASCII码（对于扩展ASCII使用0-255范围）
+                    int asciiCode = (int)c;
+
+                    // 只保留标准ASCII字符（0-127），非ASCII字符标记为[NA]
+                    if (asciiCode >= 0 && asciiCode <= 127)
+                    {
+                        // 核心修改：转换为16进制，补零到2位，大写显示（可改为x小写）
+                        string hexCode = asciiCode.ToString("X2");
+                        asciiBuilder.Append($"{hexCode} ");
+
+
+                    }
+                    else
+                    {
+                        asciiBuilder.Append("[NA] ");
+                    }
+                }
+
+                if (ckAdvantechCmd.IsChecked == true)
+                {
+                    string hexCode = "0D";
+                    asciiBuilder.Append($"{hexCode} ");
+                }
+                _globalVM.SerialConfig.Tb16ViewText = asciiBuilder.ToString().TrimEnd();
             }
         }
 

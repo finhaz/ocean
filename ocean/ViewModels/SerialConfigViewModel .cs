@@ -181,6 +181,17 @@ namespace ocean.ViewModels
         }
 
         /// <summary>
+        /// 16进制发送（对应ck16Send的IsChecked）
+        /// </summary>
+        private bool _isAsciiView;
+        public bool IsAsciiView
+        {
+            get => _isAsciiView;
+            set => SetProperty(ref _isAsciiView, value);
+        }
+
+
+        /// <summary>
         /// 自动发送（对应ckAutoSend的IsChecked）
         /// </summary>
         private bool _isAutoSend;
@@ -530,6 +541,8 @@ namespace ocean.ViewModels
             {
                 // 显示16进制预览框
                 Tb16ViewVisibility = Visibility.Visible;
+                //
+                IsAsciiView = true;
                 // 更新预览文本
                 Update16ViewText();
             }

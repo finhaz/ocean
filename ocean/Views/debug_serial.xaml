@@ -204,7 +204,8 @@
                               Margin="3,3,0,0"
                               Click="ck16Send_Click"/>
                     <CheckBox Name="ckAsciiView" 
-                              Content="显示Ascii码"  
+                              Content="显示Ascii码"
+                              IsChecked="{Binding SerialConfig.IsAsciiView,Mode=TwoWay}"
                               Grid.Row="1"
                               Grid.Column="0" 
                               VerticalAlignment="Top" 
