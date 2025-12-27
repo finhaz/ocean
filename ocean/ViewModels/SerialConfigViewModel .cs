@@ -1,4 +1,7 @@
-﻿using ocean.Communication;
+﻿using Microsoft.Win32;
+using Microsoft.Xaml.Behaviors.Core;
+using ocean.Communication;
+using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,10 +9,10 @@ using System.IO.Ports; // 必须引入：包含StopBits、Parity枚举
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using System.Windows.Controls;
-using ocean.Mvvm;
+using System.IO;
 
 namespace ocean.ViewModels
 {
@@ -18,6 +21,50 @@ namespace ocean.ViewModels
     /// </summary>
     public class SerialConfigViewModel : ObservableObject
     {
+        // 保存数据的命令
+        public ICommand SaveReceiveDataCommand { get; }
+
+        // 保存数据的核心方法
+        private void ExecuteSaveReceiveData()
+        {
+            try
+            {
+                // 如果文本为空，提示用户
+                if (string.IsNullOrWhiteSpace(TbReceiveText))
+                {
+                    MessageBox.Show("没有可保存的串口数据！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // 创建保存文件对话框
+                var saveFileDialog = new SaveFileDialog
+                {
+                    // 设置默认文件名（包含当前时间，避免重复）
+                    FileName = $"串口接收数据_{DateTime.Now:yyyyMMddHHmmss}.txt",
+                    // 设置文件类型
+                    Filter = "文本文件 (*.txt)|*.txt|所有文件 (*.*)|*.*",
+                    // 默认文件类型为txt
+                    DefaultExt = ".txt",
+                    // 确认覆盖前提示
+                    OverwritePrompt = true
+                };
+
+                // 如果用户确认保存
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    // 将文本框内容写入文件
+                    File.WriteAllText(saveFileDialog.FileName, TbReceiveText, Encoding.UTF8);
+                    MessageBox.Show($"数据已成功保存到：{saveFileDialog.FileName}", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                // 捕获异常并提示用户
+                MessageBox.Show($"保存失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
         #region 端口名相关
         private ObservableCollection<string> _portNames = new ObservableCollection<string>();
         public ObservableCollection<string> PortNames
@@ -272,7 +319,8 @@ namespace ocean.ViewModels
         {
             InitPortNames();
             InitComStateStyle();
-
+            // 初始化保存命令
+            SaveReceiveDataCommand = new ActionCommand(ExecuteSaveReceiveData);
             // 初始化命令
             //HexSendClickCommand = new RelayCommand(OnHexSendClicked);
             //AutoSendClickCommand = new RelayCommand(OnAutoSendClicked);
