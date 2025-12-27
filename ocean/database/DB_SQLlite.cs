@@ -1,4 +1,5 @@
-﻿using ocean.Communication;
+﻿using Microsoft.Data.Sqlite;
+using ocean.Communication;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,13 +9,6 @@ using System.Windows;
 
 namespace SomeNameSpace
 {
-
-    public struct Data_r
-    {
-        public int SN, COMMAND, LENG, NO, TYP, ACK;
-        public float VALUE, FACTOR;
-        public string NAME, UNITor;
-    }
     public class DB_SQLlite
     {
         // 单例模式（保持不变）
@@ -31,6 +25,8 @@ namespace SomeNameSpace
 
         //public static string ConnString = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=./MOON.db;";
         public static string ConnString = "Data Source=test.db";
+
+        public static string dbfile = "Data Source=test.db";
 
         //public Data_r[] data = new Data_r[200];
         public int u = 0;
@@ -288,6 +284,95 @@ namespace SomeNameSpace
             odc.ExecuteNonQuery();
             odc.Dispose();
         }
+
+
+        static void create_table(string dbfile)
+        {
+            //string dbfile = @"URI=file:sql.db";
+            SqliteConnection cnn = new SqliteConnection(dbfile);
+            cnn.Open();
+
+            string sql = "Create table Person (Id integer primary key, Name text);";
+            SqliteCommand cmd = new SqliteCommand(sql, cnn);
+            cmd.ExecuteNonQuery();
+            cnn.Close();
+        }
+
+        void addtableline(string dbfile)
+        {
+            //string dbfile = @"URI=file:sql.db";
+            SqliteConnection cnn = new SqliteConnection(dbfile);
+            cnn.Open();
+
+            string sql = "insert into  Person (Id , Name) values(1,'Mike');";
+            SqliteCommand cmd = new SqliteCommand(sql, cnn);
+            cmd.ExecuteNonQuery();
+            cnn.Close();
+
+            Console.WriteLine("Insert row OK");
+
+        }
+
+        void find_data(string dbfile)
+        {
+            //string dbfile = @"URI=file:sql.db";
+
+            SqliteConnection cnn = new SqliteConnection(dbfile);
+
+            cnn.Open();
+
+            string sql = "Select * From  Person";
+
+            SqliteCommand cmd = new SqliteCommand(sql, cnn);
+
+            SqliteDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+
+            {
+
+                Console.WriteLine($"{reader.GetInt32(0)}  {reader.GetString(1)} ");
+
+            }
+
+            reader.Close();
+
+            cnn.Close();
+
+
+        }
+
+
+        void update_data(string dbfile)
+        {
+            //string dbfile = @"URI=file:sql.db";
+            SqliteConnection cnn = new SqliteConnection(dbfile);
+            cnn.Open();
+
+            string sql = "update  Person set Name='Jim jones' where id=1;";
+            SqliteCommand cmd = new SqliteCommand(sql, cnn);
+            cmd.ExecuteNonQuery();
+            cnn.Close();
+
+            Console.WriteLine("Update row OK");
+
+        }
+
+
+        void delete_data(string dbfile)
+        {
+            //string dbfile = @"URI=file:sql.db";
+            SqliteConnection cnn = new SqliteConnection(dbfile);
+            cnn.Open();
+
+            string sql = "delete from  Person where id=3;";
+            SqliteCommand cmd = new SqliteCommand(sql, cnn);
+            cmd.ExecuteNonQuery();
+            cnn.Close();
+            Console.WriteLine("Delete row OK");
+
+        }
+
 
     }
 }
