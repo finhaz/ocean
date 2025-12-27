@@ -22,7 +22,7 @@ using System.Windows.Media;
 namespace ocean.Communication
 
 {
-    public class Modbusset : ObservableObject
+    public class GeneralDebugPageViewModel: ObservableObject
     {
         public byte[] sendbf = new byte[128];
         //针对数据协议：
@@ -141,7 +141,7 @@ namespace ocean.Communication
 
 
 
-        public Modbusset()
+        public GeneralDebugPageViewModel()
         {
             dtm = new DataTable();
             AddDataTableColumns(dtm);

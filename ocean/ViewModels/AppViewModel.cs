@@ -24,15 +24,15 @@ namespace ocean.ViewModels
         private AppViewModel()
         {
             // 初始化Modbusset实例
-            _modbusSet = new Modbusset();
-            _mcctronller = new MCControl();
+            _modbusSet = new GeneralDebugPageViewModel();
+            _mcctronller = new DeviceControlPageViewModel();
         }
 
         // *************************
         // 业务属性
         // *************************
-        private Modbusset _modbusSet;
-        public Modbusset ModbusSet
+        private GeneralDebugPageViewModel _modbusSet;
+        public GeneralDebugPageViewModel ModbusSet
         {
             get => _modbusSet;
             set => SetProperty(ref _modbusSet, value);
@@ -41,8 +41,8 @@ namespace ocean.ViewModels
         // 全局串口配置实例（所有页面共享）
         public SerialConfigViewModel SerialConfig { get; } = new SerialConfigViewModel();
 
-        private MCControl _mcctronller;
-        public MCControl McController
+        private DeviceControlPageViewModel _mcctronller;
+        public DeviceControlPageViewModel McController
         {
             get => _mcctronller;
             set => SetProperty(ref _mcctronller, value);

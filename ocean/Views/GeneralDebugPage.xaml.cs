@@ -36,15 +36,15 @@ using ocean.Mvvm;
 namespace ocean.UI
 {
     /// <summary>
-    /// Modserial.xaml 的交互逻辑
+    /// GeneralDebugPage.xaml 的交互逻辑
     /// </summary>
     /// 
 
-    public partial class Modserial
+    public partial class GeneralDebugPage
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
 
-        public Modserial()
+        public GeneralDebugPage()
         {
 
             InitializeComponent();

@@ -28,14 +28,14 @@ using static System.Net.Mime.MediaTypeNames;
 namespace ocean.UI
 {
     /// <summary>
-    /// DataAnal.xaml 的交互逻辑
+    /// DeviceControlPage.xaml 的交互逻辑
     /// </summary>
-    public partial class MCcontrolpage : Page
+    public partial class DeviceControlPage : Page
     {
 
         private AppViewModel _globalVM = AppViewModel.Instance;
 
-        public MCcontrolpage()
+        public DeviceControlPage()
         {
             InitializeComponent();
             DataContext = _globalVM;

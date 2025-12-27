@@ -21,21 +21,21 @@ namespace ocean.ViewModels
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                 Label = "串口配置界面",
                 NavigationType = typeof(BugsPage),
-                NavigationDestination = new Uri("Views/SerialAllocation.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/SerialConfig.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "通用调试界面",
                 NavigationType = typeof(UserPage),
-                NavigationDestination = new Uri("Views/Modserial.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/GeneralDebugPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserDoctorSolid },
                 Label = "控制界面",
                 NavigationType = typeof(BreakPage),
-                NavigationDestination = new Uri("Views/MCcontrolpage.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/DeviceControlPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {

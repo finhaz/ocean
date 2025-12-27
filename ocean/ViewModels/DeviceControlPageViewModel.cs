@@ -19,7 +19,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ocean.Communication
 {
-    public class MCControl:ObservableObject
+    public class DeviceControlPageViewModel: ObservableObject
     {
         //自定义运行界面的地址
 
@@ -95,7 +95,7 @@ namespace ocean.Communication
         // 核心：当前选中的协议实例（直接复用原有单例）
         private IProtocol _currentProtocol;
 
-        public MCControl() 
+        public DeviceControlPageViewModel() 
         {
 
             SerialTextBlock = new TextBlock<string>();
