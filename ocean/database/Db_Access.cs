@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ocean.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
@@ -10,7 +11,7 @@ namespace SomeNameSpace
     /// <summary>
     /// 操作Access数据库(.NET Core)
     /// </summary>
-    public class DB_Access
+    public class DB_Access: IDatabaseOperation
     {
         // 定义连接字符串
         // 请根据项目需求手动更改连接字符串, 本例中将example.accdb文件在生成时复制到了输出目录
@@ -56,7 +57,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="dt">表</param>
         /// <param name="tableName">表名</param>
-        public static void UpdateDBTable(System.Data.DataTable dt, string tableName)
+        public void UpdateDBTable(System.Data.DataTable dt, string tableName)
         {
             if (!IsTableExist(tableName))
             {
@@ -110,7 +111,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="dt">表</param>
         /// <param name="tableName">表名</param>
-        public static bool CreatDBTable(System.Data.DataTable dt, string tableName)
+        public bool CreatDBTable(System.Data.DataTable dt, string tableName)
         {
             if (IsTableExist(tableName))
             {
@@ -169,7 +170,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static bool DeleteDBTable(string tableName)
+        public bool DeleteDBTable(string tableName)
         {
             if (IsTableExist(tableName))
             {
@@ -197,7 +198,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static bool IsTableExist(string tableName)
+        public bool IsTableExist(string tableName)
         {
             using OdbcConnection conn = new OdbcConnection(ConnString);
             try
@@ -221,7 +222,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static DataTable GetDBTable(string tableName)
+        public DataTable GetDBTable(string tableName)
         {
             if (!IsTableExist(tableName))
             {
@@ -245,6 +246,10 @@ namespace SomeNameSpace
                 return null;
             }
         }
+
+
+
+
     }
 }
 

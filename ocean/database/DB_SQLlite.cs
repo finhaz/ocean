@@ -79,7 +79,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="dt">表</param>
         /// <param name="tableName">表名</param>
-        public static void UpdateDBTable(System.Data.DataTable dt, string tableName)
+        public void UpdateDBTable(System.Data.DataTable dt, string tableName)
         {
             if (!IsTableExist(tableName))
             {
@@ -133,7 +133,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="dt">表</param>
         /// <param name="tableName">表名</param>
-        public static bool CreatDBTable(System.Data.DataTable dt, string tableName)
+        public bool CreatDBTable(System.Data.DataTable dt, string tableName)
         {
             if (IsTableExist(tableName))
             {
@@ -192,7 +192,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static bool DeleteDBTable(string tableName)
+        public bool DeleteDBTable(string tableName)
         {
             if (IsTableExist(tableName))
             {
@@ -220,7 +220,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static bool IsTableExist(string tableName)
+        public  bool IsTableExist(string tableName)
         {
             using SQLiteConnection conn = new SQLiteConnection(ConnString);
             try
@@ -244,7 +244,7 @@ namespace SomeNameSpace
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static DataTable GetDBTable(string tableName)
+        public DataTable GetDBTable(string tableName)
         {
             if (!IsTableExist(tableName))
             {

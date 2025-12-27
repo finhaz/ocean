@@ -129,9 +129,9 @@ namespace ocean.Communication
         public void LoadDataFromDatabase()
         {
             // 读取数据库表，赋值给对应属性
-            dtrun = DB_SQLlite.GetDBTable("PARAMETER_RUN");
-            dtset = DB_SQLlite.GetDBTable("PARAMETER_SET");
-            dtfactor = DB_SQLlite.GetDBTable("PARAMETER_FACTOR");
+            dtrun = DB_SQLlite.Instance.GetDBTable("PARAMETER_RUN");
+            dtset = DB_SQLlite.Instance.GetDBTable("PARAMETER_SET");
+            dtfactor = DB_SQLlite.Instance.GetDBTable("PARAMETER_FACTOR");
 
             // 可选：处理空表情况（避免后续操作空引用）
             dtrun ??= new DataTable("PARAMETER_RUN");
