@@ -95,6 +95,9 @@ namespace ocean.Communication
         // 核心：当前选中的协议实例（直接复用原有单例）
         private IProtocol _currentProtocol;
 
+        // 核心：当前选中的数据库实例（直接复用原有单例）
+        private IDatabaseOperation _dbOperation=new DB_SQLlite();
+
         public DeviceControlPageViewModel() 
         {
 
@@ -128,10 +131,11 @@ namespace ocean.Communication
         /// </summary>
         public void LoadDataFromDatabase()
         {
+             
             // 读取数据库表，赋值给对应属性
-            dtrun = DB_SQLlite.Instance.GetDBTable("PARAMETER_RUN");
-            dtset = DB_SQLlite.Instance.GetDBTable("PARAMETER_SET");
-            dtfactor = DB_SQLlite.Instance.GetDBTable("PARAMETER_FACTOR");
+            dtrun = _dbOperation.GetDBTable("PARAMETER_RUN");
+            dtset = _dbOperation.GetDBTable("PARAMETER_SET");
+            dtfactor = _dbOperation.GetDBTable("PARAMETER_FACTOR");
 
             // 可选：处理空表情况（避免后续操作空引用）
             dtrun ??= new DataTable("PARAMETER_RUN");
@@ -264,7 +268,7 @@ namespace ocean.Communication
 
 
 
-            DB_SQLlite.Instance.DataBase_SET_Save(table, value, (byte)tempsn);
+            _dbOperation.DataBase_SET_Save(table, value, (byte)tempsn);
 
             if (CommonRes.mySerialPort.IsOpen == true)
             {

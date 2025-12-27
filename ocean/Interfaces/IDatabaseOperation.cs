@@ -22,6 +22,9 @@ namespace ocean.Interfaces
 
         public bool CreatDBTable(System.Data.DataTable dt, string tableName);
 
+
+        public void DataBase_SET_Save(string table, float set_num, byte tempsn);
+
         // 扩展：添加其他通用数据库操作（按需补充）
         // bool ExecuteNonQuery(string sql);
         // DataTable Query(string sql);

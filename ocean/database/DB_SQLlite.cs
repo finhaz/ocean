@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using ocean.Communication;
+using ocean.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,12 +10,12 @@ using System.Windows;
 
 namespace SomeNameSpace
 {
-    public class DB_SQLlite
+    public class DB_SQLlite : IDatabaseOperation
     {
         // 单例模式（保持不变）
-        private DB_SQLlite() { }
-        private static readonly Lazy<DB_SQLlite> _instance = new Lazy<DB_SQLlite>(() => new DB_SQLlite());
-        public static DB_SQLlite Instance => _instance.Value;
+        //private DB_SQLlite() { }
+        //private static readonly Lazy<DB_SQLlite> _instance = new Lazy<DB_SQLlite>(() => new DB_SQLlite());
+        //public static DB_SQLlite Instance => _instance.Value;
         /// <summary>
         /// 操作sqlite数据库(.NET Core)
         /// </summary>
