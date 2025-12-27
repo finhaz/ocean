@@ -3,8 +3,8 @@ using System.Linq;
 
 namespace fruit
 {
-	public class PSO_analysis
-	{
+	public class PSOAlgorithm
+    {
         //PSO常数
         double c1 = 1.49445;     // 学习因子
         double c2 = 1.49445;     // 学习因子
