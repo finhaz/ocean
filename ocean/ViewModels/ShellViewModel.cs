@@ -16,6 +16,7 @@ namespace ocean.ViewModels
         public ShellViewModel()
         {
             // Build the menus
+            //汉堡菜单上方的按钮
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
@@ -34,17 +35,18 @@ namespace ocean.ViewModels
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserDoctorSolid },
                 Label = "控制界面",
-                NavigationType = typeof(BreakPage),
+                NavigationType = typeof(DeviceControlPage),
                 NavigationDestination = new Uri("Views/DeviceControlPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FontAwesomeBrands },
                 Label = "协议说明",
-                NavigationType = typeof(AwesomePage),
+                NavigationType = typeof(Prointroduction),
                 NavigationDestination = new Uri("Views/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
             });
 
+            //汉堡菜单下方的按钮
             this.OptionsMenu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.AnchorSolid },
