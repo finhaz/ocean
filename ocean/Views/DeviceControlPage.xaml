@@ -39,7 +39,10 @@
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="25*"/>
-                    <RowDefinition Height="100*"/>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="25*"/>
+                    <RowDefinition Height="25*"/>
                 </Grid.RowDefinitions>
                 <TextBlock 
                     Name="textBox1" 
@@ -103,6 +106,31 @@
                     Grid.ColumnSpan="2" 
                     ItemsSource="{Binding ModbusSet.ProOptions}"
                     SelectedItem="{Binding McController.ProtocolNum, Mode=TwoWay}" SelectionChanged="cbProcho_SelectionChanged" />
+                <TextBlock 
+                    Grid.Row="7" 
+                    Text="选中数据库：" 
+                    Grid.ColumnSpan="2"
+                    Width="100"
+                    VerticalAlignment="Center" />
+                <TextBox 
+                    Grid.Row="8" 
+                    Text="{Binding McController.DbFilePath}" 
+                    Width="100"
+                    Grid.ColumnSpan="2"
+                    IsReadOnly="True"/>
+                <Button
+                    Grid.Row="9" 
+                    Grid.ColumnSpan="2"
+                    Content="选择文件" 
+                    Command="{Binding McController.SelectDatabaseFileCommand}" 
+                    Width="100"/>
+                <Button
+                    Grid.Row="10" 
+                    Content="读取数据表"
+                    Grid.ColumnSpan="2"
+                    Command="{Binding McController.LoadDatabaseTablesCommand}" 
+                    Width="100"/>
+                
             </Grid>
 
             <Grid Grid.Column="2">
@@ -116,7 +144,7 @@
                         <DataGrid x:Name="datashow" 
                                   CellEditEnding="datashow_CellEditEnding" 
                                   BeginningEdit="datashow_BeginningEdit"
-                                  ItemsSource="{Binding McController.dtrun, Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.Dtrun, Mode=TwoWay}">
 
                         </DataGrid>
                     </TabItem>
@@ -124,7 +152,7 @@
                     <TabItem Header="调试参数">
                         <DataGrid x:Name="dataset"
                                   CellEditEnding="dataset_CellEditEnding"
-                                  ItemsSource="{Binding McController.dtset,Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.Dtset,Mode=TwoWay}">
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
@@ -142,7 +170,7 @@
                     <TabItem Header="修正系数">
                         <DataGrid x:Name="datafactor"
                                   CellEditEnding="datafactor_CellEditEnding"
-                                  ItemsSource="{Binding McController.dtfactor,Mode=TwoWay}">
+                                  ItemsSource="{Binding McController.Dtfactor,Mode=TwoWay}">
 
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn>

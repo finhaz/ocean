@@ -25,9 +25,9 @@ namespace SomeNameSpace
         // 因此DBQ后面写的是
 
         //public static string ConnString = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=./MOON.db;";
-        public static string ConnString = "Data Source=test.db";
+        public static string ConnString ;
 
-        public static string dbfile = "Data Source=test.db";
+        //public readonly string ConnString;
 
         //public Data_r[] data = new Data_r[200];
         public int u = 0;
@@ -37,9 +37,9 @@ namespace SomeNameSpace
         //OleDbCommand cmd;
         //OleDbDataReader dr;
 
-        OdbcConnection conn;
-        OdbcCommand cmd;
-        OdbcDataReader dr;
+        //OdbcConnection conn;
+        //OdbcCommand cmd;
+        //OdbcDataReader dr;
 
         string[] error1 = new string[16];
         //public int runnum;
@@ -47,7 +47,10 @@ namespace SomeNameSpace
         int num_pso = 0;//记录存在多少条PSO记录
         int UG_Num = 0;
 
-
+        public DB_SQLlite(string connectionString)
+        {
+            ConnString = connectionString;
+        }
 
         /// <summary>
         /// 获取数据库中所有表名

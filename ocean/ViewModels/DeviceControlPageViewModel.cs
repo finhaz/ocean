@@ -1,4 +1,5 @@
-﻿using ocean.database;
+﻿using Microsoft.Win32;
+using ocean.database;
 using ocean.Interfaces;
 using ocean.Mvvm;
 using SomeNameSpace;
@@ -54,11 +55,6 @@ namespace ocean.Communication
 
         public ICommand ButtonIncrease { get; }
 
-        //数据处理
-        public DataTable dtrun { get; set; }
-        public DataTable dtset { get; set; }
-        public DataTable dtfactor { get; set; }
-
 
         //数据库对接
         public int select_index;
@@ -96,7 +92,7 @@ namespace ocean.Communication
         private IProtocol _currentProtocol;
 
         // 核心：当前选中的数据库实例（直接复用原有单例）
-        private IDatabaseOperation _dbOperation=new DB_SQLlite();
+        //private IDatabaseOperation _dbOperation=new DB_SQLlite();
 
         public DeviceControlPageViewModel() 
         {
@@ -109,7 +105,6 @@ namespace ocean.Communication
             );
 
             InitTimer();
-            LoadDataFromDatabase();
             
         }
 
@@ -125,24 +120,6 @@ namespace ocean.Communication
             };
         }
 
-
-        /// <summary>
-        /// 从数据库加载数据的核心方法（内聚初始化逻辑）
-        /// </summary>
-        public void LoadDataFromDatabase()
-        {
-             
-            // 读取数据库表，赋值给对应属性
-            dtrun = _dbOperation.GetDBTable("PARAMETER_RUN");
-            dtset = _dbOperation.GetDBTable("PARAMETER_SET");
-            dtfactor = _dbOperation.GetDBTable("PARAMETER_FACTOR");
-
-            // 可选：处理空表情况（避免后续操作空引用）
-            dtrun ??= new DataTable("PARAMETER_RUN");
-            dtset ??= new DataTable("PARAMETER_SET");
-            dtfactor ??= new DataTable("PARAMETER_FACTOR");
-            runnum = dtrun.Rows.Count;
-        }
 
 
         public void show_stop()
@@ -201,7 +178,7 @@ namespace ocean.Communication
                     // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
                     UiDispatcherHelper.ExecuteOnUiThread(() =>
                     {
-                        dtrun.Rows[datax.SN][5] = datax.VALUE;
+                        Dtrun.Rows[datax.SN][5] = datax.VALUE;
                     });
                 }                
             }
@@ -247,22 +224,22 @@ namespace ocean.Communication
 
             if (table == "PARAMETER_FACTOR")
             {
-                y = dtfactor.Rows[0][0].ToString();
+                y = Dtfactor.Rows[0][0].ToString();
                 z = Convert.ToInt32(y);
                 tempsn = x + z;
 
 
-                val = dtfactor.Rows[x][2].ToString();
+                val = Dtfactor.Rows[x][2].ToString();
                 value = Convert.ToSingle(val);
             }
             else
             {
-                y = dtset.Rows[0][0].ToString();
+                y = Dtset.Rows[0][0].ToString();
                 z = Convert.ToInt32(y);
                 tempsn = x + z;
 
 
-                val = dtset.Rows[x][5].ToString();
+                val = Dtset.Rows[x][5].ToString();
                 value = Convert.ToSingle(val);
             }
 
@@ -346,5 +323,162 @@ namespace ocean.Communication
                 MessageBox.Show("打开串口！");
             }
         }
+
+        #region 1. 绑定属性（手动实现SetProperty）
+        // 选中的数据库文件路径
+        private string _dbFilePath = string.Empty;
+        public string DbFilePath
+        {
+            get => _dbFilePath;
+            set => SetProperty(ref _dbFilePath, value);
+        }
+
+        // 读取的三张数据表（用于UI绑定）
+        private DataTable _dtrun = new DataTable();
+        public DataTable Dtrun
+        {
+            get => _dtrun;
+            set => SetProperty(ref _dtrun, value);
+        }
+
+        private DataTable _dtset = new DataTable();
+        public DataTable Dtset
+        {
+            get => _dtset;
+            set => SetProperty(ref _dtset, value);
+        }
+
+        private DataTable _dtfactor = new DataTable();
+        public DataTable Dtfactor
+        {
+            get => _dtfactor;
+            set => SetProperty(ref _dtfactor, value);
+        }
+
+        // 接口变量（统一操作数据库）
+        private IDatabaseOperation _dbOperation = null!;
+        #endregion
+
+        // ViewModels/GeneralDebugWindowViewModel.cs
+        #region 2. 命令定义（复用现有RelayCommand<T>）
+        // 文件选择命令（无参数，泛型指定为object，参数传null）
+        private ICommand? _selectDatabaseFileCommand;
+        public ICommand SelectDatabaseFileCommand
+        {
+            get
+            {
+                if (_selectDatabaseFileCommand == null)
+                {
+                    // 泛型指定为object，execute忽略参数，canExecute设为null
+                    _selectDatabaseFileCommand = new RelayCommand<object>(
+                        parameter => SelectDatabaseFile(), // 无参数逻辑
+                        parameter => true // 始终可执行
+                    );
+                }
+                return _selectDatabaseFileCommand;
+            }
+        }
+
+        // 读取数据表命令（同理）
+        private ICommand? _loadDatabaseTablesCommand;
+        public ICommand LoadDatabaseTablesCommand
+        {
+            get
+            {
+                if (_loadDatabaseTablesCommand == null)
+                {
+                    _loadDatabaseTablesCommand = new RelayCommand<object>(
+                        parameter => LoadDatabaseTables(),
+                        parameter => true
+                    );
+                }
+                return _loadDatabaseTablesCommand;
+            }
+        }
+        #endregion
+
+        #region 3. 命令执行逻辑（与原逻辑一致）
+        /// <summary>
+        /// 选择数据库文件的逻辑
+        /// </summary>
+        private void SelectDatabaseFile()
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "数据库文件|*.db;*.mdb;*.accdb|SQLite文件(*.db)|*.db|Access文件(*.mdb;*.accdb)|*.mdb;*.accdb",
+                Title = "选择数据库文件",
+                Multiselect = false
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                // 赋值给绑定属性（自动触发UI更新）
+                DbFilePath = openFileDialog.FileName;
+                // 初始化数据库操作实例
+                InitDbOperation(DbFilePath);
+            }
+        }
+
+        /// <summary>
+        /// 读取数据表的逻辑
+        /// </summary>
+        private void LoadDatabaseTables()
+        {
+            if (string.IsNullOrEmpty(DbFilePath) || _dbOperation == null)
+            {
+                MessageBox.Show("请先选择有效的数据库文件！");
+                return;
+            }
+
+            try
+            {
+                // 先检查表是否存在
+                if (!_dbOperation.IsTableExist("PARAMETER_RUN"))
+                {
+                    MessageBox.Show("表PARAMETER_RUN不存在！");
+                    return;
+                }
+
+                // 调用接口读取表数据（统一调用，无需区分数据库类型）
+                Dtrun = _dbOperation.GetDBTable("PARAMETER_RUN");
+                Dtset = _dbOperation.GetDBTable("PARAMETER_SET");
+                Dtfactor = _dbOperation.GetDBTable("PARAMETER_FACTOR");
+
+                MessageBox.Show("数据表读取成功！");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"读取失败：{ex.Message}");
+            }
+        }
+        #endregion
+
+        #region 4. 私有方法：初始化数据库实例（自动识别类型）
+        private void InitDbOperation(string filePath)
+        {
+            var ext = System.IO.Path.GetExtension(filePath).ToLower();
+
+            switch (ext)
+            {
+                case ".db":
+                    // SQLite连接字符串
+                    var sqliteConnStr = $"Data Source={filePath};Version=3;";
+                    _dbOperation = new DB_SQLlite(sqliteConnStr);
+                    break;
+
+                case ".mdb":
+                case ".accdb":
+                    // Access连接字符串（适配ACE驱动）
+                    var accessConnStr = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Persist Security Info=False;";
+                    _dbOperation = new DB_Access(accessConnStr);
+                    break;
+
+                default:
+                    throw new NotSupportedException($"不支持的数据库类型：{ext}");
+            }
+        }
+        #endregion
+
+
     }
 }

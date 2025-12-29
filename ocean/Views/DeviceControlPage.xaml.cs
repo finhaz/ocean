@@ -80,7 +80,7 @@ namespace ocean.UI
         private void datashow_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             _globalVM.McController.newValue = (e.EditingElement as TextBox).Text;
-            _globalVM.McController.runnum= _globalVM.McController.dtrun.Rows.Count;
+            _globalVM.McController.runnum= _globalVM.McController.Dtrun.Rows.Count;
         }
 
 

@@ -26,6 +26,12 @@ namespace SomeNameSpace
 
         public static string ConnString = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=./MOON.mdb;";
 
+
+        public DB_Access(string connectionString)
+        {
+            ConnString = connectionString;
+        }
+
         /// <summary>
         /// 获取数据库中所有表名
         /// </summary>
