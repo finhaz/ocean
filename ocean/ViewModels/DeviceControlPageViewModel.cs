@@ -467,7 +467,8 @@ namespace ocean.Communication
                     break;
                 case ".mdb":
                     // 适配.mdb的Jet驱动
-                    connStr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={filePath};";
+                    //connStr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={filePath};";
+                    connStr = $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};;DBQ={filePath};";
                     _dbOperation = new DB_Access(connStr);
                     break;
                 case ".accdb":
