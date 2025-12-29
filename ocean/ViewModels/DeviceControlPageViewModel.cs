@@ -457,22 +457,24 @@ namespace ocean.Communication
         private void InitDbOperation(string filePath)
         {
             var ext = System.IO.Path.GetExtension(filePath).ToLower();
+            string connStr = string.Empty;
 
             switch (ext)
             {
                 case ".db":
-                    // SQLite连接字符串
-                    var sqliteConnStr = $"Data Source={filePath};Version=3;";
-                    _dbOperation = new DB_SQLlite(sqliteConnStr);
+                    connStr = $"Data Source={filePath};Version=3;";
+                    _dbOperation = new DB_SQLlite(connStr);
                     break;
-
                 case ".mdb":
-                case ".accdb":
-                    // Access连接字符串（适配ACE驱动）
-                    var accessConnStr = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};Persist Security Info=False;";
-                    _dbOperation = new DB_Access(accessConnStr);
+                    // 适配.mdb的Jet驱动
+                    connStr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={filePath};";
+                    _dbOperation = new DB_Access(connStr);
                     break;
-
+                case ".accdb":
+                    // 适配.accdb的ACE驱动
+                    connStr = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={filePath};";
+                    _dbOperation = new DB_Access(connStr);
+                    break;
                 default:
                     throw new NotSupportedException($"不支持的数据库类型：{ext}");
             }
