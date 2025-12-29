@@ -468,7 +468,7 @@ namespace ocean.Communication
                 case ".mdb":
                     // 适配.mdb的Jet驱动
                     //connStr = $"Provider=Microsoft.Jet.OLEDB.4.0;Data Source={filePath};";
-                    connStr = $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};;DBQ={filePath};";
+                    connStr = $"Driver={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={filePath};";
                     _dbOperation = new DB_Access(connStr);
                     break;
                 case ".accdb":
@@ -478,6 +478,60 @@ namespace ocean.Communication
                     break;
                 default:
                     throw new NotSupportedException($"不支持的数据库类型：{ext}");
+            }
+        }
+        #endregion
+
+        #region 保存数据命令（无参数RelayCommand）
+        private ICommand? _saveDataToDbCommand;
+        public ICommand SaveDataToDbCommand
+        {
+            get
+            {
+                if (_saveDataToDbCommand == null)
+                {
+                    _saveDataToDbCommand = new RelayCommand<object>(
+                        parameter => SaveDataToDb(),
+                        parameter => true
+                    ); 
+                }
+                return _saveDataToDbCommand;
+            }
+        }
+
+        /// <summary>
+        /// 保存所有表数据到数据库
+        /// </summary>
+        private void SaveDataToDb()
+        {
+            // 校验：未选择数据库/无数据时提示
+            if (string.IsNullOrEmpty(DbFilePath) || _dbOperation == null)
+            {
+                MessageBox.Show("请先选择有效的数据库文件！");
+                return;
+            }
+
+            try
+            {
+                // 保存三张表（按顺序）
+                if (Dtrun != null && Dtrun.Rows.Count > 0)
+                {
+                    _dbOperation.UpdateDBTable(Dtrun, "PARAMETER_RUN");
+                }
+                if (Dtset != null && Dtset.Rows.Count > 0)
+                {
+                    _dbOperation.UpdateDBTable(Dtset, "PARAMETER_SET");
+                }
+                if (Dtfactor != null && Dtfactor.Rows.Count > 0)
+                {
+                    _dbOperation.UpdateDBTable(Dtfactor, "PARAMETER_FACTOR");
+                }
+
+                MessageBox.Show("所有数据已成功保存到数据库！");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"保存失败：{ex.Message}");
             }
         }
         #endregion

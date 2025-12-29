@@ -130,7 +130,15 @@
                     Grid.ColumnSpan="2"
                     Command="{Binding McController.LoadDatabaseTablesCommand}" 
                     Width="100"/>
-                
+                <Button
+                    Grid.Row="11" 
+                    Content="保存数据到数据库"
+                    Grid.ColumnSpan="2"
+                    Command="{Binding McController.SaveDataToDbCommand}" 
+                    Width="100" 
+                    Background="#2196F3" 
+                    Foreground="White"/>
+
             </Grid>
 
             <Grid Grid.Column="2">
