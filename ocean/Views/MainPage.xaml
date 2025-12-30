@@ -25,5 +25,14 @@
                    HorizontalAlignment="Center"
                    FontSize="48"
                    Text="friut and ocean" />
+        <TextBlock Text="选择通讯类型：" FontSize="14" FontWeight="Bold"/>
+
+        <RadioButton x:Name="RdoSerial" Content="串口通讯" 
+                         Checked="RdoCommunication_Checked"
+                         IsChecked="True"/>
+        <!-- 默认选中串口 -->
+
+        <RadioButton x:Name="RdoEthernet" Content="以太网通讯"
+                         Checked="RdoCommunication_Checked"/>
     </StackPanel>
 </Page>
