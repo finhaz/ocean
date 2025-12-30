@@ -14,8 +14,8 @@ namespace ocean.ViewModels
     {
         SerialPort,    // 串口
         Ethernet,       // 以太网
-        TcpClient,
-        Udp
+        CAN,
+        IIC
     }
     public class ShellViewModel : BindableBase
     {
@@ -29,8 +29,8 @@ namespace ocean.ViewModels
         {
             { CommunicationType.SerialPort, ("Views/SerialConfigPage.xaml", typeof(SerialConfigPage)) },
             { CommunicationType.Ethernet, ("Views/EthernetConfigPage.xaml", typeof(EthernetConfigPage)) },
-            { CommunicationType.TcpClient, ("Views/BugsPage.xaml", typeof(BugsPage)) },
-            { CommunicationType.Udp, ("Views/BugsPage.xaml", typeof(BugsPage)) }
+            { CommunicationType.CAN, ("Views/CANConfigPage.xaml", typeof(CANConfigPage)) },
+            { CommunicationType.IIC, ("Views/IICConfigPage.xaml", typeof(IICConfigPage)) }
         };
 
 
@@ -45,7 +45,7 @@ namespace ocean.ViewModels
             //汉堡菜单上方的按钮
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.SellsyBrands },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.NetworkWiredSolid },
                 Label = "选择通讯界面",
                 NavigationType = typeof(MainPage),
                 NavigationDestination = new Uri("Views/MainPage.xaml", UriKind.RelativeOrAbsolute)
@@ -66,15 +66,15 @@ namespace ocean.ViewModels
             });
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserDoctorSolid },
-                Label = "控制界面",
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.PowerOffSolid },
+                Label = "设备控制界面",
                 NavigationType = typeof(DeviceControlPage),
                 NavigationDestination = new Uri("Views/DeviceControlPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FontAwesomeBrands },
-                Label = "协议说明",
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FileArrowDownSolid },
+                Label = "通讯协议说明",
                 NavigationType = typeof(Prointroduction),
                 NavigationDestination = new Uri("Views/Prointroduction.xaml", UriKind.RelativeOrAbsolute)
             });
@@ -82,14 +82,7 @@ namespace ocean.ViewModels
             //汉堡菜单下方的按钮
             this.OptionsMenu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.AnchorSolid },
-                Label = "Settings",
-                NavigationType = typeof(SettingsPage),
-                NavigationDestination = new Uri("Views/SettingsPage.xaml", UriKind.RelativeOrAbsolute)
-            });
-            this.OptionsMenu.Add(new MenuItem()
-            {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.AndroidBrands },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.InfoSolid },
                 Label = "About",
                 NavigationType = typeof(AboutPage),
                 NavigationDestination = new Uri("Views/AboutPage.xaml", UriKind.RelativeOrAbsolute)

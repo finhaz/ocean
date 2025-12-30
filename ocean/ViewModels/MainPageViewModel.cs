@@ -19,8 +19,8 @@ namespace ocean.ViewModels
         {
             new KeyValuePair<string, CommunicationType>("串口通讯", CommunicationType.SerialPort),
             new KeyValuePair<string, CommunicationType>("以太网通讯", CommunicationType.Ethernet),
-            new KeyValuePair<string, CommunicationType>("TCP客户端", CommunicationType.TcpClient),
-            new KeyValuePair<string, CommunicationType>("UDP通讯", CommunicationType.Udp)
+            new KeyValuePair<string, CommunicationType>("CAN通讯", CommunicationType.CAN),
+            new KeyValuePair<string, CommunicationType>("IIC通讯", CommunicationType.IIC)
         };
 
         // 当前选中的通讯类型（双向绑定到ComboBox）

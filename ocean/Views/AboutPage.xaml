@@ -10,16 +10,33 @@
       Style="{DynamicResource PageStyle}"
       mc:Ignorable="d">
 
-    <Grid>
+    <!-- 极简布局：垂直堆叠所有信息 -->
+    <Grid Margin="15">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <!-- 软件版本 -->
+            <TextBlock Text="软件版本：v1.0.0" FontSize="14" FontWeight="Bold" Margin="0,0,0,10"/>
 
-        <iconPacks:PackIconFontAwesome Width="48"
-                                       Height="48"
-                                       Margin="10"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
-                                       Kind="RadiationSolid" />
-        <TextBox Text="基于mahapp，感谢CSDN的多位博主的博客"></TextBox>
+            <!-- 致谢信息 -->
+            <TextBlock Text="致谢：" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="基于mahapp设计的界面，感谢多位博主支持" 
+                       FontSize="12" TextWrapping="Wrap" Margin="0,0,0,15"/>
 
+            <!-- 支持的通讯方式 -->
+            <TextBlock Text="支持的通讯方式：" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock Text="• 串口" FontSize="12" Margin="0,0,0,3"/>
+            <TextBlock Text="• 以太网（待支持）" FontSize="12" Margin="0,0,0,3"/>
+            <TextBlock Text="• IIC（待支持）" FontSize="12" Margin="0,0,0,3"/>
+            <TextBlock Text="• CAN（待支持）" FontSize="12" Margin="0,0,0,15"/>
+            
+            <!-- 支持的协议 -->
+            <TextBlock Text="支持协议：" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                <TextBlock Text="MODBUS（RTU）、" FontSize="12"/>
+                <TextBlock Text="CAN 2.0（待支持）、" FontSize="12"/>
+                <TextBlock Text="TCP/IP（待支持）、" FontSize="12"/>
+                <TextBlock Text="UDP（待支持）、" FontSize="12"/>
+                <TextBlock Text="MQTT（待支持）" FontSize="12"/>
+            </StackPanel>
+        </StackPanel>
     </Grid>
 </Page>
