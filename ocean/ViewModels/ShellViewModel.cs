@@ -39,7 +39,7 @@ namespace ocean.ViewModels
             this.Menu.Add(new MenuItem()
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
-                Label = "串口配置界面",
+                Label = "通讯配置界面",
                 NavigationType = typeof(BugsPage),
                 NavigationDestination = new Uri("Views/SerialConfig.xaml", UriKind.RelativeOrAbsolute)
             });
@@ -89,22 +89,22 @@ namespace ocean.ViewModels
         public void UpdateCommunicationMenu(CommunicationType type)
         {
             // 找到"通讯配置"菜单
-            var configMenu = Menu.FirstOrDefault(m => m.Label == "通讯配置");
+            var configMenu = Menu.FirstOrDefault(m => m.Label == "通讯配置界面");
             if (configMenu == null) return;
 
             switch (type)
             {
                 case CommunicationType.SerialPort:
-                    configMenu.NavigationDestination = new Uri("Views/SerialConfigPage.xaml", UriKind.RelativeOrAbsolute);
+                    configMenu.NavigationDestination = new Uri("Views/SerialConfig.xaml", UriKind.RelativeOrAbsolute);
                     configMenu.NavigationType = typeof(SerialConfig);
-                    configMenu.Label = "串口配置界面"; // 可选：修改菜单显示名称
+                    //configMenu.Label = "串口配置界面"; // 可选：修改菜单显示名称
                     configMenu.Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid };
                     break;
 
                 case CommunicationType.Ethernet:
                     configMenu.NavigationDestination = new Uri("Views/UserPage.xaml", UriKind.RelativeOrAbsolute);
                     configMenu.NavigationType = typeof(UserPage);
-                    configMenu.Label = "以太网配置界面"; // 可选：修改菜单显示名称
+                    //configMenu.Label = "以太网配置界面"; // 可选：修改菜单显示名称
                     configMenu.Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.SectionSolid};
                     break;
             }

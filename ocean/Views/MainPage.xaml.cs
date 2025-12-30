@@ -18,10 +18,10 @@ namespace ocean.Views
             InitializeComponent();
 
             // 获取ShellViewModel（需保证Shell是主窗口）
-            var shellWindow = Application.Current.MainWindow as MainWindow;
-            if (shellWindow != null)
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow != null)
             {
-                _shellViewModel = shellWindow.DataContext as ShellViewModel;
+                _shellViewModel = mainWindow.DataContext as ShellViewModel;
             }
         }
 

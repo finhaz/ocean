@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MahApps.Metro.Controls;
+using ocean.UI;
+using ocean.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,8 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MahApps.Metro.Controls;
-using ocean.UI;
 using MenuItem = ocean.ViewModels.MenuItem;
 
 
@@ -26,7 +27,8 @@ namespace ocean
     public partial class MainWindow: MetroWindow
     {
         private readonly Navigation.NavigationServiceEx navigationServiceEx;
-
+        // 暴露ViewModel供其他页面访问（关键）
+        public ShellViewModel ViewModel { get; private set; }
 
 
         public MainWindow()
@@ -42,7 +44,9 @@ namespace ocean
 
             this.navigationServiceEx.load_table();
 
-
+            // 初始化ViewModel并设置DataContext
+            ViewModel = new ShellViewModel();
+            DataContext = ViewModel;
 
         }
 
