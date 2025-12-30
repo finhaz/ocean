@@ -27,8 +27,8 @@ namespace ocean
     public partial class MainWindow: MetroWindow
     {
         private readonly Navigation.NavigationServiceEx navigationServiceEx;
-        // 暴露ViewModel供其他页面访问（关键）
-        public ShellViewModel ViewModel { get; private set; }
+        // 全局AppViewModel
+        private AppViewModel _appViewModel;
 
 
         public MainWindow()
@@ -44,10 +44,12 @@ namespace ocean
 
             this.navigationServiceEx.load_table();
 
-            // 初始化ViewModel并设置DataContext
-            ViewModel = new ShellViewModel();
-            DataContext = ViewModel;
-
+            // 获取全局AppViewModel
+            _appViewModel = AppViewModel.Instance;
+            DataContext = _appViewModel;
+            // 替代原有可能的手动添加Menu的逻辑（如果有的话）
+            HamburgerMenuControl.ItemsSource = _appViewModel.ShellViewModel.Menu;
+            HamburgerMenuControl.OptionsItemsSource = _appViewModel.ShellViewModel.OptionsMenu;
         }
 
 

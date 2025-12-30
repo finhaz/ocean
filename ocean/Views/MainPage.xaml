@@ -4,10 +4,16 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:ocean.ViewModels"
       Title="MainPage"
       d:DesignHeight="300"
       d:DesignWidth="300"
       mc:Ignorable="d">
+
+    <!-- 设置DataContext为MainPageViewModel -->
+    <Page.DataContext>
+        <vm:MainPageViewModel />
+    </Page.DataContext>
 
     <StackPanel HorizontalAlignment="Center"
                 VerticalAlignment="Top"
@@ -15,24 +21,25 @@
         <TextBlock Margin="24"
                    HorizontalAlignment="Center"
                    FontSize="48"
-                   Text="MahApps.Metro" />
+                   Text="Ocean上位机" />
         <iconPacks:PackIconMaterial Width="128"
                                     Height="128"
                                     HorizontalAlignment="Center"
                                     Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
                                     Kind="Hamburger" />
-        <TextBlock Margin="24"
-                   HorizontalAlignment="Center"
-                   FontSize="48"
-                   Text="friut and ocean" />
-        <TextBlock Text="选择通讯类型：" FontSize="14" FontWeight="Bold"/>
+        <TextBlock 
+            Text="请选择通讯方式：" 
+            FontSize="16" 
+            FontWeight="Bold"/>
+        <!-- ComboBox选择框（支持后续新增选项） -->
+        <!-- ComboBox纯绑定（无后台事件） -->
+        <ComboBox x:Name="CmbCommunicationType" 
+                      Width="250" 
+                      FontSize="14"
+                      ItemsSource="{Binding CommTypeOptions}"
+                      DisplayMemberPath="Key"
+                      SelectedValuePath="Value"
+                      SelectedValue="{Binding SelectedCommType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <RadioButton x:Name="RdoSerial" Content="串口通讯" 
-                         Checked="RdoCommunication_Checked"
-                         IsChecked="True"/>
-        <!-- 默认选中串口 -->
-
-        <RadioButton x:Name="RdoEthernet" Content="以太网通讯"
-                         Checked="RdoCommunication_Checked"/>
     </StackPanel>
 </Page>

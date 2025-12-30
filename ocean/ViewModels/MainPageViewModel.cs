@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ocean.ViewModels
+{
+    public class MainPageViewModel : INotifyPropertyChanged
+    {
+        // 绑定到全局AppViewModel
+        private AppViewModel _appViewModel = AppViewModel.Instance;
+        public AppViewModel AppViewModel => _appViewModel;
+
+        // 通讯类型选项（供ComboBox绑定）
+        public List<KeyValuePair<string, CommunicationType>> CommTypeOptions { get; } = new()
+    {
+        new KeyValuePair<string, CommunicationType>("串口通讯", CommunicationType.SerialPort),
+        new KeyValuePair<string, CommunicationType>("以太网通讯", CommunicationType.Ethernet),
+        new KeyValuePair<string, CommunicationType>("TCP客户端", CommunicationType.TcpClient),
+        new KeyValuePair<string, CommunicationType>("UDP通讯", CommunicationType.Udp)
+    };
+
+        // 当前选中的通讯类型（双向绑定到ComboBox）
+        public CommunicationType SelectedCommType
+        {
+            get => _appViewModel.SelectedCommType;
+            set => _appViewModel.SelectedCommType = value;
+        }
+
+        #region INotifyPropertyChanged实现
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propName = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        #endregion
+    }
+}

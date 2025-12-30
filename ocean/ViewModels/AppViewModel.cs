@@ -48,6 +48,40 @@ namespace ocean.ViewModels
             set => SetProperty(ref _mcctronller, value);
         }
 
+
+        // 持有ShellViewModel（供全局访问）
+        private ShellViewModel _shellViewModel;
+        public ShellViewModel ShellViewModel
+        {
+            get => _shellViewModel;
+            set => SetProperty(ref _shellViewModel, value);
+        }
+
+
+        // 全局通讯类型（供所有页面绑定）
+        private CommunicationType _selectedCommType = CommunicationType.SerialPort;
+        public CommunicationType SelectedCommType
+        {
+            get => _selectedCommType;
+            set
+            {
+                if (SetProperty(ref _selectedCommType, value))
+                {
+                    // 选中类型变化时，自动更新ShellViewModel的菜单Uri
+                    ShellViewModel?.UpdateCommunicationMenu(value);
+                }
+            }
+        }
+
+        // 初始化（程序启动时调用）
+        public void Initialize()
+        {
+            // 初始化ShellViewModel
+            ShellViewModel = new ShellViewModel();
+            // 初始化默认通讯类型
+            SelectedCommType = CommunicationType.SerialPort;
+        }
+
         // 可添加其他全局共享属性（如之前的CommonRes、Debugsera等）
         // private CommonRes _ucom;
         // public CommonRes Ucom { get => _ucom; set => SetProperty(ref _ucom, value); }

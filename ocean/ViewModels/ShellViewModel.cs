@@ -3,6 +3,7 @@ using ocean.Mvvm;
 using ocean.UI;
 using ocean.Views;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -12,13 +13,26 @@ namespace ocean.ViewModels
     public enum CommunicationType
     {
         SerialPort,    // 串口
-        Ethernet       // 以太网
+        Ethernet,       // 以太网
+        TcpClient,
+        Udp
     }
     public class ShellViewModel : BindableBase
     {
         public ObservableCollection<MenuItem> Menu { get; } = new();
 
         public ObservableCollection<MenuItem> OptionsMenu { get; } = new();
+
+        private const string CommunicationMenuLabel = "通讯配置界面";
+        // 通讯类型与页面的映射表（扩展时仅需修改这里）
+        private readonly Dictionary<CommunicationType, (string Uri, Type PageType)> _commTypeMap = new()
+        {
+            { CommunicationType.SerialPort, ("Views/SerialConfig.xaml", typeof(SerialConfig)) },
+            { CommunicationType.Ethernet, ("Views/UserPage.xaml", typeof(UserPage)) },
+            { CommunicationType.TcpClient, ("Views/UserPage.xaml", typeof(UserPage)) },
+            { CommunicationType.Udp, ("Views/UserPage.xaml", typeof(UserPage)) }
+        };
+
 
         public ShellViewModel()
         {
@@ -31,7 +45,7 @@ namespace ocean.ViewModels
             //汉堡菜单上方的按钮
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.SellsyBrands },
                 Label = "选择通讯界面",
                 NavigationType = typeof(MainPage),
                 NavigationDestination = new Uri("Views/MainPage.xaml", UriKind.RelativeOrAbsolute)
@@ -83,31 +97,18 @@ namespace ocean.ViewModels
         }
 
         /// <summary>
-        /// 根据选择的通讯类型，更新配置菜单的跳转目标
+        /// 更新通讯配置菜单Uri（仅改Uri/PageType，不改标签）
         /// </summary>
-        /// <param name="type">通讯类型（串口/以太网）</param>
         public void UpdateCommunicationMenu(CommunicationType type)
         {
-            // 找到"通讯配置"菜单
-            var configMenu = Menu.FirstOrDefault(m => m.Label == "通讯配置界面");
+            if (!_commTypeMap.ContainsKey(type)) return;
+
+            var configMenu = Menu.FirstOrDefault(m => m.Label == CommunicationMenuLabel);
             if (configMenu == null) return;
 
-            switch (type)
-            {
-                case CommunicationType.SerialPort:
-                    configMenu.NavigationDestination = new Uri("Views/SerialConfig.xaml", UriKind.RelativeOrAbsolute);
-                    configMenu.NavigationType = typeof(SerialConfig);
-                    //configMenu.Label = "串口配置界面"; // 可选：修改菜单显示名称
-                    configMenu.Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid };
-                    break;
-
-                case CommunicationType.Ethernet:
-                    configMenu.NavigationDestination = new Uri("Views/UserPage.xaml", UriKind.RelativeOrAbsolute);
-                    configMenu.NavigationType = typeof(UserPage);
-                    //configMenu.Label = "以太网配置界面"; // 可选：修改菜单显示名称
-                    configMenu.Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.SectionSolid};
-                    break;
-            }
+            var (newUri, newPageType) = _commTypeMap[type];
+            configMenu.NavigationDestination = new Uri(newUri, UriKind.RelativeOrAbsolute);
+            configMenu.NavigationType = newPageType;
         }
 
     }
