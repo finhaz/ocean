@@ -13,12 +13,14 @@
         GlowBrush="{DynamicResource MahApps.Brushes.AccentBase}"
         WindowStartupLocation="CenterScreen"
         WindowTransitionsEnabled="False"
-        mc:Ignorable="d" Closing="MetroWindow_Closing"          
+        mc:Ignorable="d" Closing="MetroWindow_Closing"
+        DataContext="{x:Static viewModels:AppViewModel.Instance}"
         >
+    <!--
     <Controls:MetroWindow.DataContext>
         <viewModels:ShellViewModel />
     </Controls:MetroWindow.DataContext>
-
+    -->
     <Controls:MetroWindow.LeftWindowCommands>
         <Controls:WindowCommands ShowSeparators="False">
             <Button x:Name="GoBackButton"
@@ -104,8 +106,8 @@
                           IsPaneOpen="False"
                           ItemInvoked="HamburgerMenuControl_OnItemInvoked"
                           ItemTemplate="{StaticResource MenuItemTemplate}"
-                          ItemsSource="{Binding Menu}"
+                          ItemsSource="{Binding ShellViewModel.Menu}"
                           OptionsItemTemplate="{StaticResource MenuItemTemplate}"
-                          OptionsItemsSource="{Binding OptionsMenu}" />
+                          OptionsItemsSource="{Binding ShellViewModel.OptionsMenu}" />
 
 </Controls:MetroWindow>

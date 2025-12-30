@@ -26,6 +26,10 @@ namespace ocean.ViewModels
             // 初始化Modbusset实例
             _modbusSet = new GeneralDebugPageViewModel();
             _mcctronller = new DeviceControlPageViewModel();
+            // 初始化ShellViewModel
+            ShellViewModel = new ShellViewModel();
+            // 初始化默认通讯类型
+            SelectedCommType = CommunicationType.SerialPort;
         }
 
         // *************************
@@ -71,15 +75,6 @@ namespace ocean.ViewModels
                     ShellViewModel?.UpdateCommunicationMenu(value);
                 }
             }
-        }
-
-        // 初始化（程序启动时调用）
-        public void Initialize()
-        {
-            // 初始化ShellViewModel
-            ShellViewModel = new ShellViewModel();
-            // 初始化默认通讯类型
-            SelectedCommType = CommunicationType.SerialPort;
         }
 
         // 可添加其他全局共享属性（如之前的CommonRes、Debugsera等）

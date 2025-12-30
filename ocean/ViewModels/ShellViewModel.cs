@@ -27,10 +27,10 @@ namespace ocean.ViewModels
         // 通讯类型与页面的映射表（扩展时仅需修改这里）
         private readonly Dictionary<CommunicationType, (string Uri, Type PageType)> _commTypeMap = new()
         {
-            { CommunicationType.SerialPort, ("Views/SerialConfig.xaml", typeof(SerialConfig)) },
-            { CommunicationType.Ethernet, ("Views/UserPage.xaml", typeof(UserPage)) },
-            { CommunicationType.TcpClient, ("Views/UserPage.xaml", typeof(UserPage)) },
-            { CommunicationType.Udp, ("Views/UserPage.xaml", typeof(UserPage)) }
+            { CommunicationType.SerialPort, ("Views/SerialConfigPage.xaml", typeof(SerialConfigPage)) },
+            { CommunicationType.Ethernet, ("Views/EthernetConfigPage.xaml", typeof(EthernetConfigPage)) },
+            { CommunicationType.TcpClient, ("Views/BugsPage.xaml", typeof(BugsPage)) },
+            { CommunicationType.Udp, ("Views/BugsPage.xaml", typeof(BugsPage)) }
         };
 
 
@@ -55,7 +55,7 @@ namespace ocean.ViewModels
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                 Label = "通讯配置界面",
                 NavigationType = typeof(BugsPage),
-                NavigationDestination = new Uri("Views/SerialConfig.xaml", UriKind.RelativeOrAbsolute)
+                NavigationDestination = new Uri("Views/SerialConfigPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {

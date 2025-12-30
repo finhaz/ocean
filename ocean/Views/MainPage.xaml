@@ -10,14 +10,16 @@
       d:DesignWidth="300"
       mc:Ignorable="d">
 
-    <!-- 设置DataContext为MainPageViewModel -->
-    <Page.DataContext>
-        <vm:MainPageViewModel />
-    </Page.DataContext>
+    <!-- 页面顶部新增ViewModel资源（关键！） -->
+    <Page.Resources>
+        <vm:MainPageViewModel x:Key="MainPageVM" />
+        <!-- 手动创建ViewModel实例 -->
+    </Page.Resources>
 
     <StackPanel HorizontalAlignment="Center"
                 VerticalAlignment="Top"
-                Orientation="Vertical">
+                Orientation="Vertical"
+                DataContext="{StaticResource MainPageVM}">
         <TextBlock Margin="24"
                    HorizontalAlignment="Center"
                    FontSize="48"

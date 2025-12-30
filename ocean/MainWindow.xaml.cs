@@ -47,9 +47,6 @@ namespace ocean
             // 获取全局AppViewModel
             _appViewModel = AppViewModel.Instance;
             DataContext = _appViewModel;
-            // 替代原有可能的手动添加Menu的逻辑（如果有的话）
-            HamburgerMenuControl.ItemsSource = _appViewModel.ShellViewModel.Menu;
-            HamburgerMenuControl.OptionsItemsSource = _appViewModel.ShellViewModel.OptionsMenu;
         }
 
 

@@ -16,12 +16,12 @@ namespace ocean.ViewModels
 
         // 通讯类型选项（供ComboBox绑定）
         public List<KeyValuePair<string, CommunicationType>> CommTypeOptions { get; } = new()
-    {
-        new KeyValuePair<string, CommunicationType>("串口通讯", CommunicationType.SerialPort),
-        new KeyValuePair<string, CommunicationType>("以太网通讯", CommunicationType.Ethernet),
-        new KeyValuePair<string, CommunicationType>("TCP客户端", CommunicationType.TcpClient),
-        new KeyValuePair<string, CommunicationType>("UDP通讯", CommunicationType.Udp)
-    };
+        {
+            new KeyValuePair<string, CommunicationType>("串口通讯", CommunicationType.SerialPort),
+            new KeyValuePair<string, CommunicationType>("以太网通讯", CommunicationType.Ethernet),
+            new KeyValuePair<string, CommunicationType>("TCP客户端", CommunicationType.TcpClient),
+            new KeyValuePair<string, CommunicationType>("UDP通讯", CommunicationType.Udp)
+        };
 
         // 当前选中的通讯类型（双向绑定到ComboBox）
         public CommunicationType SelectedCommType
