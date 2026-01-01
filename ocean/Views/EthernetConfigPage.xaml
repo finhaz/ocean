@@ -1,24 +1,71 @@
-﻿<Page x:Class="ocean.Views.UserPage"
+﻿<Page x:Class="ocean.Views.EthernetConfigPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      Title="UserPage"
+      xmlns:vm="clr-namespace:ocean.ViewModels"
+      Title="EthernetConfigPage"
       d:DesignHeight="300"
       d:DesignWidth="300"
       Style="{DynamicResource PageStyle}"
       mc:Ignorable="d">
 
-    <Grid>
+    <!-- 绑定ViewModel -->
+    <Page.DataContext>
+        <vm:EthernetConfigViewModel/>
+    </Page.DataContext>
 
-        <iconPacks:PackIconFontAwesome Width="48"
-                                       Height="48"
-                                       Margin="10"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Top"
-                                       Foreground="{DynamicResource MahApps.Brushes.AccentBase}"
-                                       Kind="UserRegular" />
+    <!-- 简单转换器 -->
+    <Page.Resources>
+        <vm:StringEqualsConverter x:Key="StringEqualsConverter"/>
+    </Page.Resources>
 
+    <!-- 基础布局 -->
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 1. 协议选择 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,5">
+            <Label Content="协议：" Width="60"/>
+            <RadioButton Content="TCP" IsChecked="{Binding SelectedProtocol, Converter={StaticResource StringEqualsConverter}, ConverterParameter=TCP}" Margin="0,0,20,0"/>
+            <RadioButton Content="UDP" IsChecked="{Binding SelectedProtocol, Converter={StaticResource StringEqualsConverter}, ConverterParameter=UDP}"/>
+        </StackPanel>
+
+        <!-- 2. 本地IP -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5">
+            <Label Content="本地IP：" Width="60"/>
+            <TextBox Text="{Binding LocalIp}" Width="150"/>
+            <Label Content="端口：" Width="40" Margin="10,0"/>
+            <TextBox Text="{Binding LocalPort}" Width="80"/>
+        </StackPanel>
+
+        <!-- 3. 远程IP -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,5">
+            <Label Content="远程IP：" Width="60"/>
+            <TextBox Text="{Binding RemoteIp}" Width="150"/>
+            <Label Content="端口：" Width="40" Margin="10,0"/>
+            <TextBox Text="{Binding RemotePort}" Width="80"/>
+        </StackPanel>
+
+        <!-- 分隔线 -->
+        <Separator Grid.Row="4" Margin="0,10"/>
+
+        <!-- 操作按钮 -->
+        <StackPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10">
+            <Button Content="{Binding ConnectButtonText}" Command="{Binding ConnectCommand}" Width="80" Margin="0,0,10,0"/>
+            <Button Content="保存" Command="{Binding SaveCommand}" Width="80"/>
+        </StackPanel>
     </Grid>
+
+
 </Page>

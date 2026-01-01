@@ -61,7 +61,7 @@ namespace ocean.ViewModels
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.UserSolid },
                 Label = "通用调试界面",
-                NavigationType = typeof(UserPage),
+                NavigationType = typeof(GeneralDebugPage),
                 NavigationDestination = new Uri("Views/GeneralDebugPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
