@@ -1,4 +1,5 @@
 ﻿using ocean.Communication;
+using ocean.Interfaces;
 using ocean.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -27,38 +28,50 @@ namespace ocean.UI
     public partial class SerialConfigPage : Page
     {
         private AppViewModel _globalVM = AppViewModel.Instance;
-
         public DispatcherTimer time1 = new DispatcherTimer();
 
         delegate void HanderInterfaceUpdataDelegate(string mySendData);
         HanderInterfaceUpdataDelegate myUpdataHander;
         delegate void txtGotoEndDelegate();
 
+        // 缓存当前串口实例（避免重复获取）
+        private SerialCommunication _serialComm;
+
         public SerialConfigPage()
         {
             InitializeComponent();
-            // 将Page的DataContext绑定到全局ViewModel
             DataContext = _globalVM;
 
             time1.Tick += new EventHandler(time1_Tick);
-            //CommonRes.mySerialPort.DataReceived += new SerialDataReceivedEventHandler(mySerialPort_DataReceived);
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            CommonRes.mySerialPort.Encoding = System.Text.Encoding.GetEncoding("GB2312");
-            bdExpend.Visibility = Visibility.Hidden;
-            if (CommonRes.mySerialPort.IsOpen)
+            try
             {
-
-                btOpenCom.Content = "关闭串口";
-                comState.Style = (Style)FindResource("EllipseStyleGreen");
-                
+                // 获取串口实例（替换 CommonRes.mySerialPort）
+                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+                // 设置串口编码（替换 CommonRes.mySerialPort.Encoding）
+                _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // 未选择串口时提示（可选）
+                _globalVM.SerialConfig.TbComStateText = "未初始化串口：" + ex.Message;
             }
 
+            bdExpend.Visibility = Visibility.Hidden;
+
+            // 替换 CommonRes.mySerialPort.IsOpen 判断
+            if (_serialComm != null && _serialComm.IsConnected)
+            {
+                btOpenCom.Content = "关闭串口";
+                comState.Style = (Style)FindResource("EllipseStyleGreen");
+            }
         }
 
         private void time1_Tick(object sender, EventArgs e)
         {
-            if (CommonRes.mySerialPort.IsOpen)
+            // 替换 CommonRes.mySerialPort.IsOpen 判断
+            if (_serialComm != null && _serialComm.IsConnected)
             {
                 btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
             }
@@ -68,7 +81,7 @@ namespace ocean.UI
         {
             if (ckAutoSend.IsChecked == true)
             {
-                if (Convert.ToDouble(tbIntervalTime.Text) == 0)
+                if (string.IsNullOrEmpty(tbIntervalTime.Text) || Convert.ToDouble(tbIntervalTime.Text) == 0)
                 {
                     time1.Stop();
                 }
@@ -80,13 +93,25 @@ namespace ocean.UI
             }
         }
 
-
+        /// <summary>
+        /// 打开/关闭串口按钮（已改造）
+        /// </summary>
         private void btOpenCom_Click(object sender, RoutedEventArgs e)
         {
-
-            if (CommonRes.mySerialPort.IsOpen)
+            try
             {
-                CommonRes.mySerialPort.Close();
+                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+            if (_serialComm.IsConnected)
+            {
+                // 关闭串口逻辑
+                _serialComm.Close();
                 _globalVM.SerialConfig.IsConfigEnabled = true;
                 btOpenCom.Content = "打开串口";
                 _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "已关闭";
@@ -96,55 +121,44 @@ namespace ocean.UI
             {
                 try
                 {
-                    CommonRes.mySerialPort.PortName = _globalVM.SerialConfig.SelectedPortName;
+                    if (string.IsNullOrEmpty(_globalVM.SerialConfig.SelectedPortName))
+                    {
+                        MessageBox.Show("未选择串口！");
+                        return;
+                    }
+
+                    var serialConfig = new SerialConfig
+                    {
+                        SelectedPortName = _globalVM.SerialConfig.SelectedPortName,
+                        SelectedBaudRate = _globalVM.SerialConfig.SelectedBaudRate,
+                        SelectedParityName = _globalVM.SerialConfig.SelectedParityName,
+                        SelectedStopBit = _globalVM.SerialConfig.SelectedStopBit,
+                        SelectedDataBits = int.Parse(cbDataBits.Text)
+                    };
+
+                    _serialComm.Open(serialConfig);
                 }
-                catch 
+                catch (Exception ex)
                 {
-                    MessageBox.Show("未选择串口！");
+                    if (ex.Message.Contains("占用"))
+                    {
+                        _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "串口被占用！";
+                        MessageBox.Show("串口被占用！");
+                    }
+                    else
+                    {
+                        _globalVM.SerialConfig.TbComStateText = "串口打开失败：" + ex.Message;
+                        MessageBox.Show("串口打开失败：" + ex.Message);
+                    }
                     return;
                 }
-                CommonRes.mySerialPort.BaudRate = _globalVM.SerialConfig.SelectedBaudRate;
-                switch (_globalVM.SerialConfig.SelectedParityName)
-                {
-                    case "无":
-                        CommonRes.mySerialPort.Parity = Parity.None;
-                        break;
-                    case "奇校验":
-                        CommonRes.mySerialPort.Parity = Parity.Odd;
-                        break;
-                    case "偶校验":
-                        CommonRes.mySerialPort.Parity = Parity.Even;
-                        break;
-                }
-                switch (_globalVM.SerialConfig.SelectedStopBit )
-                {
-                    case 0:
-                        CommonRes.mySerialPort.StopBits = StopBits.None;
-                        break;
-                    case 1:
-                        CommonRes.mySerialPort.StopBits = StopBits.One;
-                        break;
-                    case 2:
-                        CommonRes.mySerialPort.StopBits = StopBits.Two;
-                        break;
-                }
-                try
-                {
-                    CommonRes.mySerialPort.Open();
-                }
-                catch
-                {
-                    _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "串口被占用！";
-                    MessageBox.Show("串口被占用！");
-                    return;
-                }
+
                 _globalVM.SerialConfig.IsConfigEnabled = false;
                 btOpenCom.Content = "关闭串口";
-                _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "," + cbBaudRate.Text + "," +
-                    cbParity.Text + "," + cbDataBits.Text + "," + cbStopBits.Text;
+                _globalVM.SerialConfig.TbComStateText = $"{cbPortName.Text},{cbBaudRate.Text}," +
+                    $"{cbParity.Text},{cbDataBits.Text},{cbStopBits.Text}";
                 comState.Style = (Style)this.FindResource("EllipseStyleGreen");
             }
-
         }
 
         private void btSend_Click(object sender, RoutedEventArgs e)
@@ -152,28 +166,45 @@ namespace ocean.UI
             btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
         }
 
-
         public void btSend_Event(string strSend, bool hexState)
         {
-            if (CommonRes.mySerialPort.IsOpen)
+            try
             {
-                if (hexState == false)
+                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+            if (_serialComm.IsConnected)
+            {
+                try
                 {
-                    //if (ckAdvantechCmd.IsChecked == true) { strSend = strSend.ToUpper(); }
-                    byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
-                    CommonRes.mySerialPort.Write(sendData, 0, sendData.Length);
-                    txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
-                    if (ckAdvantechCmd.IsChecked == true)
+                    if (hexState == false)
                     {
-                        byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D");
-                        CommonRes.mySerialPort.Write(sendAdvCmd, 0, 1);
-                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + Convert.ToInt32(sendData.Length));
+                        byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
+                        // 替换 CommonRes.mySerialPort.Write 为 Send 接口
+                        _serialComm.Send(sendData, 0, sendData.Length);
+                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + sendData.Length);
+
+                        if (ckAdvantechCmd.IsChecked == true)
+                        {
+                            byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D");
+                            _serialComm.Send(sendAdvCmd, 0, 1);
+                            txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + 1); // 修正：原逻辑重复加了sendData.Length
+                        }
+                    }
+                    else
+                    {
+                        byte[] sendHexData = _globalVM.SerialConfig.HexStringToByteArray(strSend);
+                        _serialComm.Send(sendHexData, 0, sendHexData.Length);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    byte[] sendHexData = _globalVM.SerialConfig.HexStringToByteArray(strSend);
-                    CommonRes.mySerialPort.Write(sendHexData, 0, sendHexData.Length);
+                    MessageBox.Show("发送失败：" + ex.Message);
                 }
             }
             else
@@ -183,58 +214,59 @@ namespace ocean.UI
             }
         }
 
-
-
         private void btClearView_Click(object sender, RoutedEventArgs e)
         {
-
             _globalVM.SerialConfig.ReceiveCount = "0";
             _globalVM.SerialConfig.TbReceiveText = "";
         }
 
         private void ck16View_Click(object sender, RoutedEventArgs e)
         {
-
             var vm = _globalVM.SerialConfig;
-
-
             if (vm.IsHexView)
-            {               
-                // 从字符串切到16进制：需先将字符串转为字节数组
+            {
                 byte[] bytes = Encoding.Default.GetBytes(vm.TbReceiveText);
-                vm.TbReceiveText = vm.ByteArrayToHexString(bytes);               
+                vm.TbReceiveText = vm.ByteArrayToHexString(bytes);
             }
             else
             {
-                // 从16进制切回字符串：需先将当前十六进制字符串转回字节数组
                 byte[] bytes = vm.HexStringToByteArray(vm.TbReceiveText.Replace(" ", ""));
                 vm.TbReceiveText = Encoding.Default.GetString(bytes);
             }
-            
         }
-
-
 
         private void ckAutoSend_Click(object sender, RoutedEventArgs e)
         {
-            if (CommonRes.mySerialPort.IsOpen == false)
+            try
+            {
+                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+            }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(ex.Message);
+                ckAutoSend.IsChecked = false;
+                return;
+            }
+
+            if (!_serialComm.IsConnected)
             {
                 MessageBox.Show("串口未开！");
                 ckAutoSend.IsChecked = false;
                 return;
             }
+
             if (ckAutoSend.IsChecked == true)
             {
-
                 tbkIntervalTime.Visibility = Visibility.Visible;
                 tbIntervalTime.Visibility = Visibility.Visible;
-                time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
-                if (Convert.ToDouble(tbIntervalTime.Text) == 0)
+
+                if (string.IsNullOrEmpty(tbIntervalTime.Text) || Convert.ToDouble(tbIntervalTime.Text) == 0)
                 {
                     return;
                 }
                 else
                 {
+                    time1.Interval = TimeSpan.FromSeconds(Convert.ToDouble(tbIntervalTime.Text));
                     time1.Start();
                 }
             }
@@ -249,17 +281,14 @@ namespace ocean.UI
 
         private void ck16Send_Click(object sender, RoutedEventArgs e)
         {
-            get16View((bool)ck16Send.IsChecked);           
+            get16View((bool)ck16Send.IsChecked);
         }
-
 
         #region 简化后的get16View方法（仅触发ViewModel逻辑）
         private void get16View(bool isHex)
         {
-            // 直接调用ViewModel的方法，无需操作任何UI控件
             _globalVM.SerialConfig.Toggle16View(isHex);
         }
-
 
         private void ckAdvantechCmd_Click(object sender, RoutedEventArgs e)
         {
@@ -270,7 +299,6 @@ namespace ocean.UI
             }
         }
         #endregion
-
 
         private void btExpend_Click(object sender, RoutedEventArgs e)
         {
@@ -284,6 +312,7 @@ namespace ocean.UI
                 bdExpend.Visibility = Visibility.Visible;
                 tbReceive.Margin = new Thickness(0, 1, bdExpend.Width + 5, 0);
             }
+
             CheckBox ckBox = gdExpend.FindName("ckExpend0") as CheckBox;
             if (ckBox == null)
             {
@@ -318,45 +347,31 @@ namespace ocean.UI
         private void dynamicButton_Click(object sender, RoutedEventArgs e)
         {
             Button bt1 = (Button)sender;
-            string str = "";
-            str = Convert.ToString(bt1.Content);
+            string str = bt1.Content.ToString();
             TextBox tb1 = gdExpend.FindName("expendTextBox" + str.Substring(str.Length - 1, 1)) as TextBox;
             CheckBox ck1 = gdExpend.FindName("ckExpend" + str.Substring(str.Length - 1, 1)) as CheckBox;
             btSend_Event(tb1.Text, (bool)ck1.IsChecked);
-            //MessageBox.Show("点了确定！" + str.Substring(str.Length - 1, 1));
         }
 
         private void tbSend_TextChanged(object sender, TextChangedEventArgs e)
         {
-
             if (ckAsciiView.IsChecked == true)
             {
-                //get16View((bool)ckAsciiView.IsChecked);
                 StringBuilder asciiBuilder = new StringBuilder();
-                // 清空原有值
                 _globalVM.SerialConfig.Tb16ViewText = string.Empty;
 
-                // 遍历每个字符转换为ASCII码
                 foreach (char c in tbSend.Text)
                 {
-                    // 核心修改：忽略空格字符
                     if (char.IsWhiteSpace(c))
                     {
-                        continue; // 跳过空格，不处理
+                        continue;
                     }
 
-
-                    // 获取字符的ASCII码（对于扩展ASCII使用0-255范围）
                     int asciiCode = (int)c;
-
-                    // 只保留标准ASCII字符（0-127），非ASCII字符标记为[NA]
                     if (asciiCode >= 0 && asciiCode <= 127)
                     {
-                        // 核心修改：转换为16进制，补零到2位，大写显示（可改为x小写）
                         string hexCode = asciiCode.ToString("X2");
                         asciiBuilder.Append($"{hexCode} ");
-
-
                     }
                     else
                     {
@@ -366,8 +381,7 @@ namespace ocean.UI
 
                 if (ckAdvantechCmd.IsChecked == true)
                 {
-                    string hexCode = "0D";
-                    asciiBuilder.Append($"{hexCode} ");
+                    asciiBuilder.Append("0D ");
                 }
                 _globalVM.SerialConfig.Tb16ViewText = asciiBuilder.ToString().TrimEnd();
             }
@@ -377,8 +391,6 @@ namespace ocean.UI
         {
             get16View((bool)ckAsciiView.IsChecked);
         }
-
-
 
         private void getData(string sendData)
         {
@@ -395,30 +407,20 @@ namespace ocean.UI
             txtRecive.Text = Convert.ToString(Convert.ToInt32(txtRecive.Text) + Convert.ToInt32(byteNum));
         }
 
-
-        #region 核心：适配CommonRes委托的串口数据处理方法
+        #region 核心：适配SerialCommunication.DataReceived的串口数据处理方法
         /// <summary>
-        /// 适配CommonRes.SerialDataReceivedHandler的处理方法
+        /// 适配SerialCommunication.DataReceived事件的处理方法
         /// </summary>
-        /// <param name="gbuffer">全局缓冲区</param>
-        /// <param name="gb_last">缓冲区初始位置</param>
-        /// <param name="buffer_len">读取的字节数</param>
-        /// <param name="protocolNum">协议号</param>
-        private void DebugSerialDataHandler(byte[] gbuffer, int gb_last, int buffer_len)
+        private void DebugSerialDataHandler(object sender, DataReceivedEventArgs e)
         {
+            byte[] buf = new byte[e.BufferLength];
+            Array.Copy(e.Buffer, e.LastIndex, buf, 0, e.BufferLength);
 
-            // 1. 从全局缓冲区中提取本次读取的数据（替代原有直接读取串口的逻辑）
-            byte[] buf = new byte[buffer_len];
-            Array.Copy(gbuffer, gb_last, buf, 0, buffer_len); // 从gbuffer的gb_last位置复制buffer_len个字节
-
-
-
-            // 2. 复用原有数据处理逻辑（几乎无改动）
             myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
             txtGotoEndDelegate myGotoend = txtGotoEnd;
             HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
 
-            string abc, abc1;
+            string abc = string.Empty;
             if (_globalVM.SerialConfig.IsHexView == true)
             {
                 abc = _globalVM.SerialConfig.ByteArrayToHexString(buf);
@@ -428,10 +430,10 @@ namespace ocean.UI
                     hexStringView += abc.Substring(i, 2) + " ";
                 }
                 abc = hexStringView;
-                abc1 = abc.Replace(" ", "");
+                string abc1 = abc.Replace(" ", "");
                 if (abc1.Length >= 2 && abc1.Substring(abc1.Length - 2, 2) == "0D")
                 {
-                    abc = abc + "\n";
+                    abc += "\n";
                 }
             }
             else
@@ -439,30 +441,34 @@ namespace ocean.UI
                 abc = System.Text.Encoding.Default.GetString(buf);
             }
 
-            // 3. 保留原有Dispatcher调度更新UI
-            Dispatcher.Invoke(myUpdataHander, new string[] { abc });
+            Dispatcher.Invoke(myUpdataHander, abc);
             Dispatcher.Invoke(myGotoend);
-            Dispatcher.Invoke(myUpdata1, new string[] { buffer_len.ToString() });
+            Dispatcher.Invoke(myUpdata1, e.BufferLength.ToString());
         }
-
         #endregion
-
-
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 页面卸载时，清空全局CurrentDataHandler（避免冲突）
-
-            if (CommonRes.CurrentDataHandler == DebugSerialDataHandler)
+            // 移除DataReceived事件绑定（替代原CommonRes.CurrentDataHandler清空）
+            if (_serialComm != null)
             {
-                CommonRes.CurrentDataHandler = null;
+                _serialComm.DataReceived -= DebugSerialDataHandler;
             }
-            time1.Stop(); // 可选：停止定时器
+            time1.Stop();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.CurrentDataHandler = DebugSerialDataHandler;
+            try
+            {
+                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+                // 绑定DataReceived事件（替代原CommonRes.CurrentDataHandler赋值）
+                _serialComm.DataReceived += DebugSerialDataHandler;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _globalVM.SerialConfig.TbComStateText = "数据接收绑定失败：" + ex.Message;
+            }
         }
     }
 }

@@ -138,7 +138,9 @@ namespace ocean.Communication
         private IProtocol _currentProtocol;
 
 
-
+        // 新增：全局通讯实例（ViewModel内唯一，与SerialConfigView共用同一个实例）
+        // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
+        private ICommunication _comm;
 
 
         public GeneralDebugPageViewModel()
@@ -147,6 +149,7 @@ namespace ocean.Communication
             AddDataTableColumns(dtm);
             ButtonCommand = new RelayCommand(OnButtonClick);
             DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
+
         }
 
 
@@ -155,6 +158,8 @@ namespace ocean.Communication
         // 协议切换（选择框事件调用）
         public void InitProtocol(string protocolNum)
         {
+            // 若需要运行时切换通讯方式，可定时/按需刷新实例（示例）
+            _comm = CommunicationManager.Instance.GetCurrentCommunication();
             // 直接赋值原有单例，无需新建对象
             _currentProtocol = protocolNum switch
             {
@@ -250,14 +255,12 @@ namespace ocean.Communication
 
         private void OnButtonClick(object parameter)
         {
-
             if (parameter is DataRowView rowView)
             {
-                // 处理按钮点击逻辑（例如弹出对话框）
-                //MessageBox.Show($"按钮被点击，行ID：{rowView["ID"]}");
                 int addr = Convert.ToInt32(rowView["Addr"]);
 
-                if (!CommonRes.mySerialPort.IsOpen)
+                // 直接使用全局_comm，无需重复获取（与SerialConfigView实例一致）
+                if (!_comm.IsConnected)
                 {
                     MessageBox.Show("请打开串口！");
                     return;
@@ -266,65 +269,58 @@ namespace ocean.Communication
                 {
                     int value = Convert.ToInt32(rowView["Command"]);
                     int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value);
-                    CommonRes.mySerialPort.Write(sendbf, 0, send_num);
-                    string txt = "";
-                    txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
+
+                    // 共用同一个通讯实例发送
+                    _comm.Send(sendbf, 0, send_num);
+
+                    string txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
                     BoxStr += txt;
                 }
                 catch
                 {
                     MessageBox.Show("输入命令不能为空！");
                 }
-
             }
-
         }
 
 
 
-        // 双击事件核心逻辑（参数为DataGrid，适配你的RelayCommand<T>）
+
+        // 双击事件核心逻辑
         private void ExecuteDataGridDoubleClick(DataGrid dataGrid)
         {
             if (dataGrid == null) return;
 
-            // 捕获当前鼠标位置的元素（替代原e.OriginalSource）
             var mousePosition = Mouse.GetPosition(dataGrid);
             var hitTestResult = VisualTreeHelper.HitTest(dataGrid, mousePosition);
             if (hitTestResult == null) return;
 
-            // 1. 查找点击的单元格（复用FindVisualParent）
             var cell = FindVisualParent<DataGridCell>(hitTestResult.VisualHit as DependencyObject);
             if (cell == null) return;
 
-            // 2. 判断是否是数值列
             if (cell.Column.Header.ToString() == "数值")
             {
-                // 3. 提取数值、地址、ID等信息
                 var rowView = cell.DataContext as DataRowView;
                 if (rowView != null)
                 {
-                    // 提取Value列值
                     object value = rowView["Value"];
                     value = value == DBNull.Value ? "空值" : value;
                     MessageBox.Show($"当前数值：{value}", "数值详情");
 
-                    // 提取Addr并调用ReadButtonHander（增加类型安全判断）
                     if (int.TryParse(rowView["Addr"].ToString(), out int addr))
                     {
-                        // 执行读取逻辑
                         int send_num = _currentProtocol.MonitorGet(sendbf, addr, 1);
-                        CommonRes.mySerialPort.Write(sendbf, 0, send_num);
 
-                        string txt = "";
-                        txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
+                        // 直接使用全局_comm发送（与SerialConfigView实例一致）
+                        _comm.Send(sendbf, 0, send_num);
+
+                        string txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
                         BoxStr += txt;
-
                     }
 
-                    // 提取ID并赋值给Readpos
                     if (int.TryParse(rowView["ID"].ToString(), out int readpos))
                     {
-                        Readpos = readpos; // 绑定属性，外部可通过ModbusSet.Readpos访问
+                        Readpos = readpos;
                     }
                 }
             }
@@ -345,6 +341,36 @@ namespace ocean.Communication
         }
 
 
+
+        public void Page_LoadedD(object sender, RoutedEventArgs e)
+        {
+            // 仅对串口类型绑定数据接收事件（预留以太网扩展）
+            if (_comm is SerialCommunication serialComm)
+            {
+                // 绑定串口数据接收事件（替代 CommonRes.CurrentDataHandler = HandleSerialData）
+                serialComm.DataReceived += HandleSerialDataWrapper;
+            }        
+        }
+
+        public void Page_UnLoadedD(object sender, RoutedEventArgs e)
+        {
+            // 仅对串口类型解绑数据接收事件
+            if (_comm is SerialCommunication serialComm)
+            {
+                // 解绑事件（替代 CommonRes.CurrentDataHandler 清空）
+                serialComm.DataReceived -= HandleSerialDataWrapper;
+            }
+            // 释放Modbusset资源（原有逻辑保留）
+            Dispose();
+        }
+
+        // 事件包装器（适配 DataReceivedEventArgs 到原有 HandleSerialData 参数）
+        // 核心：无需修改原有 HandleSerialData 逻辑，仅做参数映射
+        private void HandleSerialDataWrapper(object sender, DataReceivedEventArgs e)
+        {
+            // 直接调用原有 HandleSerialData 方法（参数与原 CommonRes 委托一致）
+            HandleSerialData(e.Buffer, e.LastIndex, e.BufferLength);
+        }
 
 
 

@@ -41,7 +41,7 @@
                       ItemsSource="{Binding CommTypeOptions}"
                       DisplayMemberPath="Key"
                       SelectedValuePath="Value"
-                      SelectedValue="{Binding SelectedCommType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                      SelectedValue="{Binding SelectedCommType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="CmbCommunicationType_SelectionChanged"/>
 
     </StackPanel>
 </Page>

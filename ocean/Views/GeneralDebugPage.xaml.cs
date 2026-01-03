@@ -188,19 +188,13 @@ namespace ocean.UI
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // 将Modbusset的HandleSerialData方法注册为当前活跃处理者
-            CommonRes.CurrentDataHandler = _globalVM.ModbusSet.HandleSerialData;
+            _globalVM.ModbusSet.Page_LoadedD(sender,e);
+
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 仅当当前处理者是本Page的Modbusset时，才取消
-            if (CommonRes.CurrentDataHandler == _globalVM.ModbusSet.HandleSerialData)
-            {
-                CommonRes.CurrentDataHandler = null;
-            }
-            // 释放Modbusset资源
-            _globalVM.ModbusSet.Dispose();
+            _globalVM.ModbusSet.Page_UnLoadedD(sender,e);
         }
 
         // 释放资源
