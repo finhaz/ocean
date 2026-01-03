@@ -93,6 +93,9 @@ namespace ocean.Communication
 
         // 核心：当前选中的数据库实例（直接复用原有单例）
         //private IDatabaseOperation _dbOperation=new DB_SQLlite();
+        // 新增：全局通讯实例（ViewModel内唯一，与SerialConfigView共用同一个实例）
+        // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
+        private ICommunication _comm;
 
         public DeviceControlPageViewModel() 
         {
@@ -111,6 +114,8 @@ namespace ocean.Communication
         // 协议切换（选择框事件调用）
         public void InitProtocol(string protocolNum)
         {
+            // 若需要运行时切换通讯方式，可定时/按需刷新实例（示例）
+            _comm = CommunicationManager.Instance.GetCurrentCommunication();
             // 直接赋值原有单例，无需新建对象
             _currentProtocol = protocolNum switch
             {
@@ -133,7 +138,8 @@ namespace ocean.Communication
                 }
                 send_num = _currentProtocol.MonitorGet(sendbf, sn,runnum);
                 sn = sn + 1;
-                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+                // 共用同一个通讯实例发送
+                _comm.Send(sendbf, 0, send_num);
 
 
                 string str = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", 0, true);
@@ -201,7 +207,8 @@ namespace ocean.Communication
             send_num = _currentProtocol.MonitorRun(sendbf, brun, addr);
             sn=addr;
 
-            CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+            // 共用同一个通讯实例发送
+            _comm.Send(sendbf, 0, send_num);
             string txt = SerialDataProcessor.Instance.FormatSerialDataToHexString(sendbf, send_num, "TX:", true);
 
             
@@ -247,7 +254,7 @@ namespace ocean.Communication
 
             _dbOperation.DataBase_SET_Save(table, value, (byte)tempsn);
 
-            if (CommonRes.mySerialPort.IsOpen == true)
+            if (_comm.IsConnected)
             {
 
                 if (_currentProtocol == null)
@@ -255,7 +262,7 @@ namespace ocean.Communication
 
                 send_num = _currentProtocol.MonitorSet(sendbf, tempsn,value);
 
-                CommonRes.mySerialPort.Write(sendbf, 0, send_num);
+                _comm.Send(sendbf, 0, send_num);
             }
             else
             {
@@ -304,7 +311,7 @@ namespace ocean.Communication
         private void ButtonIncreaseAction(object parameter)
         {
             MessageBox.Show("h!");
-            if (CommonRes.mySerialPort.IsOpen == true)
+            if (_comm.IsConnected)
             {
                 bshow = !bshow;
                 if (bshow)
@@ -537,5 +544,42 @@ namespace ocean.Communication
         #endregion
 
 
+
+        public void Page_LoadedD(object sender, RoutedEventArgs e)
+        {
+            // 仅对串口类型绑定数据接收事件（预留以太网扩展）
+            if (_comm is SerialCommunication serialComm)
+            {
+                // 绑定串口数据接收事件（替代 CommonRes.CurrentDataHandler = HandleSerialData）
+                serialComm.DataReceived += HandleSerialDataWrapper;
+            }
+        }
+
+
+        public void Page_UnloadedD(object sender, RoutedEventArgs e)
+        {
+            // 仅对串口类型解绑数据接收事件
+            if (_comm is SerialCommunication serialComm)
+            {
+                // 解绑事件（替代 CommonRes.CurrentDataHandler 清空）
+                serialComm.DataReceived -= HandleSerialDataWrapper;
+            }
+            // 释放Modbusset资源（原有逻辑保留）
+            //Dispose();
+
+        }
+
+        // 事件包装器（适配 DataReceivedEventArgs 到原有 HandleSerialData 参数）
+        // 核心：无需修改原有 HandleSerialData 逻辑，仅做参数映射
+        private void HandleSerialDataWrapper(object sender, DataReceivedEventArgs e)
+        {
+            // 直接调用原有 HandleSerialData 方法（参数与原 CommonRes 委托一致）
+            HandleSerialData(e.Buffer, e.LastIndex, e.BufferLength);
+        }
+
+
     }
+
+
+
 }

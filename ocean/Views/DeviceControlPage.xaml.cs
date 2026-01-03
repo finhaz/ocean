@@ -52,11 +52,11 @@ namespace ocean.UI
             //PSO_v.pso_init = false;
             //IPSO_v.pso_init = false;
 
-            if (!CommonRes.mySerialPort.IsOpen)
-            {
-                MessageBox.Show("请打开串口！");
-                return;
-            }
+            //if (!CommonRes.mySerialPort.IsOpen)
+            //{
+            //    MessageBox.Show("请打开串口！");
+            //    return;
+            //}
             int addr = Int32.Parse(_globalVM.McController.RaddText);
             _globalVM.McController.runstop_cotnrol(addr,true);
             textBox1.Text= "系统正在运行";
@@ -116,19 +116,15 @@ namespace ocean.UI
 
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
-        { 
-             // 仅当当前处理者是本Page的MKlll时，才取消
-            if (CommonRes.CurrentDataHandler == _globalVM.McController.HandleSerialData)
-            {
-                CommonRes.CurrentDataHandler = null;
-            }
-            // 释放MKlll资源
-            //_globalVM.MKlll.Dispose();
+        {
+            _globalVM.McController.Page_UnloadedD(sender,e);
+
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            CommonRes.CurrentDataHandler = _globalVM.McController.HandleSerialData;
+            _globalVM.McController.Page_LoadedD(sender,e);
+
         }
 
         public void Dispose()
