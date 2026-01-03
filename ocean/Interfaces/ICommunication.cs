@@ -20,6 +20,9 @@ namespace ocean.Interfaces
         void Close();
         void Send(byte[] data, int offset, int length);
         string FormatSendData(byte[] data, int length);
+
+        // 以太网扩展：获取/设置配置（预留）
+        CommunicationConfig Config { get; set; }
     }
 
     // 数据接收事件参数
@@ -40,7 +43,7 @@ namespace ocean.Interfaces
     // 通讯配置基类
     public abstract class CommunicationConfig
     {
-        public CommunicationType Type { get; set; } = CommunicationType.Serial;
+        public CommunicationType Type { get; set; } = CommunicationType.SerialPort;
     }
 
     // 串口配置类（核心）
@@ -58,10 +61,16 @@ namespace ocean.Interfaces
         public string TbComStateText { get; set; } = "串口未打开";
     }
 
-    // 通讯类型枚举（预留以太网）
-    public enum CommunicationType
+
+    // 2. 以太网配置类（适配ICommunication）
+    public class EthernetConfig : CommunicationConfig
     {
-        Serial,
-        Tcp
+        public string SelectedProtocol { get; set; } = "TCP"; // TCP/UDP
+        public string TcpMode { get; set; } = "Server";       // Server/Client
+        public string LocalIp { get; set; } = "127.0.0.1";
+        public int LocalPort { get; set; } = 8080;
+        public string RemoteIp { get; set; } = "127.0.0.1";
+        public int RemotePort { get; set; } = 8080;
     }
+
 }

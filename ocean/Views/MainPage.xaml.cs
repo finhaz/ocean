@@ -1,4 +1,5 @@
 ﻿using ocean.Communication;
+using ocean.Interfaces;
 using ocean.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,12 @@ namespace ocean.Views
                     CommunicationManager.Instance.CreateSerialInstance();
                     break;
                 case CommunicationType.Ethernet:
-                    // 选择以太网：暂不处理（预留）
+                    // 仅创建以太网空实例，不指定TCP/UDP
+                    CommunicationManager.Instance.CreateEthernetInstance();
+                    break;
+                case CommunicationType.CAN:
+                case CommunicationType.IIC:
+                    // 预留，暂不处理
                     break;
             }
         }

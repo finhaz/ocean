@@ -30,6 +30,9 @@ namespace ocean.Communication
         // 串口是否打开
         public bool IsConnected => _serialPort.IsOpen;
 
+        // 串口无需Config，空实现（不影响原有逻辑）
+        public CommunicationConfig Config { get; set; }
+
         // 构造函数：初始化串口实例
         public SerialCommunication()
         {

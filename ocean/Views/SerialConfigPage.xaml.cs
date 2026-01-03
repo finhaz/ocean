@@ -37,6 +37,9 @@ namespace ocean.UI
         // 缓存当前串口实例（避免重复获取）
         private SerialCommunication _serialComm;
 
+        // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
+        private ICommunication _comm;
+
         public SerialConfigPage()
         {
             InitializeComponent();
