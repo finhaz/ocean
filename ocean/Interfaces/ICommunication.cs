@@ -66,11 +66,17 @@ namespace ocean.Interfaces
     public class EthernetConfig : CommunicationConfig
     {
         public string SelectedProtocol { get; set; } = "TCP"; // TCP/UDP
-        public string TcpMode { get; set; } = "Server";       // Server/Client
+        public string TcpMode { get; set; } = "Server";       // Server/Client（仅TCP有效）
+        public string UdpMode { get; set; } = "Server";       // 新增：UDP区分Server/Client
         public string LocalIp { get; set; } = "127.0.0.1";
         public int LocalPort { get; set; } = 8080;
         public string RemoteIp { get; set; } = "127.0.0.1";
         public int RemotePort { get; set; } = 8080;
+
+        // 新增：判断是否为服务器模式（用于控制LocalPort是否生效）
+        public bool IsServerMode =>
+            (SelectedProtocol == "TCP" && TcpMode == "Server") ||
+            (SelectedProtocol == "UDP" && UdpMode == "Server");
     }
 
 }

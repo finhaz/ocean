@@ -19,6 +19,12 @@ namespace ocean.ViewModels
 {
     public class EthernetConfigViewModel : INotifyPropertyChanged
     {
+        // 原有字段补充UDP模式
+        private string _udpMode = "Server"; // UDP Server/Client
+
+        // 新增：LocalPort是否可用（仅服务器模式可用）
+        private bool _isLocalPortEnabled;
+
         // 原有字段完全保留
         private string _selectedProtocol = "TCP";
         private string _tcpMode = "Server";
@@ -32,7 +38,31 @@ namespace ocean.ViewModels
         // 当前以太网实例（TCP/UDP）
         private ICommunication _ethernetComm;
 
+        // 原有属性保留，新增UDP模式属性
+        public string UdpMode
+        {
+            get => _udpMode;
+            set
+            {
+                _udpMode = value;
+                OnPropertyChanged();
+                UpdateLocalPortEnabledState(); // 更新LocalPort启用状态
+            }
+        }
+
+        // 新增：LocalPort启用状态（绑定到UI）
+        public bool IsLocalPortEnabled
+        {
+            get => _isLocalPortEnabled;
+            set
+            {
+                _isLocalPortEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
         // 原有属性完全保留
+        // 重写原有属性的变更逻辑（补充LocalPort状态更新）
         public string SelectedProtocol
         {
             get => _selectedProtocol;
@@ -42,8 +72,7 @@ namespace ocean.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsTcpSelected));
                 OnPropertyChanged(nameof(IsRemoteConfigVisible));
-                // 切换协议时重新创建实例
-                CreateEthernetProtocolInstance();
+                UpdateLocalPortEnabledState(); // 更新LocalPort启用状态
             }
         }
 
@@ -55,8 +84,10 @@ namespace ocean.ViewModels
                 _tcpMode = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsRemoteConfigVisible));
+                UpdateLocalPortEnabledState(); // 更新LocalPort启用状态
             }
         }
+
 
         public string LocalIp
         {
@@ -120,6 +151,7 @@ namespace ocean.ViewModels
         {
             // 初始化时创建默认协议实例（TCP）
             CreateEthernetProtocolInstance();
+            UpdateLocalPortEnabledState(); // 初始状态
 
             // 原有命令初始化保留
             ConnectCommand = new DelegateCommand(ExecuteConnect);
@@ -128,7 +160,32 @@ namespace ocean.ViewModels
             ClearLogCommand = new DelegateCommand(ExecuteClearLog);
         }
 
-        // 根据SelectedProtocol创建TCP/UDP实例
+        // 核心：更新LocalPort启用状态（仅服务器模式可用）
+        private void UpdateLocalPortEnabledState()
+        {
+            if (SelectedProtocol == "TCP")
+            {
+                // TCP：仅服务器模式启用LocalPort
+                IsLocalPortEnabled = TcpMode == "Server";
+            }
+            else if (SelectedProtocol == "UDP")
+            {
+                // UDP：仅服务器模式启用LocalPort
+                IsLocalPortEnabled = UdpMode == "Server";
+            }
+            else
+            {
+                IsLocalPortEnabled = false;
+            }
+
+            // 客户端模式下，清空LocalPort输入框并提示
+            if (!IsLocalPortEnabled)
+            {
+                LocalPort = "自动分配";
+            }
+        }
+
+        // 改造CreateEthernetProtocolInstance（绑定日志委托）
         private void CreateEthernetProtocolInstance()
         {
             try
@@ -136,28 +193,31 @@ namespace ocean.ViewModels
                 // 释放原有实例
                 _ethernetComm?.Dispose();
 
-                // 根据选择的协议创建实例
                 if (SelectedProtocol == "TCP")
                 {
-                    _ethernetComm = new TcpCommunication();
+                    var tcpComm = new TcpCommunication();
+                    // 绑定 AddLog 事件（此时不会报错）
+                    //tcpComm.AddLog += AddLog;
+                    _ethernetComm = tcpComm;
                 }
                 else
                 {
-                    _ethernetComm = new UdpCommunication();
+                    var udpComm = new UdpCommunication();
+                    //udpComm.AddLog += AddLog; // 绑定 AddLog 事件
+                    _ethernetComm = udpComm;
                 }
 
-                // 替换CommunicationManager中的实例
                 CommunicationManager.Instance.ReplaceEthernetInstance(_ethernetComm);
-
-                // 绑定数据接收事件
                 _ethernetComm.DataReceived += OnEthernetDataReceived;
-                AddLog($"已切换到{SelectedProtocol}协议");
+                AddLog($"已切换到 {SelectedProtocol} 协议");
             }
             catch (Exception ex)
             {
                 AddLog($"切换协议失败：{ex.Message}");
             }
         }
+
+
 
         // 连接/断开逻辑（原有逻辑适配）
         private void ExecuteConnect()

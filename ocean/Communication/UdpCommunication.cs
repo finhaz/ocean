@@ -9,68 +9,132 @@ using System.Threading.Tasks;
 
 namespace ocean.Communication
 {
-    // UDP通讯类（实现ICommunication）
     public class UdpCommunication : ICommunication
     {
+        #region 私有字段
         private UdpClient _udpClient;
         private EthernetConfig _config;
-        private bool _isConnected;
+        #endregion
 
+        #region 公共事件（核心：AddLog 必须 public）
+        public event Action<string> AddLog;
         public event EventHandler<DataReceivedEventArgs> DataReceived;
-        public bool IsConnected => _isConnected;
+        #endregion
+
+        #region 公共属性
+        public bool IsConnected { get; private set; }
         public CommunicationConfig Config
         {
             get => _config;
             set => _config = (EthernetConfig)value;
         }
+        #endregion
 
+        #region 核心方法
         public void Open(CommunicationConfig config)
         {
             _config = (EthernetConfig)config;
-            _udpClient = new UdpClient(_config.LocalPort);
-            _isConnected = true;
-            StartReceiveUdpData();
+            IsConnected = false;
+
+            try
+            {
+                if (_config.UdpMode == "Server")
+                {
+                    // 服务器模式：绑定指定端口
+                    _udpClient = new UdpClient(_config.LocalPort);
+                    IsConnected = true;
+                    AddLog?.Invoke($"UDP服务器启动成功：本地端口 {_config.LocalPort}");
+                }
+                else
+                {
+                    // 客户端模式：自动分配端口
+                    _udpClient = new UdpClient(); // 无参构造 = 自动分配端口
+                    IsConnected = true;
+
+                    IPEndPoint localEP = (IPEndPoint)_udpClient.Client.LocalEndPoint;
+                    AddLog?.Invoke($"UDP客户端启动成功：本地自动端口 {localEP.Port}");
+                }
+
+                StartReceiveData();
+            }
+            catch (Exception ex)
+            {
+                AddLog?.Invoke($"UDP打开失败：{ex.Message}");
+                IsConnected = false;
+            }
         }
 
         public void Close()
         {
-            _udpClient?.Close();
-            _isConnected = false;
+            try
+            {
+                _udpClient?.Close();
+                IsConnected = false;
+                AddLog?.Invoke("UDP连接已断开");
+            }
+            catch (Exception ex)
+            {
+                AddLog?.Invoke($"UDP断开失败：{ex.Message}");
+            }
         }
 
         public void Send(byte[] data, int offset, int length)
         {
-            if (!_isConnected)
+            if (!IsConnected || _udpClient == null)
                 throw new InvalidOperationException("UDP未启动");
 
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(_config.RemoteIp), _config.RemotePort);
-            _udpClient.Send(data, length, remoteEP);
+            try
+            {
+                IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(_config.RemoteIp), _config.RemotePort);
+                _udpClient.Send(data, length, remoteEP);
+                AddLog?.Invoke($"UDP发送数据：{BitConverter.ToString(data, offset, length).Replace("-", " ")}");
+            }
+            catch (Exception ex)
+            {
+                AddLog?.Invoke($"UDP发送失败：{ex.Message}");
+                throw;
+            }
         }
 
         public string FormatSendData(byte[] data, int length)
         {
-            // 从数组索引0开始，取length长度的字节格式化
             return $"TX(UDP): {BitConverter.ToString(data, 0, length).Replace("-", " ")}";
         }
+        #endregion
 
-        private void StartReceiveUdpData()
+        #region 私有辅助方法
+        private void StartReceiveData()
         {
+            if (_udpClient == null) return;
+
             _udpClient.BeginReceive((ar) =>
             {
                 try
                 {
                     IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
                     byte[] data = _udpClient.EndReceive(ar, ref remoteEP);
-                    DataReceived?.Invoke(this, new DataReceivedEventArgs(data, 0, data.Length));
-                    StartReceiveUdpData();
+
+                    if (data.Length > 0)
+                    {
+                        DataReceived?.Invoke(this, new DataReceivedEventArgs(data, 0, data.Length));
+                        AddLog?.Invoke($"UDP接收数据 [{remoteEP}]: {BitConverter.ToString(data).Replace("-", " ")}");
+                    }
+
+                    StartReceiveData(); // 继续接收
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    AddLog?.Invoke($"UDP接收失败：{ex.Message}");
+                }
             }, null);
         }
+        #endregion
 
+        #region 释放资源
         public void Dispose()
         {
             Close();
         }
+        #endregion
     }
 }
