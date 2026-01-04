@@ -232,25 +232,6 @@ namespace ocean.Communication
                           
         }
 
-        public int Monitor_Solve(byte[] buffer)
-        {
-
-            int Value = 0;
-
-            if (buffer[1] == 3)
-            {
-                byte[] typeBytes = new byte[buffer[2]];
-                Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
-                Array.Reverse(typeBytes);
-                Value = BitConverter.ToInt16(typeBytes, 0);
-            }
-            else if (buffer[1] == 6)
-            {
-
-            }
-
-            return Value;
-        }
 
 
         private void OnButtonClick(object parameter)
