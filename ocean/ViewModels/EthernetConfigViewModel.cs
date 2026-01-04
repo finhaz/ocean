@@ -14,6 +14,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using ocean.Communication;
 
 namespace ocean.ViewModels
 {
@@ -197,13 +198,13 @@ namespace ocean.ViewModels
                 {
                     var tcpComm = new TcpCommunication();
                     // 绑定 AddLog 事件（此时不会报错）
-                    //tcpComm.AddLog += AddLog;
+                    tcpComm.AddLog = AddLog;
                     _ethernetComm = tcpComm;
                 }
                 else
                 {
                     var udpComm = new UdpCommunication();
-                    //udpComm.AddLog += AddLog; // 绑定 AddLog 事件
+                    udpComm.AddLog += AddLog; // 绑定 AddLog 事件
                     _ethernetComm = udpComm;
                 }
 
@@ -318,156 +319,6 @@ namespace ocean.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
-
-    // TCP通讯实现（独立类）
-    public class TcpCommunication : ICommunication
-    {
-        private TcpListener _tcpListener;
-        private TcpClient _tcpClient;
-        private NetworkStream _networkStream;
-        private EthernetConfig _config;
-
-        public event EventHandler<DataReceivedEventArgs> DataReceived;
-        public bool IsConnected { get; private set; }
-        public CommunicationConfig Config
-        {
-            get => _config;
-            set => _config = (EthernetConfig)value;
-        }
-
-        public void Open(CommunicationConfig config)
-        {
-            _config = (EthernetConfig)config;
-            IsConnected = false;
-
-            if (_config.TcpMode == "Server")
-            {
-                _tcpListener = new TcpListener(IPAddress.Parse(_config.LocalIp), _config.LocalPort);
-                _tcpListener.Start();
-                _tcpListener.BeginAcceptTcpClient(OnTcpClientConnected, null);
-                IsConnected = true;
-            }
-            else
-            {
-                _tcpClient = new TcpClient(new IPEndPoint(IPAddress.Parse(_config.LocalIp), _config.LocalPort));
-                _tcpClient.Connect(_config.RemoteIp, _config.RemotePort);
-                _networkStream = _tcpClient.GetStream();
-                IsConnected = true;
-                StartReceiveData();
-            }
-        }
-
-        public void Close()
-        {
-            _networkStream?.Close();
-            _tcpClient?.Close();
-            _tcpListener?.Stop();
-            IsConnected = false;
-        }
-
-        public void Send(byte[] data, int offset, int length)
-        {
-            if (!IsConnected || _networkStream == null)
-                throw new InvalidOperationException("TCP未连接");
-            _networkStream.Write(data, offset, length);
-        }
-
-        public string FormatSendData(byte[] data, int length)
-        {
-            return $"TX(TCP): {BitConverter.ToString(data).Replace("-", " ")}";
-        }
-
-        private void OnTcpClientConnected(IAsyncResult ar)
-        {
-            try
-            {
-                _tcpClient = _tcpListener.EndAcceptTcpClient(ar);
-                _networkStream = _tcpClient.GetStream();
-                _tcpListener.BeginAcceptTcpClient(OnTcpClientConnected, null);
-                StartReceiveData();
-            }
-            catch { }
-        }
-
-        private void StartReceiveData()
-        {
-            byte[] buffer = new byte[1024];
-            _networkStream?.BeginRead(buffer, 0, buffer.Length, (ar) =>
-            {
-                try
-                {
-                    int bytesRead = _networkStream.EndRead(ar);
-                    if (bytesRead > 0)
-                    {
-                        DataReceived?.Invoke(this, new DataReceivedEventArgs(buffer, 0, bytesRead));
-                        StartReceiveData();
-                    }
-                }
-                catch { }
-            }, null);
-        }
-
-        public void Dispose() => Close();
-    }
-
-    // UDP通讯实现（独立类）
-    public class UdpCommunication : ICommunication
-    {
-        private UdpClient _udpClient;
-        private EthernetConfig _config;
-
-        public event EventHandler<DataReceivedEventArgs> DataReceived;
-        public bool IsConnected { get; private set; }
-        public CommunicationConfig Config
-        {
-            get => _config;
-            set => _config = (EthernetConfig)value;
-        }
-
-        public void Open(CommunicationConfig config)
-        {
-            _config = (EthernetConfig)config;
-            _udpClient = new UdpClient(_config.LocalPort);
-            IsConnected = true;
-            StartReceiveData();
-        }
-
-        public void Close()
-        {
-            _udpClient?.Close();
-            IsConnected = false;
-        }
-
-        public void Send(byte[] data, int offset, int length)
-        {
-            if (!IsConnected)
-                throw new InvalidOperationException("UDP未启动");
-            IPEndPoint remoteEP = new IPEndPoint(IPAddress.Parse(_config.RemoteIp), _config.RemotePort);
-            _udpClient.Send(data, length, remoteEP);
-        }
-
-        public string FormatSendData(byte[] data, int length)
-        {
-            return $"TX(UDP): {BitConverter.ToString(data).Replace("-", " ")}";
-        }
-
-        private void StartReceiveData()
-        {
-            _udpClient.BeginReceive((ar) =>
-            {
-                try
-                {
-                    IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] data = _udpClient.EndReceive(ar, ref remoteEP);
-                    DataReceived?.Invoke(this, new DataReceivedEventArgs(data, 0, data.Length));
-                    StartReceiveData();
-                }
-                catch { }
-            }, null);
-        }
-
-        public void Dispose() => Close();
-    }
+    }  
 
 }

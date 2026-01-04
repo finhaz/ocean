@@ -20,8 +20,8 @@ namespace ocean.Communication
         #endregion
 
         #region 公共事件（核心：AddLog 必须 public）
-        // 日志输出事件（ViewModel 绑定用）
-        public event Action<string> AddLog;
+        // 实现接口的AddLog委托（不是事件，是普通委托属性）
+        public Action<string> AddLog { get; set; }
         // 数据接收事件
         public event EventHandler<DataReceivedEventArgs> DataReceived;
         #endregion
