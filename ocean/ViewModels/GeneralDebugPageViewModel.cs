@@ -210,18 +210,9 @@ namespace ocean.Communication
             Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
             checkresult = _currentProtocol.MonitorCheck(buffer, buffer_len);
 
-            int Corder = 0;
-            if (_currentProtocol == TCPModbus.Instance)
-            {
-                Corder = buffer[7];
-            }
-            else
-            {
-                Corder = buffer[1];
-            }
             if (checkresult == 1)
             {
-                if (Corder == 3 && dtm.Rows.Count > 0)
+                if (dtm.Rows.Count > 0)
                 {
                     temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
                     // 跨线程更新DataTable（避免UI线程异常）

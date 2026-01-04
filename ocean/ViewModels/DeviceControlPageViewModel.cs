@@ -188,9 +188,16 @@ namespace ocean.Communication
                     {
                         Dtrun.Rows[datax.SN][5] = datax.VALUE;
                     });
-                }                
+                }
             }
-            
+            else
+            {
+                UiDispatcherHelper.ExecuteOnUiThread(() =>
+                {
+                    SerialTextBlock.Text += "RX:Wrong";
+                });
+            }
+
         }
 
 
