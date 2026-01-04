@@ -547,23 +547,29 @@ namespace ocean.Communication
 
         public void Page_LoadedD(object sender, RoutedEventArgs e)
         {
+            /*
             // 仅对串口类型绑定数据接收事件（预留以太网扩展）
             if (_comm is SerialCommunication serialComm)
             {
                 // 绑定串口数据接收事件（替代 CommonRes.CurrentDataHandler = HandleSerialData）
                 serialComm.DataReceived += HandleSerialDataWrapper;
             }
+            */
+            _comm.DataReceived += HandleSerialDataWrapper;
         }
 
 
         public void Page_UnloadedD(object sender, RoutedEventArgs e)
         {
+            /*
             // 仅对串口类型解绑数据接收事件
             if (_comm is SerialCommunication serialComm)
             {
                 // 解绑事件（替代 CommonRes.CurrentDataHandler 清空）
                 serialComm.DataReceived -= HandleSerialDataWrapper;
             }
+            */
+            _comm.DataReceived -= HandleSerialDataWrapper;
             // 释放Modbusset资源（原有逻辑保留）
             //Dispose();
 
