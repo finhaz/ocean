@@ -45,7 +45,7 @@ namespace ocean.Communication
             set => SetProperty(ref bshowcontet, value); // 一行搞定，无需重复逻辑
         }
 
-        private string protocolNum = "Modbus协议";
+        private string protocolNum = "Modbus RTU协议";
         public string ProtocolNum
         {
             get => protocolNum;
@@ -120,7 +120,8 @@ namespace ocean.Communication
             _currentProtocol = protocolNum switch
             {
                 "FE协议" => COMFE.Instance,       // COMFE实现了IProtocol
-                "Modbus协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                "Modbus RTU协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                "Modbus TCP协议" => TCPModbus.Instance,//TCPModbus实现了IProtocol
                 _ => throw new ArgumentException($"不支持的协议类型：{protocolNum}")
             };
         }

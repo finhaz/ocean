@@ -67,7 +67,7 @@ namespace ocean.Communication
             set => SetProperty(ref _dSelectedOption, value);
         }
 
-        private string _proSelectedOption = "Modbus协议";
+        private string _proSelectedOption = "Modbus RTU协议";
         public string ProSelectedOption
         {
             get => _proSelectedOption;
@@ -76,7 +76,7 @@ namespace ocean.Communication
 
 
 
-        private string _intoSelectedOption = "Modbus协议";
+        private string _intoSelectedOption = "Modbus RTU协议";
         public string IntoSelectedOption
         {
             get => _intoSelectedOption;
@@ -102,7 +102,7 @@ namespace ocean.Communication
         { "线圈状态(RW)", "离散输入(RO)", "保持寄存器(RW)", "输入寄存器(RO)" };
 
         public ObservableCollection<string> ProOptions { get; set; } = new ObservableCollection<string>
-        { "Modbus协议", "FE协议" };
+        { "Modbus RTU协议", "FE协议","Modbus TCP协议" };
 
 
         // 协议信息集合
@@ -110,7 +110,7 @@ namespace ocean.Communication
         {
             new ProtocolInfo
             {
-                Name = "Modbus协议",
+                Name = "Modbus RTU协议",
                 FrameStructure = "地址域(1字节) + 功能码(1字节) + 数据域(N字节) + CRC校验(2字节)",
                 Transport = "RTU/ASCII/TCP三种，RTU为二进制格式，效率更高",
                 Features = "常用功能码：03（读保持寄存器）、06（写单个寄存器）"
@@ -164,7 +164,8 @@ namespace ocean.Communication
             _currentProtocol = protocolNum switch
             {
                 "FE协议" => COMFE.Instance,       // COMFE实现了IProtocol
-                "Modbus协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                "Modbus RTU协议" => COMModbus.Instance, // COMModbus实现了IProtocol
+                "Modbus TCP协议"=>TCPModbus.Instance,//TCPModbus实现了IProtocol
                 _ => throw new ArgumentException($"不支持的协议类型：{protocolNum}")
             };
         }
@@ -208,26 +209,52 @@ namespace ocean.Communication
 
             Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
 
-            checkresult=_currentProtocol.MonitorCheck(buffer, buffer.Length);
-
-            if (checkresult == 1)
+            if (_currentProtocol == TCPModbus.Instance)
             {
-                if (buffer[1] == 3 && dtm.Rows.Count > 0)
+                checkresult = _currentProtocol.MonitorCheck(buffer, buffer_len);
+                if (checkresult == 1)
                 {
-                    temp_Value = _currentProtocol.MonitorSolve(buffer,Readpos-1);
-                    // 跨线程更新DataTable（避免UI线程异常）
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (buffer[7] == 3 && dtm.Rows.Count > 0)
                     {
-                        dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
+                        temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
+                        // 跨线程更新DataTable（避免UI线程异常）
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
+                        });
+                    }
+                }
+                else
+                {
+                    UiDispatcherHelper.ExecuteOnUiThread(() =>
+                    {
+                        BoxStr += "RX:Wrong";
                     });
                 }
             }
             else
             {
-                UiDispatcherHelper.ExecuteOnUiThread(() =>
+                checkresult = _currentProtocol.MonitorCheck(buffer, buffer.Length);
+
+                if (checkresult == 1)
                 {
-                    BoxStr += "RX:Wrong";
-                });
+                    if (buffer[1] == 3 && dtm.Rows.Count > 0)
+                    {
+                        temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
+                        // 跨线程更新DataTable（避免UI线程异常）
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
+                        });
+                    }
+                }
+                else
+                {
+                    UiDispatcherHelper.ExecuteOnUiThread(() =>
+                    {
+                        BoxStr += "RX:Wrong";
+                    });
+                }
             }
             
         }
