@@ -208,55 +208,37 @@ namespace ocean.Communication
 
 
             Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
+            checkresult = _currentProtocol.MonitorCheck(buffer, buffer_len);
 
+            int Corder = 0;
             if (_currentProtocol == TCPModbus.Instance)
             {
-                checkresult = _currentProtocol.MonitorCheck(buffer, buffer_len);
-                if (checkresult == 1)
+                Corder = buffer[7];
+            }
+            else
+            {
+                Corder = buffer[1];
+            }
+            if (checkresult == 1)
+            {
+                if (Corder == 3 && dtm.Rows.Count > 0)
                 {
-                    if (buffer[7] == 3 && dtm.Rows.Count > 0)
+                    temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
+                    // 跨线程更新DataTable（避免UI线程异常）
+                    Application.Current.Dispatcher.Invoke(() =>
                     {
-                        temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
-                        // 跨线程更新DataTable（避免UI线程异常）
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
-                        });
-                    }
-                }
-                else
-                {
-                    UiDispatcherHelper.ExecuteOnUiThread(() =>
-                    {
-                        BoxStr += "RX:Wrong";
+                        dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
                     });
                 }
             }
             else
             {
-                checkresult = _currentProtocol.MonitorCheck(buffer, buffer.Length);
-
-                if (checkresult == 1)
+                UiDispatcherHelper.ExecuteOnUiThread(() =>
                 {
-                    if (buffer[1] == 3 && dtm.Rows.Count > 0)
-                    {
-                        temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
-                        // 跨线程更新DataTable（避免UI线程异常）
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
-                        });
-                    }
-                }
-                else
-                {
-                    UiDispatcherHelper.ExecuteOnUiThread(() =>
-                    {
-                        BoxStr += "RX:Wrong";
-                    });
-                }
+                    BoxStr += "RX:Wrong";
+                });
             }
-            
+                          
         }
 
         public int Monitor_Solve(byte[] buffer)

@@ -98,10 +98,10 @@ namespace ocean
             int crc;
             int crc_g;
             int index = len - 2;
-            crc = crc16_ccitt(buffer, (len-3), 0);
+            crc = crc16_ccitt(buffer, (len-2), 0);
             if (index > 2)
             {
-                crc_g = BitConverter.ToInt16(buffer, index);
+                crc_g = BitConverter.ToUInt16(buffer, index);
                 if (crc_g == crc)
                     return 0X01;               
             }

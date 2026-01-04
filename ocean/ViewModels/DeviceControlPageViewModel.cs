@@ -173,8 +173,9 @@ namespace ocean.Communication
             });
 
             Array.Copy(gbuffer, gb_last, buffer, 0, buffer_len);
-            check_result = _currentProtocol.MonitorCheck(buffer, buffer.Length);
-            
+            check_result = _currentProtocol.MonitorCheck(buffer, buffer_len);
+
+
             // 校验成功=1的处理
             if (check_result == 1)
             {
