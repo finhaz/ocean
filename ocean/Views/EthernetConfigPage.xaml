@@ -56,7 +56,7 @@
             <Label Content="本地IP：" Width="60"/>
             <TextBox Text="{Binding LocalIp}" Width="150"/>
             <Label Content="端口：" Width="40" Margin="10,0"/>
-            <TextBox Text="{Binding LocalPort}" Width="80"/>
+            <TextBox Text="{Binding LocalPort}" Width="80" IsEnabled="{Binding IsLocalPortEnabled}"/>
         </StackPanel>
 
         <!-- 4. 远程IP和端口（TCP客户端/UDP显示） -->

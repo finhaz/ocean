@@ -31,7 +31,7 @@ namespace ocean.Views
                     CommunicationManager.Instance.CreateSerialInstance();
                     break;
                 case CommunicationType.Ethernet:
-                    // 仅创建以太网空实例，不指定TCP/UDP
+                    // 仅创建网络通讯空实例，不指定TCP/UDP
                     CommunicationManager.Instance.CreateEthernetInstance();
                     break;
                 case CommunicationType.CAN:

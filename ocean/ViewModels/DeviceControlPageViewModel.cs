@@ -570,8 +570,8 @@ namespace ocean.Communication
             }
             */
             _comm.DataReceived -= HandleSerialDataWrapper;
-            // 释放Modbusset资源（原有逻辑保留）
-            //Dispose();
+            // 释放ViewModel资源（原有逻辑保留）
+            Dispose();
 
         }
 
@@ -583,9 +583,11 @@ namespace ocean.Communication
             HandleSerialData(e.Buffer, e.LastIndex, e.BufferLength);
         }
 
+        public void Dispose()
+        {
+            // 若有其他资源需释放，在此处理
+        }
+
 
     }
-
-
-
 }

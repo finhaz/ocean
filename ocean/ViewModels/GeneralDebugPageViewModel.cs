@@ -367,7 +367,7 @@ namespace ocean.Communication
             */
 
             _comm.DataReceived -= HandleSerialDataWrapper;
-            // 释放Modbusset资源（原有逻辑保留）
+            // 释放ViewModel资源（原有逻辑保留）
             Dispose();
         }
 

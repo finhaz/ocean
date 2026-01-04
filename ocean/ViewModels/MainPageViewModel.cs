@@ -18,7 +18,7 @@ namespace ocean.ViewModels
         public List<KeyValuePair<string, CommunicationType>> CommTypeOptions { get; } = new()
         {
             new KeyValuePair<string, CommunicationType>("串口通讯", CommunicationType.SerialPort),
-            new KeyValuePair<string, CommunicationType>("以太网通讯", CommunicationType.Ethernet),
+            new KeyValuePair<string, CommunicationType>("网络通讯", CommunicationType.Ethernet),
             new KeyValuePair<string, CommunicationType>("CAN通讯", CommunicationType.CAN),
             new KeyValuePair<string, CommunicationType>("IIC通讯", CommunicationType.IIC)
         };

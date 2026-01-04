@@ -13,7 +13,7 @@ namespace ocean.ViewModels
     public enum CommunicationType
     {
         SerialPort,    // 串口
-        Ethernet,       // 以太网
+        Ethernet,       // 网络
         CAN,
         IIC
     }

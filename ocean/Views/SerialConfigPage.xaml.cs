@@ -462,6 +462,13 @@ namespace ocean.UI
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!_serialComm.IsConnected)
+            {
+                _globalVM.SerialConfig.IsConfigEnabled = true;
+                btOpenCom.Content = "打开串口";
+                _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "已关闭";
+                comState.Style = (Style)FindResource("EllipseStyleRed");
+            }
             try
             {
                 _serialComm = CommunicationManager.Instance.GetSerialInstance();

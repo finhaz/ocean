@@ -36,7 +36,7 @@ namespace ocean.ViewModels
         private string _dataLog = string.Empty;
         private string _sendData = string.Empty;
 
-        // 当前以太网实例（TCP/UDP）
+        // 当前网络通讯实例（TCP/UDP）
         private ICommunication _ethernetComm;
 
         // 原有属性保留，新增UDP模式属性
@@ -164,6 +164,7 @@ namespace ocean.ViewModels
         // 核心：更新LocalPort启用状态（仅服务器模式可用）
         private void UpdateLocalPortEnabledState()
         {
+            LocalPort = "8080";
             if (SelectedProtocol == "TCP")
             {
                 // TCP：仅服务器模式启用LocalPort
@@ -232,6 +233,12 @@ namespace ocean.ViewModels
                 }
                 else
                 {
+                    int tLocalPort = 8080; 
+                    if (IsLocalPortEnabled)
+                    {
+                        tLocalPort=int.Parse(LocalPort);
+                    }
+
                     // 构建配置
                     var config = new EthernetConfig
                     {
@@ -239,7 +246,7 @@ namespace ocean.ViewModels
                         SelectedProtocol = SelectedProtocol,
                         TcpMode = TcpMode,
                         LocalIp = LocalIp,
-                        LocalPort = int.Parse(LocalPort),
+                        LocalPort = tLocalPort,
                         RemoteIp = RemoteIp,
                         RemotePort = int.Parse(RemotePort)
                     };
@@ -291,7 +298,7 @@ namespace ocean.ViewModels
         {
             try
             {
-                AddLog("以太网配置已保存");
+                AddLog("网络通讯配置已保存");
                 MessageBox.Show("配置保存成功！", "提示");
             }
             catch (Exception ex)
