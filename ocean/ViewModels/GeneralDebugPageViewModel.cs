@@ -316,15 +316,15 @@ namespace ocean.Communication
                         {
                             // 2. 核心赋值：直接给实体类的Value属性赋值
                             // 同时根据当前行的DisplayType自动转换类型（保持和选择的呈现类型一致）
-                            if (targetItem.DisplayType == "整形数")
+                            if (targetItem.DisplayType == "十进制整数")
                             {
                                 // 转为int类型赋值
-                                targetItem.Value = Convert.ToInt32(temp_Value.VALUE);
+                                targetItem.Value = Convert.ToInt32(temp_Value.VALUE)* targetItem.Coefficient;
                             }
                             else
                             {
                                 // 转为double类型赋值（默认浮点数）
-                                targetItem.Value = Convert.ToDouble(temp_Value.VALUE);
+                                targetItem.Value = Convert.ToDouble(temp_Value.VALUE)*targetItem.Coefficient;
                             }
                         }
                         else

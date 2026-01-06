@@ -117,6 +117,7 @@ namespace ocean.UI
             Setadd.Visibility = Visibility.Visible;
         }
 
+        /*
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             if (dataGrodx.SelectedItem is DataRowView selectedRowView)
@@ -128,7 +129,24 @@ namespace ocean.UI
                 MessageBox.Show("请指定行！");
             }
         }
+        */
+        private void ButtonDelete_Click(object sender, RoutedEventArgs e)
+        {
+            // 多选删除：获取所有选中的ModbusDataItem
+            var selectedItems = dataGrodx.SelectedItems.Cast<ModbusDataItem>().ToList();
 
+            if (selectedItems.Count == 0)
+            {
+                MessageBox.Show("请指定行！");
+                return;
+            }
+
+            // 逐个移除（避免遍历集合时修改集合导致异常）
+            foreach (var item in selectedItems)
+            {
+                _globalVM.ModbusSet.ModbusDataList.Remove(item);
+            }
+        }
 
 
         private void ShowText_TextChanged(object sender, TextChangedEventArgs e)
@@ -160,12 +178,12 @@ namespace ocean.UI
             {
                 try
                 {
-                    //// 方式1：如果是ObservableCollection<ModbusConfigItem>
-                    //var configList = _globalVM.ModbusSet.dtm.ToList();
-                    //string json = JsonConvert.SerializeObject(configList, Formatting.Indented);
+                    // 方式1：如果是ObservableCollection<ModbusConfigItem>
+                    var configList = _globalVM.ModbusSet.ModbusDataList.ToList();
+                    string json = JsonConvert.SerializeObject(configList, Newtonsoft.Json.Formatting.Indented);
 
-                    // 方式2：如果是DataTable
-                    string json = JsonConvert.SerializeObject(_globalVM.ModbusSet.dtm, Newtonsoft.Json.Formatting.Indented);
+                    //// 方式2：如果是DataTable
+                    //string json = JsonConvert.SerializeObject(_globalVM.ModbusSet.dtm, Newtonsoft.Json.Formatting.Indented);
 
                     // 写入文件
                     File.WriteAllText(saveFileDialog.FileName, json);
@@ -193,14 +211,15 @@ namespace ocean.UI
                 {
                     string json = File.ReadAllText(openFileDialog.FileName);
 
-                    //// 方式1：如果是ObservableCollection<ModbusConfigItem>
-                    //var configList = JsonConvert.DeserializeObject<List<ModbusConfigItem>>(json);
-                    //_globalVM.ModbusSet.dtm.Clear(); // 清空原有数据
-                    //foreach (var item in configList)
-                    //{
-                    //    _globalVM.ModbusSet.dtm.Add(item);
-                    //}
+                    // 方式1：如果是ObservableCollection<ModbusConfigItem>
+                    var configList = JsonConvert.DeserializeObject<List<ModbusDataItem>>(json);
+                    _globalVM.ModbusSet.ModbusDataList.Clear(); // 清空原有数据
+                    foreach (var item in configList)
+                    {
+                        _globalVM.ModbusSet.ModbusDataList.Add(item);
+                    }
 
+                    /*
                     //方式2：如果是DataTable
                     DataTable importedDt = JsonConvert.DeserializeObject<DataTable>(json);
                     _globalVM.ModbusSet.dtm.Clear();
@@ -208,7 +227,7 @@ namespace ocean.UI
                     {
                          _globalVM.ModbusSet.dtm.ImportRow(row);
                     }
-
+                    */
                     MessageBox.Show("导入成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)

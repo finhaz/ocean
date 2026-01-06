@@ -22,7 +22,7 @@ namespace ocean.ViewModels
         private int _number;
         private int _nOffSet;
         private int _nBit;
-        private int _coefficient;
+        private float _coefficient;
         private int _offset;
         private int _decimalPlaces;
         private string _transferType;
@@ -105,7 +105,7 @@ namespace ocean.ViewModels
             set => SetProperty(ref _nBit, value);
         }
 
-        public int Coefficient
+        public float Coefficient
         {
             get => _coefficient;
             set => SetProperty(ref _coefficient, value);
@@ -173,23 +173,32 @@ namespace ocean.ViewModels
         {
             if (Value == null)
             {
-                Value = DisplayType == "整形数" ? 0 : 0.0;
+                Value = DisplayType == "十进制整数" ? 0 : 0.0;
                 return;
             }
 
             try
             {
-                if (DisplayType == "整形数")
+                switch (DisplayType)
                 {
-                    // 浮点数转整数（四舍五入，可改为直接截断）
-                    double doubleValue = Convert.ToDouble(Value);
-                    Value = Convert.ToInt32(Math.Round(doubleValue));
-                }
-                else
-                {
-                    // 整数转浮点数
-                    int intValue = Convert.ToInt32(Value);
-                    Value = Convert.ToDouble(intValue);
+                    case "十进制整数":
+                        // 浮点数转十进制整数（四舍五入）
+                        double decimalDouble = Convert.ToDouble(Value);
+                        Value = Convert.ToInt32(Math.Round(decimalDouble));
+                        break;
+
+                    case "十六进制整数":
+                        // 浮点数转整数（作为十六进制的存储值，显示时转格式）
+                        double hexDouble = Convert.ToDouble(Value);
+                        Value = Convert.ToInt32(Math.Round(hexDouble)); // 存储为int
+                        break;
+
+                    case "浮点数":
+                    default:
+                        // 整数（十进制/十六进制）转浮点数
+                        int floatInt = Convert.ToInt32(Value);
+                        Value = Convert.ToDouble(floatInt);
+                        break;
                 }
             }
             catch (Exception)

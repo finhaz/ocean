@@ -18,6 +18,7 @@
             <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
             <local:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
             <mvvm:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
+            <mvvm:ValueDisplayConverter x:Key="ValueDisplayConverter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
@@ -149,9 +150,18 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <!-- 给TextBlock绑定双击事件 -->
-                                        <TextBlock Text="{Binding Value}"
-                                                   Background="LightSkyBlue"  />
-                                        <!-- 鼠标悬浮显示手型，提升体验 -->
+                                    <TextBlock 
+                                                   Background="LightSkyBlue"  >
+                                        <TextBlock.Text>
+                                            <!-- 多值绑定：同时传Value和DisplayType给转换器 -->
+                                            <MultiBinding Converter="{StaticResource ValueDisplayConverter}">
+                                                <Binding Path="Value"/>
+                                                <Binding Path="DisplayType"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+
+                                    </TextBlock>
+                                    <!-- 鼠标悬浮显示手型，提升体验 -->
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -225,7 +235,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
-                                                      SelectedItem="{Binding DisplayType, Mode=TwoWay}"
+                                                      SelectedItem="{Binding DisplayType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                       ItemsSource="{Binding DataContext.ModbusSet.DisplayTypeOptions, 
                                                                     RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                                     <!-- 若选项是对象，需指定显示字段 -->
