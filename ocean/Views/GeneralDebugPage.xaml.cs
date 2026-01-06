@@ -69,6 +69,9 @@ namespace ocean.UI
                 newRow["NOffSet"] = 0;
                 newRow["NBit"] = 16;
                 newRow["Coefficient"] = 1;
+                newRow["TransferType"] = "无符号整数";
+                newRow["DisplayType"] = "浮点数";
+
                 _globalVM.ModbusSet.dtm.Rows.Add(newRow);
                 radd = radd + 1;
             }

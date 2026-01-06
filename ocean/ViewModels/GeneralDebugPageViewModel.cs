@@ -112,6 +112,12 @@ namespace ocean.Communication
         public ObservableCollection<string> ProOptions { get; set; } = new ObservableCollection<string>
         { "Modbus RTU协议", "FE协议","Modbus TCP协议" };
 
+        public ObservableCollection<string> TransferTypeOptions { get; set; } = new ObservableCollection<string>
+        { "有符号整数", "无符号整数", "浮点数", "字节流","位数据" };
+
+        public ObservableCollection<string> DisplayTypeOptions { get; set; } = new ObservableCollection<string>
+        { "浮点数", "位数据", "十进制整数", "十六进制整数","字节流","字符串" };
+
 
         // 协议信息集合
         public ObservableCollection<ProtocolInfo> ProtocolList { get; set; } = new ObservableCollection<ProtocolInfo>

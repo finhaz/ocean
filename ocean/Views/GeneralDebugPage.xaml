@@ -200,17 +200,40 @@
                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                 Source={StaticResource ModbusSetProxy}, 
                                                 Converter={StaticResource BoolToVisConverter}}"/>
-                            <DataGridTextColumn Header="传输类型" 
-                                                Binding="{Binding TransferType}" 
+                
+                            <!-- ：选择框列 -->
+                        <DataGridTemplateColumn Header="传输类型" Width="120" 
                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                 Source={StaticResource ModbusSetProxy}, 
-                                                Converter={StaticResource BoolToVisConverter}}"/>
-                            <DataGridTextColumn Header="呈现类型" 
-                                                Binding="{Binding DisplayType}" 
+                                                Converter={StaticResource BoolToVisConverter}}" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox FontSize="10" 
+                                                      SelectedItem="{Binding TransferType, Mode=TwoWay}"
+                                                      ItemsSource="{Binding DataContext.ModbusSet.TransferTypeOptions, 
+                                                                    RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                                    <!-- 若选项是对象，需指定显示字段 -->
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
+                        <!-- ：选择框列 -->
+                        <DataGridTemplateColumn Header="呈现类型" Width="120" 
                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                 Source={StaticResource ModbusSetProxy}, 
-                                                Converter={StaticResource BoolToVisConverter}}"/>
-                            <DataGridTextColumn Header="字节序" 
+                                                Converter={StaticResource BoolToVisConverter}}" >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox FontSize="10" 
+                                                      SelectedItem="{Binding DisplayType, Mode=TwoWay}"
+                                                      ItemsSource="{Binding DataContext.ModbusSet.DisplayTypeOptions, 
+                                                                    RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                                    <!-- 若选项是对象，需指定显示字段 -->
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="字节序" 
                                                 Binding="{Binding ByteOrder}" 
                                                  Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                  Source={StaticResource ModbusSetProxy}, 
