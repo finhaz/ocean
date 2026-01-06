@@ -129,7 +129,7 @@
             </Grid.RowDefinitions>
             <TabControl>
                 <DataGrid x:Name="dataGrodx"
-                                ItemsSource="{Binding ModbusSet.dtm, Mode=TwoWay}"
+                                ItemsSource="{Binding ModbusSet.ModbusDataList, Mode=TwoWay}"
                                 AutoGenerateColumns="False"
                                 CanUserAddRows="False">
                         <!-- 使用Interactivity行为绑定命令（替代传统事件） -->

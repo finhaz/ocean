@@ -59,6 +59,7 @@ namespace ocean.UI
             int rsnum = Int32.Parse(_globalVM.ModbusSet.Snum);
             int i = 0;
             for (i = 0; i < rsnum; i++) {
+                /*
                 // 创建新行并赋值
                 DataRow newRow = _globalVM.ModbusSet.dtm.NewRow();
                 newRow["ID"] = _globalVM.ModbusSet.dtm.Rows.Count + 1;
@@ -69,10 +70,37 @@ namespace ocean.UI
                 newRow["NOffSet"] = 0;
                 newRow["NBit"] = 16;
                 newRow["Coefficient"] = 1;
-                newRow["TransferType"] = "无符号整数";
-                newRow["DisplayType"] = "浮点数";
+                newRow["TransferType"] = _globalVM.ModbusSet.DSelectedTransferType;
+                newRow["DisplayType"] = _globalVM.ModbusSet.DSelectedDisplayType;
 
-                _globalVM.ModbusSet.dtm.Rows.Add(newRow);
+                _globalVM.ModbusSet.dtm.Rows.Add(newRow);*/
+
+                _globalVM.ModbusSet.ModbusDataList.Add(new ModbusDataItem
+                {
+                    ID = _globalVM.ModbusSet.ModbusDataList.Count + 1,
+                    Name = "默认名称",
+                    Value = 0.0, // 默认浮点数
+                    Command = 0.0,
+                    IsButtonClicked = false,
+                    Unit = "",
+                    Rangle = "",
+                    SelectedOption = _globalVM.ModbusSet.DSelectedOption,
+                    Addr = 0,
+                    Number = 0,
+                    NOffSet = 0,
+                    NBit = 0,
+                    Coefficient = 1,
+                    Offset = 0,
+                    DecimalPlaces = 2,
+                    TransferType = _globalVM.ModbusSet.DSelectedTransferType,
+                    DisplayType = _globalVM.ModbusSet.DSelectedDisplayType, // 默认显示类型
+                    ByteOrder = 0,
+                    WordOrder = 0,
+                    IsDrawCurve = false,
+                    IntervalTime = 1000
+                });
+
+
                 radd = radd + 1;
             }
             _globalVM.ModbusSet.Sadd = Convert.ToString(radd);
