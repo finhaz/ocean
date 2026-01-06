@@ -74,6 +74,14 @@ namespace ocean.Communication
             set => SetProperty(ref _proSelectedOption, value);
         }
 
+        // 控制高级列显示/隐藏的布尔属性
+        private bool _isAdvancedColumnsVisible=false;
+        public bool IsAdvancedColumnsVisible
+        {
+            get => _isAdvancedColumnsVisible;
+            set => SetProperty(ref _isAdvancedColumnsVisible, value);
+        }
+
 
 
         private string _intoSelectedOption = "Modbus RTU协议";
@@ -141,7 +149,8 @@ namespace ocean.Communication
         // 新增：全局通讯实例（ViewModel内唯一，与SerialConfigView共用同一个实例）
         // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
         private ICommunication _comm;
-
+        // 切换列显示/隐藏的命令
+        public ICommand ToggleAdvancedColumnsCommand { get; }
 
         public GeneralDebugPageViewModel()
         {
@@ -149,6 +158,13 @@ namespace ocean.Communication
             AddDataTableColumns(dtm);
             ButtonCommand = new RelayCommand(OnButtonClick);
             DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
+
+            // 初始化命令（使用Microsoft.Xaml.Behaviors的DelegateCommand，也可自定义ICommand）
+            ToggleAdvancedColumnsCommand = new DelegateCommand(() =>
+            {
+                // 切换布尔值
+                IsAdvancedColumnsVisible = !IsAdvancedColumnsVisible;
+            });
 
         }
 
@@ -186,7 +202,16 @@ namespace ocean.Communication
             dt.Columns.Add("Addr", typeof(int));
             dt.Columns.Add("Number", typeof(int));
             dt.Columns.Add("NOffSet", typeof(int));
-            dt.Columns.Add("NBit", typeof(int));        
+            dt.Columns.Add("NBit", typeof(int));
+            dt.Columns.Add("Coefficient", typeof(int));
+            dt.Columns.Add("Offset",typeof(int));
+            dt.Columns.Add("DecimalPlaces", typeof(int));
+            dt.Columns.Add("TransferType", typeof(string));
+            dt.Columns.Add("DisplayType", typeof(string));
+            dt.Columns.Add("ByteOrder", typeof(int));
+            dt.Columns.Add("WordOrder", typeof(int));
+            dt.Columns.Add("IsDrawCurve", typeof(bool));
+            dt.Columns.Add("IntervalTime", typeof(int));
         }
 
 

@@ -125,7 +125,7 @@ namespace ocean
             }
             else if (data.COMMAND == 6)
             {
-
+                data.SN = buffer[2]<<8+buffer[3];
             }
 
             return data;

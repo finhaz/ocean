@@ -9,7 +9,14 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="GeneralDebugPage" Unloaded="Page_Unloaded" Loaded="Page_Loaded">
 
+    
+    
     <Grid>
+        <!-- 添加资源：布尔值转可见性的转换器 -->
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+            <vm:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
             <ColumnDefinition Width="100*"/>
@@ -100,6 +107,27 @@
                 <Button Content="取消" Grid.Row="5" Grid.Column="1" 
                         Click="setcancel_click" ></Button>
             </Grid>
+            <!-- 新增的切换按钮 -->
+            <Button 
+                Grid.Row="7" 
+                Grid.ColumnSpan="2"
+                Content="{Binding ModbusSet.IsAdvancedColumnsVisible, 
+                        Converter={StaticResource BoolToVisConverter}, 
+                        ConverterParameter=Invert, 
+                        StringFormat={}{0:显示高级列;隐藏高级列}}"
+                Command="{Binding ModbusSet.ToggleAdvancedColumnsCommand}"
+                Width="120" 
+                Height="25" 
+                HorizontalAlignment="Left" 
+                Margin="10,0,0,0"/>
+            <TextBox                 
+                Grid.Row="8" 
+                Grid.ColumnSpan="2" 
+                Text="{Binding ModbusSet.IsAdvancedColumnsVisible, Converter={StaticResource BoolToVisConverter}}"
+                TextWrapping="Wrap"                    
+                />
+
+
         </Grid>
 
         <Grid  Grid.Column="2">
@@ -150,7 +178,7 @@
                             <DataGridTextColumn Header="单位" Binding="{Binding Unit}"/>
                             <DataGridTextColumn Header="范围" Binding="{Binding Rangle}"/>
                             <!-- ：选择框列 -->
-                            <DataGridTemplateColumn Header="区块" Width="120">
+                            <DataGridTemplateColumn Header="区块" Width="120" >
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox FontSize="10" 
@@ -163,9 +191,54 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
                             <DataGridTextColumn Header="数量" Binding="{Binding Number}"/>
-                            <DataGridTextColumn Header="偏移" Binding="{Binding NOffSet}"/>
+                            <DataGridTextColumn Header="位偏移" Binding="{Binding NOffSet}"/>
                             <DataGridTextColumn Header="位数" Binding="{Binding NBit}"/>
-                        </DataGrid.Columns>
+                            <!-- 以下是需要隐藏/显示的高级列（默认隐藏） -->
+                            <DataGridTextColumn Header="系数" 
+                                                Binding="{Binding Coefficient}" 
+                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                Source={StaticResource ModbusSetProxy}, 
+                                                Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="偏移" 
+                                                Binding="{Binding Offset}" 
+                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                 Source={StaticResource ModbusSetProxy}, 
+                                                 Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="小数位数" 
+                                                Binding="{Binding DecimalPlaces}" 
+                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                Source={StaticResource ModbusSetProxy}, 
+                                                Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="传输类型" 
+                                                Binding="{Binding TransferType}" 
+                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                Source={StaticResource ModbusSetProxy}, 
+                                                Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="呈现类型" 
+                                                Binding="{Binding DisplayType}" 
+                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                Source={StaticResource ModbusSetProxy}, 
+                                                Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="字节序" 
+                                                Binding="{Binding ByteOrder}" 
+                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                 Source={StaticResource ModbusSetProxy}, 
+                                                 Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="字序" 
+                                                Binding="{Binding WordOrder}" 
+                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                 Source={StaticResource ModbusSetProxy}, 
+                                                 Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridCheckBoxColumn Header="是否绘制曲线" Binding="{Binding IsDrawCurve}" 
+                                                     Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                     Source={StaticResource ModbusSetProxy}, 
+                                                     Converter={StaticResource BoolToVisConverter}}"/>
+                            <DataGridTextColumn Header="间隔时间（ms）" 
+                                                Binding="{Binding IntervalTime}" 
+                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                                                Source={StaticResource ModbusSetProxy}, 
+                                                Converter={StaticResource BoolToVisConverter}}"/>
+                    </DataGrid.Columns>
                 </DataGrid>
             </TabControl>
             <TextBox TextWrapping="Wrap" 
