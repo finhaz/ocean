@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:vm="clr-namespace:ocean.ViewModels" 
+      xmlns:local="clr-namespace:ocean.ViewModels"
+      xmlns:mvvm="clr-namespace:ocean.Mvvm"
       xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -15,7 +16,8 @@
         <!-- 添加资源：布尔值转可见性的转换器 -->
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
-            <vm:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
+            <local:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
+            <mvvm:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
@@ -68,6 +70,13 @@
             <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
             <Button Content="导出配置" Grid.Row="3" Grid.ColumnSpan="2" Click="ExportConfig_Click"/>
             <Button Content="导入配置" Grid.Row="4" Grid.ColumnSpan="2" Click="ImportConfig_Click"/>
+                        <!-- 新增的切换按钮 -->
+            <Button 
+                Grid.Row="5" 
+                Grid.ColumnSpan="2"
+                Content="{Binding ModbusSet.IsAdvancedColumnsVisible, 
+                          Converter={StaticResource BoolToButtonTextConverter}}"
+                Command="{Binding ModbusSet.ToggleAdvancedColumnsCommand}"/>
             <Grid Name="Setadd" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20*"/>
@@ -107,25 +116,7 @@
                 <Button Content="取消" Grid.Row="5" Grid.Column="1" 
                         Click="setcancel_click" ></Button>
             </Grid>
-            <!-- 新增的切换按钮 -->
-            <Button 
-                Grid.Row="7" 
-                Grid.ColumnSpan="2"
-                Content="{Binding ModbusSet.IsAdvancedColumnsVisible, 
-                        Converter={StaticResource BoolToVisConverter}, 
-                        ConverterParameter=Invert, 
-                        StringFormat={}{0:显示高级列;隐藏高级列}}"
-                Command="{Binding ModbusSet.ToggleAdvancedColumnsCommand}"
-                Width="120" 
-                Height="25" 
-                HorizontalAlignment="Left" 
-                Margin="10,0,0,0"/>
-            <TextBox                 
-                Grid.Row="8" 
-                Grid.ColumnSpan="2" 
-                Text="{Binding ModbusSet.IsAdvancedColumnsVisible, Converter={StaticResource BoolToVisConverter}}"
-                TextWrapping="Wrap"                    
-                />
+
 
 
         </Grid>
@@ -170,7 +161,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="写" 
-                                        Command="{Binding Source={x:Static vm:AppViewModel.Instance}, Path=ModbusSet.ButtonCommand}"
+                                        Command="{Binding Source={x:Static local:AppViewModel.Instance}, Path=ModbusSet.ButtonCommand}"
                                         CommandParameter="{Binding}"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
