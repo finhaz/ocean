@@ -85,7 +85,16 @@ namespace ocean.ViewModels
         public string SelectedOption
         {
             get => _selectedOption;
-            set => SetProperty(ref _selectedOption, value);
+            //set => SetProperty(ref _selectedOption, value);
+            set
+            {
+                // 核心逻辑：_selectedOption，调整状态
+                if (SetProperty(ref _selectedOption, value))
+                {
+                    
+                    ConvertValueBySelectedOption();
+                }
+            }
         }
 
         public int Addr
@@ -219,13 +228,12 @@ namespace ocean.ViewModels
             catch (Exception)
             {
                 // 转换失败时设默认值
-                Value = DisplayType == "整形数" ? 0 : 0.0;
+                Value = DisplayType == "浮点数" ? 0.0 : 0;
             }
         }
 
         private void ConvertValueByCoefficient()
         {
-
             // 先判断是否为数值类型
             if (RValue is int || RValue is float || RValue is double || RValue is decimal)
             {
@@ -234,6 +242,38 @@ namespace ocean.ViewModels
                 //Console.WriteLine($"计算结果：{Value}");
             }
 
+        }
+
+
+        private void ConvertValueBySelectedOption()
+        {
+            if (Value == null)
+            {
+                Value = DisplayType == "十进制整数" ? 0 : 0.0;
+                return;
+            }
+
+            try
+            {
+                switch (SelectedOption)
+                {
+                    case "线圈状态(RW)":
+                    case "离散输入(RO)":
+                        DisplayType = " 十进制整数";
+                        break;
+                    case "保持寄存器(RW)":
+                    case "输入寄存器(RO)":
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+            catch (Exception)
+            {
+                // 转换失败时设默认值
+                Value = DisplayType == "浮点数" ? 0.0 : 0;
+            }
         }
     }
 }
