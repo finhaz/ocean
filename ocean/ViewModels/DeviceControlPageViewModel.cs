@@ -137,7 +137,7 @@ namespace ocean.Communication
                 {
                     sn = 0;
                 }
-                send_num = _currentProtocol.MonitorGet(sendbf, sn,runnum);
+                send_num = _currentProtocol.MonitorGet(sendbf, sn,1);
                 sn = sn + 1;
                 // 共用同一个通讯实例发送
                 _comm.Send(sendbf, 0, send_num);
@@ -180,17 +180,14 @@ namespace ocean.Communication
             if (check_result == 1)
             {
                 DataR datax= new DataR();
+                datax = _currentProtocol.MonitorSolve(buffer, sn - 1);
                 if (datax.RWX == 1)
-                {
-                    datax = _currentProtocol.MonitorSolve(buffer, sn - 1);
-                    if (datax.SN < 44)
+                {                   
+                    // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
+                    UiDispatcherHelper.ExecuteOnUiThread(() =>
                     {
-                        // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
-                        UiDispatcherHelper.ExecuteOnUiThread(() =>
-                        {
-                            Dtrun.Rows[datax.SN][5] = datax.VALUE;
-                        });
-                    }
+                        Dtrun.Rows[datax.SN][5] = datax.VALUE;
+                    });                   
                 }
             }
             else
@@ -462,7 +459,7 @@ namespace ocean.Communication
                 Dtrun = _dbOperation.GetDBTable("PARAMETER_RUN");
                 Dtset = _dbOperation.GetDBTable("PARAMETER_SET");
                 Dtfactor = _dbOperation.GetDBTable("PARAMETER_FACTOR");
-
+                runnum = Dtrun.Rows.Count;
                 MessageBox.Show("数据表读取成功！");
             }
             catch (Exception ex)
