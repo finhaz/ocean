@@ -8,209 +8,207 @@ using System.Threading.Tasks;
 
 namespace ocean.Communication
 {
-    /// <summary>
-    /// Modbus TCP实现类（完全仿照COMModbus的函数名/结构）
-    /// </summary>
     public class TCPModbus : IProtocol
     {
-        byte[] revbuffer = new byte[256];
+        // 接收缓冲区（适配TCP响应长度）
+        private readonly byte[] _revBuffer = new byte[512];
 
-        // 单例模式（和COMModbus完全一致）
+        // 单例模式（与串口版一致）
         private TCPModbus() { }
         private static readonly Lazy<TCPModbus> _instance = new Lazy<TCPModbus>(() => new TCPModbus());
         public static TCPModbus Instance => _instance.Value;
 
+        #region 核心方法：构建标准Modbus TCP报文
         /// <summary>
-        /// 构建Modbus TCP 03功能码（读取保持寄存器）请求报文
+        /// 构建MBAP报文头（严格遵循Modbus TCP标准，适配用户示例格式）
         /// </summary>
-        /// <param name="sendbf">发送缓冲区</param>
-        /// <param name="sn">寄存器起始地址</param>
-        /// <param name="num">读取寄存器数量</param>
-        public void Monitor_Get_03(byte[] sendbf, int sn, int num)
+        /// <param name="transactionId">事务ID（默认0000）</param>
+        /// <param name="unitId">单元ID（从站地址，默认01）</param>
+        /// <param name="dataLength">功能码+后续数据的总长度</param>
+        /// <returns>7字节MBAP头</returns>
+        private byte[] BuildMBAPHeader(ushort transactionId = 0x0000, byte unitId = 0x01, ushort dataLength = 0x0000)
         {
-            Array.Clear(sendbf, 0, sendbf.Length);
-
-            // --------------------- MBAP头（6字节）---------------------
-            sendbf[0] = 0x00;        // Transaction ID高字节（固定0x0001，自定义）
-            sendbf[1] = 0x01;        // Transaction ID低字节
-            sendbf[2] = 0x00;        // Protocol ID高字节（固定0x0000）
-            sendbf[3] = 0x00;        // Protocol ID低字节
-            sendbf[4] = 0x00;        // Length高字节（后续字节数：UnitID(1)+功能码数据(5)=6 → 0x0006）
-            sendbf[5] = 0x06;        // Length低字节
-            sendbf[6] = 0x01;        // Unit ID（从站地址，对应RTU的slaveId）
-
-            // --------------------- 03功能码数据（5字节）---------------------
-            sendbf[7] = 0x03;        // 功能码03
-                                     // 寄存器地址（大端序）
-            byte[] temp_i = BitConverter.GetBytes(sn);
-            sendbf[8] = temp_i[1];   // 高字节
-            sendbf[9] = temp_i[0];   // 低字节
-                                     // 读取寄存器数量（大端序）
-            temp_i = BitConverter.GetBytes(num);
-            sendbf[10] = temp_i[1];  // 高字节
-            sendbf[11] = temp_i[0];  // 低字节
-
-            // TCP无CRC，无需计算CRC
+            var mbap = new byte[7];
+            // 1. 事务ID（2字节，大端序，默认0000）
+            var transBytes = BitConverter.GetBytes(transactionId);
+            Array.Reverse(transBytes);
+            mbap[0] = transBytes[0];
+            mbap[1] = transBytes[1];
+            // 2. 协议ID（2字节，固定0000）
+            mbap[2] = 0x00;
+            mbap[3] = 0x00;
+            // 3. 长度（2字节，大端序：= 单元ID后的字节数 = 功能码+数据长度）
+            var lenBytes = BitConverter.GetBytes(dataLength);
+            Array.Reverse(lenBytes);
+            mbap[4] = lenBytes[0];
+            mbap[5] = lenBytes[1];
+            // 4. 单元ID（1字节，从站地址）
+            mbap[6] = unitId;
+            return mbap;
         }
 
         /// <summary>
-        /// 构建Modbus TCP 06功能码（写入单个寄存器）请求报文
+        /// 转换short为大端序字节数组（Modbus标准）
         /// </summary>
-        /// <param name="sendbf">发送缓冲区</param>
-        /// <param name="sn">寄存器地址</param>
-        /// <param name="send_value">写入值（浮点转短整型）</param>
-        public void Monitor_Set_06(byte[] sendbf, int sn, float send_value)
+        private byte[] ToBigEndianBytes(short value)
         {
-            Array.Clear(sendbf, 0, sendbf.Length);
-            Int16 svalue = (short)send_value;
-
-            // --------------------- MBAP头（6字节）---------------------
-            sendbf[0] = 0x00;        // Transaction ID高字节
-            sendbf[1] = 0x01;        // Transaction ID低字节
-            sendbf[2] = 0x00;        // Protocol ID高字节
-            sendbf[3] = 0x00;        // Protocol ID低字节
-            sendbf[4] = 0x00;        // Length高字节（UnitID(1)+功能码数据(5)=6 → 0x0006）
-            sendbf[5] = 0x06;        // Length低字节
-            sendbf[6] = 0x01;        // Unit ID
-
-            // --------------------- 06功能码数据（5字节）---------------------
-            sendbf[7] = 0x06;        // 功能码06
-                                     // 寄存器地址（大端序）
-            byte[] temp_i = BitConverter.GetBytes(sn);
-            sendbf[8] = temp_i[1];   // 高字节
-            sendbf[9] = temp_i[0];   // 低字节
-                                     // 写入值（大端序）
-            temp_i = BitConverter.GetBytes(svalue);
-            sendbf[10] = temp_i[1];  // 高字节
-            sendbf[11] = temp_i[0];  // 低字节
-
-            // TCP无CRC，无需计算CRC
+            var bytes = BitConverter.GetBytes(value);
+            Array.Reverse(bytes);
+            return bytes;
         }
 
         /// <summary>
-        /// 构建Modbus TCP 06功能码（运行/停止控制）请求报文
+        /// 转换int为大端序字节数组（Modbus标准）
         /// </summary>
-        /// <param name="sendbf">发送缓冲区</param>
-        /// <param name="machine">从站地址</param>
-        /// <param name="adr">寄存器地址</param>
-        /// <param name="brun">运行/停止</param>
-        public void Monitor_Run(byte[] sendbf, byte machine, int adr, bool brun)
+        private byte[] ToBigEndianBytes(int value)
         {
-            Array.Clear(sendbf, 0, sendbf.Length);
-
-            // --------------------- MBAP头（6字节）---------------------
-            sendbf[0] = 0x00;        // Transaction ID高字节
-            sendbf[1] = 0x01;        // Transaction ID低字节
-            sendbf[2] = 0x00;        // Protocol ID高字节
-            sendbf[3] = 0x00;        // Protocol ID低字节
-            sendbf[4] = 0x00;        // Length高字节（UnitID(1)+功能码数据(5)=6 → 0x0006）
-            sendbf[5] = 0x06;        // Length低字节
-            sendbf[6] = machine;     // Unit ID（传入的从站地址）
-
-            // --------------------- 06功能码数据（5字节）---------------------
-            sendbf[7] = 0x06;        // 功能码06
-                                     // 寄存器地址（大端序）
-            byte[] temp_i = BitConverter.GetBytes(adr);
-            sendbf[8] = temp_i[1];   // 高字节
-            sendbf[9] = temp_i[0];   // 低字节
-                                     // 控制值（0xaa/0x55，大端序）
-            sendbf[10] = 0x00;       // 高字节固定0x00
-            sendbf[11] = brun ? (byte)0xaa : (byte)0x55; // 低字节
-
-            // TCP无CRC，无需计算CRC
+            var bytes = BitConverter.GetBytes((ushort)value); // 数量最大支持65535，转ushort
+            Array.Reverse(bytes);
+            return bytes;
         }
+        #endregion
 
-        /// <summary>
-        /// Modbus TCP报文校验（替代RTU的CRC校验）
-        /// 校验逻辑：MBAP头合法 + 长度匹配 + 功能码合法
-        /// </summary>
-        /// <param name="buffer">接收缓冲区</param>
-        /// <param name="len">接收长度</param>
-        /// <returns>0x01=校验通过，0x03=校验失败</returns>
-        public int Monitor_check(byte[] buffer, int len)
-        {
-            // 1. 最小长度校验：MBAP头(6) + 功能码(1) + 至少1字节数据 = 8字节
-            if (len < 8) return 0x03;
-
-            // 2. 校验Protocol ID（必须为0x0000）
-            if (buffer[2] != 0x00 || buffer[3] != 0x00) return 0x03;
-
-            // 3. 校验Length字段（Length = 总长度 - 6，因为Length是MBAP头后的数据长度）
-            int lengthField = (buffer[4] << 8) | buffer[5];
-            if (lengthField != len - 6) return 0x03;
-
-            // 4. 校验功能码（仅支持03/06，可扩展）
-            byte funcCode = buffer[7];
-            if (funcCode != 0x03 && funcCode != 0x06) return 0x03;
-
-            // 所有校验通过
-            return 0x01;
-        }
-
-        /// <summary>
-        /// Modbus TCP响应报文解析（跳过MBAP头，解析功能码和数据）
-        /// </summary>
-        /// <param name="buffer">接收缓冲区</param>
-        /// <param name="Readpos">寄存器起始地址</param>
-        /// <returns>解析后的数据</returns>
-        public DataR Monitor_Solve(byte[] buffer, int Readpos)
-        {
-            DataR data = new DataR();
-            data.COMMAND = buffer[7];  // 跳过MBAP头(6字节)，功能码在第7位（索引7）
-            data.SN = Readpos;
-
-            // 解析03功能码响应（读取保持寄存器）
-            if (data.COMMAND == 0x03)
-            {
-                // 03响应结构：MBAP(6) + 功能码(1) + 字节数(1) + 寄存器数据(N*2)
-                byte byteCount = buffer[8];  // 数据字节数
-                byte[] typeBytes = new byte[byteCount];
-                Array.Copy(buffer, 9, typeBytes, 0, byteCount); // 从第9位开始拷贝数据
-                Array.Reverse(typeBytes);                       // 大端序转小端序
-                data.VALUE = BitConverter.ToInt16(typeBytes, 0);
-            }
-            // 06功能码响应无需解析数据（仅确认写入成功）
-            else if (data.COMMAND == 0x06)
-            {
-                // 可扩展：解析06响应的寄存器地址和写入值
-            }
-
-            return data;
-        }
-
-        // --------------------- 以下为IProtocol接口实现（和COMModbus完全一致）---------------------
+        #region IProtocol接口实现（严格匹配串口版逻辑，仅适配TCP格式）
         public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
         {
-            this.Monitor_Run(sendbf, 1, addr, brun);
-            return 12; // TCP 06功能码报文长度为12字节（MBAP6 + 数据6）
+            var order = brun ? 0xaa : 0x55;
+            MonitorSet(sendbf, addr, order);
+            // TCP发送长度：MBAP(7) + 数据段(6) = 13字节？不，用户示例是12字节，需按实际数据段长度计算
+            return 12; // 动态返回有效字节长度
         }
 
         public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null)
         {
-            this.Monitor_Set_06(sendbf, tempsn, (float)value);
-            return 12; // TCP 06功能码报文长度为12字节
+            // 1. 确定功能码（与串口版一致）
+            byte functionCode = regtype switch
+            {
+                "线圈状态(RW)" => 0x05,
+                "离散输入(RO)" => 0x02,
+                "保持寄存器(RW)" => 0x06,
+                "输入寄存器(RO)" => 0x04,
+                _ => 0x06
+            };
+
+            if (functionCode != 0x05 && functionCode != 0x06)
+                throw new ArgumentException("仅支持05(强制单线圈)和06(预置单寄存器)功能码");
+
+            // 2. 处理写入值（与串口版一致）
+            var sendValue = Convert.ToSingle(value);
+            short svalue = (short)sendValue;
+            if (functionCode == 0x05)
+                svalue = svalue != 0 ? unchecked((short)0xFF00) : (short)0x0000; // 还原0xFF00，用unchecked避免编译错误
+
+            // 3. 构建数据段（6字节：从站地址+功能码+地址+值）
+            var dataSegment = new byte[6];
+            dataSegment[0] = 0x01; // 从站地址（单元ID）
+            dataSegment[1] = functionCode; // 功能码
+            Array.Copy(ToBigEndianBytes((short)tempsn), 0, dataSegment, 2, 2); // 地址（大端序）
+            Array.Copy(ToBigEndianBytes(svalue), 0, dataSegment, 4, 2); // 写入值（大端序）
+
+            // 4. 构建MBAP头（长度字段=数据段长度6字节，因数据段已包含单元ID）
+            var mbapHeader = BuildMBAPHeader(0x0000, 0x01, 0x0006); // 事务ID=0000，长度=06
+
+            // 5. 拼接最终报文（MBAP头7字节 + 数据段6字节？不，用户示例是12字节，说明MBAP头实际是6字节，移除单元ID重复）
+            // 适配用户示例格式：MBAP(6字节：事务ID+协议ID+长度) + 数据段(6字节：单元ID+功能码+地址+值)
+            Array.Copy(mbapHeader, 0, sendbf, 0, 6); // 取MBAP前6字节（跳过单元ID，因数据段已包含）
+            Array.Copy(dataSegment, 0, sendbf, 6, 6); // 数据段6字节（含单元ID）
+
+            // 清空后续冗余字节
+            Array.Clear(sendbf, 12, sendbf.Length - 12);
+
+            return 12; // 总长度12字节（匹配用户示例格式）
         }
 
         public int MonitorGet(byte[] sendbf, int tempsn, object num = null, object regtype = null)
         {
-            this.Monitor_Get_03(sendbf, tempsn, 1);
-            return 12; // TCP 03功能码报文长度为12字节
+            // 1. 确定功能码（与串口版一致）
+            byte functionCode = regtype switch
+            {
+                "线圈状态(RW)" => 0x01,
+                "离散输入(RO)" => 0x02,
+                "保持寄存器(RW)" => 0x03,
+                "输入寄存器(RO)" => 0x04,
+                _ => 0x03
+            };
+
+            if (functionCode is not (0x01 or 0x02 or 0x03 or 0x04))
+                throw new ArgumentException("仅支持01(线圈)/02(离散输入)/03(保持寄存器)/04(输入寄存器)功能码");
+
+            // 2. 处理读取参数
+            int readNum = Convert.ToInt32(num);
+            if (readNum < 1 || readNum > 65535)
+                throw new ArgumentOutOfRangeException(nameof(num), "读取数量范围：1-65535");
+
+            // 3. 构建数据段（6字节：单元ID+功能码+起始地址+读取数量）
+            var dataSegment = new byte[6];
+            dataSegment[0] = 0x01; // 单元ID（从站地址）
+            dataSegment[1] = functionCode; // 功能码
+            Array.Copy(ToBigEndianBytes((short)tempsn), 0, dataSegment, 2, 2); // 起始地址（大端序）
+            Array.Copy(ToBigEndianBytes(readNum), 0, dataSegment, 4, 2); // 读取数量（大端序）
+
+            // 4. 构建MBAP头（适配用户示例：长度字段=6字节，对应数据段长度）
+            var mbapHeader = BuildMBAPHeader(0x0000, 0x01, 0x0006);
+
+            // 5. 拼接报文（MBAP前6字节 + 数据段6字节 = 12字节，匹配用户示例）
+            Array.Copy(mbapHeader, 0, sendbf, 0, 6);
+            Array.Copy(dataSegment, 0, sendbf, 6, 6);
+            Array.Clear(sendbf, 12, sendbf.Length - 12);
+
+            // 示例验证：当functionCode=0x03、tempsn=0、readNum=1时，报文为：
+            // 00 00 00 00 00 06 01 03 00 00 00 01 → 完全匹配用户期望格式
+            return 12;
         }
 
         public int MonitorCheck(byte[] buffer, object len = null)
         {
-            return this.Monitor_check(buffer, (int)len);
+            int responseLen = Convert.ToInt32(len);
+            // 最小合法响应长度：MBAP(6) + 功能码(1) = 7字节
+            if (responseLen < 7) return 0x03;
+
+            // 检查协议ID（必须为0000）
+            ushort protocolId = BitConverter.ToUInt16(new[] { buffer[3], buffer[2] }, 0);
+            if (protocolId != 0x0000) return 0x03;
+
+            // 检查功能码（异常响应：功能码最高位=1）
+            byte functionCode = buffer[7]; // 功能码在第8字节（索引7）
+            if ((functionCode & 0x80) != 0) return 0x02; // 异常响应
+
+            return 0x01; // 校验通过
         }
 
         public DataR MonitorSolve(byte[] buffer, object Readpos = null)
         {
-            return this.Monitor_Solve(buffer, (int)Readpos);
-        }
+            var data = new DataR();
+            int dataOffset = 6; // 跳过MBAP前6字节，从第7字节开始解析
 
-        // 原RTU的CRC方法保留（空实现，避免调用报错）
-        public UInt16 crc16_ccitt(byte[] data, int len, UInt16 StartIndex)
-        {
-            return 0; // TCP无需CRC，返回0即可
+            // 功能码（数据段第2字节，索引6+1=7）
+            data.COMMAND = buffer[dataOffset + 1];
+            data.SN = Convert.ToInt32(Readpos);
+
+            switch (data.COMMAND)
+            {
+                case 0x01: // 读线圈
+                case 0x02: // 读离散输入
+                    data.VALUE = buffer[dataOffset + 2]; // 数据从第9字节开始（索引8）
+                    data.RWX = 1;
+                    break;
+                case 0x03: // 读保持寄存器
+                case 0x04: // 读输入寄存器
+                           // 数据长度字节（索引8）+ 寄存器值（大端序）
+                    int byteCount = buffer[dataOffset + 2];
+                    var valueBytes = buffer.Skip(dataOffset + 3).Take(byteCount).ToArray();
+                    Array.Reverse(valueBytes); // 转小端序适配C#
+                    data.VALUE = BitConverter.ToInt16(valueBytes, 0);
+                    data.RWX = 1;
+                    break;
+                default: // 异常响应
+                    data.SN = (buffer[dataOffset + 2] << 8) | buffer[dataOffset + 3];
+                    data.RWX = 0;
+                    break;
+            }
+
+            return data;
         }
+        #endregion
     }
 }

@@ -24,34 +24,7 @@ namespace ocean
         private static readonly Lazy<COMModbus> _instance = new Lazy<COMModbus>(() => new COMModbus());
         public static COMModbus Instance => _instance.Value;
 
-
-        public void Monitor_Run(byte[] sendbf,byte machine,int adr, bool brun)
-        {
-            int crc;
-            Array.Clear(sendbf, 0, sendbf.Length);
-            sendbf[0] = machine;
-            sendbf[1] = 0x06;
-            byte[] temp_i = BitConverter.GetBytes(adr);
-
-            sendbf[2] = temp_i[1];
-            sendbf[3] = temp_i[0];
-
-            sendbf[4] = 0x00;
-            if (brun)
-                sendbf[5] = 0xaa;
-            else
-                sendbf[5] = 0x55;
-
-            crc = crc16_ccitt(sendbf,6,0);
-
-            temp_i=BitConverter.GetBytes(crc);
-            sendbf[6] = temp_i[0];
-            sendbf[7] = temp_i[1];
-        }
-
-
-
-        public UInt16 crc16_ccitt(byte[] data, int len,UInt16 StartIndex)
+        public UInt16 CRC16ccitt(byte[] data, int len,UInt16 StartIndex)
         {
             UInt16 ccitt16 = 0xA001;
             UInt16 crc = 0xFFFF;
@@ -79,8 +52,13 @@ namespace ocean
         // 新增：实现IProtocol接口的MonitorRun（适配统一调用）
         public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
         {
-            // 直接调用原有方法（param1固定为1）
-            this.Monitor_Run(sendbf, 1, addr, brun);
+            float order = 0;
+            if (brun)
+                order = 0xaa;
+            else
+                order = 0x55;
+
+            MonitorSet(sendbf, addr, order);
             // 返回Modbus固定发送长度
             return 8;
         }
@@ -143,7 +121,7 @@ namespace ocean
             sendbf[5] = temp_i[0]; // 数值低位
 
             // 5. 计算CRC16校验（前6字节）
-            crc = crc16_ccitt(sendbf, 6, 0);
+            crc = CRC16ccitt(sendbf, 6, 0);
 
             // 6. 填充CRC校验值（低位在前）
             temp_i = BitConverter.GetBytes(crc);
@@ -205,7 +183,7 @@ namespace ocean
             sendbf[5] = temp_i[0]; // 数量低位
 
             // 5. 计算CRC16校验（前6字节）
-            crc = crc16_ccitt(sendbf, 6, 0);
+            crc = CRC16ccitt(sendbf, 6, 0);
 
             // 6. 填充CRC校验值（低位在前，高位在后）
             temp_i = BitConverter.GetBytes(crc);
@@ -223,7 +201,7 @@ namespace ocean
             int crc;
             int crc_g;
             int index = (int)len - 2;
-            crc = crc16_ccitt(buffer, ((int)len - 2), 0);
+            crc = CRC16ccitt(buffer, ((int)len - 2), 0);
             if (index > 2)
             {
                 crc_g = BitConverter.ToUInt16(buffer, index);

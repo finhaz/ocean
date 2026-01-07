@@ -180,14 +180,17 @@ namespace ocean.Communication
             if (check_result == 1)
             {
                 DataR datax= new DataR();
-                datax = _currentProtocol.MonitorSolve(buffer, sn-1);
-                if (datax.SN < 44)
+                if (datax.RWX == 1)
                 {
-                    // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
-                    UiDispatcherHelper.ExecuteOnUiThread(() =>
+                    datax = _currentProtocol.MonitorSolve(buffer, sn - 1);
+                    if (datax.SN < 44)
                     {
-                        Dtrun.Rows[datax.SN][5] = datax.VALUE;
-                    });
+                        // 抽取UI更新逻辑，减少冗余注释（注释可统一放方法/常量处）
+                        UiDispatcherHelper.ExecuteOnUiThread(() =>
+                        {
+                            Dtrun.Rows[datax.SN][5] = datax.VALUE;
+                        });
+                    }
                 }
             }
             else
