@@ -183,7 +183,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox FontSize="10" 
-                                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                                  SelectedItem="{Binding SelectedOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                   ItemsSource="{Binding DataContext.ModbusSet.Options, 
                               RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                                         <!-- 若选项是对象，需指定显示字段 -->

@@ -24,49 +24,6 @@ namespace ocean
         private static readonly Lazy<COMModbus> _instance = new Lazy<COMModbus>(() => new COMModbus());
         public static COMModbus Instance => _instance.Value;
 
-        public void Monitor_Get_03(byte[] sendbf,int sn,int num)
-        {
-            int crc;
-            Array.Clear(sendbf, 0, sendbf.Length);
-            sendbf[0] = 0x01;
-            sendbf[1] = 0x03;
-            //寄存器地址
-            byte[] temp_i = BitConverter.GetBytes(sn);            
-            sendbf[2] = temp_i[1];
-            sendbf[3] = temp_i[0];
-            //读取数据个数
-            temp_i = BitConverter.GetBytes(num);
-            sendbf[4] = temp_i[1]; 
-            sendbf[5] = temp_i[0];
-
-            crc = crc16_ccitt(sendbf, 6,0);
-
-            temp_i = BitConverter.GetBytes(crc);
-            sendbf[6] = temp_i[0];
-            sendbf[7] = temp_i[1];
-        }
-
-        public void Monitor_Set_06(byte[] sendbf, int sn, float send_value)
-        {
-            int crc = 0;
-            Int16 svalue = (short)send_value;
-            Array.Clear(sendbf, 0, sendbf.Length);
-            sendbf[0] = 0x01;
-            sendbf[1] = 0x06;
-            //寄存器地址
-            byte[] temp_i = BitConverter.GetBytes(sn);
-            sendbf[2] = temp_i[1];
-            sendbf[3] = temp_i[0];
-
-            temp_i = BitConverter.GetBytes(svalue);
-            sendbf[4] = temp_i[1];
-            sendbf[5] = temp_i[0];
-            crc = crc16_ccitt(sendbf, 6,0);
-
-            temp_i = BitConverter.GetBytes(crc);
-            sendbf[6] = temp_i[0];
-            sendbf[7] = temp_i[1];
-        }
 
         public void Monitor_Run(byte[] sendbf,byte machine,int adr, bool brun)
         {
@@ -92,44 +49,6 @@ namespace ocean
             sendbf[7] = temp_i[1];
         }
 
-
-        public int Monitor_check(byte[] buffer,int len)
-        {
-            int crc;
-            int crc_g;
-            int index = len - 2;
-            crc = crc16_ccitt(buffer, (len-2), 0);
-            if (index > 2)
-            {
-                crc_g = BitConverter.ToUInt16(buffer, index);
-                if (crc_g == crc)
-                    return 0X01;               
-            }
-            return 0X03;     
-        }
-
-
-
-        public DataR Monitor_Solve(byte[] buffer, int Readpos)
-        {
-            DataR data=new DataR();
-            data.COMMAND = buffer[1];
-            data.SN = Readpos;
-
-            if (data.COMMAND == 3)
-            {
-                byte[] typeBytes = new byte[buffer[2]];
-                Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
-                Array.Reverse(typeBytes);
-                data.VALUE = BitConverter.ToInt16(typeBytes, 0);
-            }
-            else if (data.COMMAND == 6)
-            {
-                data.SN = buffer[2]<<8+buffer[3];
-            }
-
-            return data;
-        }
 
 
         public UInt16 crc16_ccitt(byte[] data, int len,UInt16 StartIndex)
@@ -167,10 +86,72 @@ namespace ocean
         }
 
         // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
-        public int MonitorSet(byte[] sendbf, int tempsn, object value = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null,object regtype = null)
         {
-            // 直接调用原有方法
-            this.Monitor_Set_06(sendbf, tempsn, (float)value);
+            byte functionCode = 0;
+            switch (regtype)
+            {
+                case "线圈状态(RW)":
+                    functionCode = 0x05;
+                    break;
+                case "离散输入(RO)":
+                    functionCode = 0x02;
+                    break;
+                case "保持寄存器(RW)":
+                    functionCode = 0x06;
+                    break;
+                case "输入寄存器(RO)":
+                    functionCode = 0x04;
+                    break;
+                default:
+                    functionCode = 0x06;
+                    break;
+            }
+
+            // 校验功能码合法性
+            if (functionCode != 0x05 && functionCode != 0x06)
+            {
+                throw new ArgumentException("仅支持05(强制单线圈)和06(预置单寄存器)功能码");
+            }
+
+            int crc = 0;
+            float send_value=(float)value;
+            Int16 svalue = (short)send_value; // 转换为16位短整型
+            Array.Clear(sendbf, 0, sendbf.Length);
+
+            // 1. 从站地址
+            sendbf[0] = 0x01;
+            // 2. 功能码（动态传入）
+            sendbf[1] = functionCode;
+
+            // 3. 操作地址（线圈/寄存器地址，高位在前）
+            byte[] temp_i = BitConverter.GetBytes(tempsn);
+            sendbf[2] = temp_i[1]; // 地址高位
+            sendbf[3] = temp_i[0]; // 地址低位
+
+            // 4. 写入数值（适配05/06的差异）
+            
+            if (functionCode == 0x05)
+            {
+                // 05功能码：线圈值固定为0xFF00(置1)或0x0000(置0)
+                //svalue = svalue != 0 ? unchecked((short)0xFF00) : (short)0x0000;
+                svalue = svalue != 0 ? (short)-256 : (short)0x0000;
+            }
+            
+            temp_i = BitConverter.GetBytes(svalue);
+            sendbf[4] = temp_i[1]; // 数值高位
+            sendbf[5] = temp_i[0]; // 数值低位
+
+            // 5. 计算CRC16校验（前6字节）
+            crc = crc16_ccitt(sendbf, 6, 0);
+
+            // 6. 填充CRC校验值（低位在前）
+            temp_i = BitConverter.GetBytes(crc);
+            sendbf[6] = temp_i[0]; // CRC低位
+            sendbf[7] = temp_i[1]; // CRC高位
+
+
+
             // 返回Modbus固定发送长度
             return 8;
         }
@@ -183,16 +164,25 @@ namespace ocean
                 case "线圈状态(RW)":
                     functionCode = 0x01;
                     break;
+                case "离散输入(RO)":
+                    functionCode = 0x02;
+                    break;
                 case "保持寄存器(RW)":
-                    //this.Monitor_Get_03(sendbf, tempsn, 1);
+                    functionCode = 0x03;
+                    break;
+                case "输入寄存器(RO)":
+                    functionCode = 0x04;
+                    break;
+                default:
                     functionCode = 0x03;
                     break;
             }
 
-            // 校验功能码合法性（可选，避免传入错误功能码）
-            if (functionCode != 0x01 && functionCode != 0x03)
+            // 校验功能码合法性（支持01/02/03/04）
+            if (functionCode != 0x01 && functionCode != 0x02 &&
+                functionCode != 0x03 && functionCode != 0x04)
             {
-                throw new ArgumentException("仅支持01（读取线圈）和03（读取保持寄存器）功能码");
+                throw new ArgumentException("仅支持01(线圈)/02(离散输入)/03(保持寄存器)/04(输入寄存器)功能码");
             }
 
             int crc;
@@ -210,7 +200,7 @@ namespace ocean
             sendbf[3] = temp_i[0]; // 地址低位
 
             // 4. 读取数量（2字节，高位在前）
-            temp_i = BitConverter.GetBytes((bool)num);
+            temp_i = BitConverter.GetBytes((int)num);
             sendbf[4] = temp_i[1]; // 数量高位
             sendbf[5] = temp_i[0]; // 数量低位
 
@@ -229,15 +219,54 @@ namespace ocean
 
         public int MonitorCheck(byte[] buffer, object len = null)
         {
-            int CheckResult = 0;
-            CheckResult = this.Monitor_check(buffer,(int)len);
-            return CheckResult;
+
+            int crc;
+            int crc_g;
+            int index = (int)len - 2;
+            crc = crc16_ccitt(buffer, ((int)len - 2), 0);
+            if (index > 2)
+            {
+                crc_g = BitConverter.ToUInt16(buffer, index);
+                if (crc_g == crc)
+                    return 0X01;
+            }
+            return 0X03;
         }
 
         public DataR MonitorSolve(byte[] buffer, object Readpos = null)
         {
             DataR data = new DataR();
-            data = this.Monitor_Solve(buffer, (int)Readpos);
+            data.COMMAND = buffer[1];
+            data.SN = (int)Readpos;
+            byte[] typeBytes = new byte[buffer[2]];
+            switch (data.COMMAND)
+            {
+                case 0x01:
+                    data.VALUE = buffer[3];
+                    data.RWX = 1;
+                    break;
+                case 0x02:
+                    data.VALUE = buffer[3];
+                    data.RWX = 1;
+                    break;
+                case 0x03:
+                    Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
+                    Array.Reverse(typeBytes);
+                    data.VALUE = BitConverter.ToInt16(typeBytes, 0);
+                    data.RWX = 1;
+                    break;
+                case 0x04:
+                    Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
+                    Array.Reverse(typeBytes);
+                    data.VALUE = BitConverter.ToInt16(typeBytes, 0);
+                    data.RWX = 1;
+                    break;
+                default:
+                    data.SN = buffer[2] << 8 + buffer[3];
+                    data.RWX = 0;
+                    break;
+            }
+
             return data;
         }
     }

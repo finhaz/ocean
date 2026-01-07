@@ -306,35 +306,39 @@ namespace ocean.Communication
                 if(ModbusDataList.Count > 0) 
                 {
                     temp_Value = _currentProtocol.MonitorSolve(buffer, Readpos - 1);
-                    // 跨线程更新DataTable（避免UI线程异常）
-                    Application.Current.Dispatcher.Invoke(() =>
+                    if (temp_Value.RWX==1)
                     {
-                        //dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
-                        var targetItem = ModbusDataList.FirstOrDefault(item => item.ID == (temp_Value.SN+1));
+                        // 跨线程更新DataTable（避免UI线程异常）
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            //dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
+                            var targetItem = ModbusDataList.FirstOrDefault(item => item.ID == (temp_Value.SN + 1));
 
-                        if (targetItem != null)
-                        {
-                            // 2. 核心赋值：直接给实体类的Value属性赋值
-                            // 同时根据当前行的DisplayType自动转换类型（保持和选择的呈现类型一致）
-                            if (targetItem.DisplayType == "十进制整数")
+                            if (targetItem != null)
                             {
-                                targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
-                                // 转为int类型赋值
-                                targetItem.Value = Convert.ToInt32(temp_Value.VALUE)* targetItem.Coefficient;
+                                // 2. 核心赋值：直接给实体类的Value属性赋值
+                                // 同时根据当前行的DisplayType自动转换类型（保持和选择的呈现类型一致）
+                                switch (targetItem.DisplayType)
+                                {
+                                    case "十进制整数":
+                                        targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
+                                        // 转为int类型赋值
+                                        targetItem.Value = Convert.ToInt32(temp_Value.VALUE) * targetItem.Coefficient;
+                                        break;
+                                    case "浮点数":
+                                        targetItem.RValue = Convert.ToDouble(temp_Value.VALUE);
+                                        // 转为double类型赋值（浮点数）
+                                        targetItem.Value = Convert.ToDouble(temp_Value.VALUE) * targetItem.Coefficient;
+                                        break;
+                                    default:
+                                        targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
+                                        // 转为int类型赋值
+                                        targetItem.Value = Convert.ToInt32(temp_Value.VALUE) * targetItem.Coefficient;
+                                        break;
+                                }
                             }
-                            else
-                            {
-                                targetItem.RValue = Convert.ToDouble(temp_Value.VALUE);
-                                // 转为double类型赋值（默认浮点数）
-                                targetItem.Value = Convert.ToDouble(temp_Value.VALUE)*targetItem.Coefficient;
-                            }
-                        }
-                        else
-                        {
-                            // 可选：未找到对应ID的行时的提示（根据业务需要保留）
-                            // MessageBox.Show($"未找到ID为{temp_Value.SN}的行！");
-                        }
-                    });
+                        });
+                    }
                 }
             }
             else
@@ -400,7 +404,7 @@ namespace ocean.Communication
                     // 核心修改：从实体类的Command属性取值（原rowView["Command"]）
                     // 注意：Command在实体类中是double类型，转int保持原有逻辑
                     int value = Convert.ToInt32(item.Command);
-                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value);
+                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value,item.SelectedOption);
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);

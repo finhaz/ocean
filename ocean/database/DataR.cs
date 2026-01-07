@@ -8,7 +8,7 @@ namespace ocean.database
 {
     public struct DataR
     {
-        public int SN, COMMAND, LENG, NO, TYP, ACK;
+        public int SN, COMMAND, LENG, NO, TYP, ACK,RWX;
         public float VALUE, FACTOR;
         public string NAME, UNITor;
     }

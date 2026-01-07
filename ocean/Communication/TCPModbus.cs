@@ -185,7 +185,7 @@ namespace ocean.Communication
             return 12; // TCP 06功能码报文长度为12字节（MBAP6 + 数据6）
         }
 
-        public int MonitorSet(byte[] sendbf, int tempsn, object value = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null)
         {
             this.Monitor_Set_06(sendbf, tempsn, (float)value);
             return 12; // TCP 06功能码报文长度为12字节
