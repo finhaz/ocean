@@ -191,7 +191,7 @@ namespace ocean.Communication
             return 12; // TCP 06功能码报文长度为12字节
         }
 
-        public int MonitorGet(byte[] sendbf, int tempsn, object num = null)
+        public int MonitorGet(byte[] sendbf, int tempsn, object num = null, object regtype = null)
         {
             this.Monitor_Get_03(sendbf, tempsn, 1);
             return 12; // TCP 03功能码报文长度为12字节

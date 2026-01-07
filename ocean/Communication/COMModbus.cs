@@ -175,9 +175,54 @@ namespace ocean
             return 8;
         }
 
-        public int MonitorGet(byte[] sendbf, int tempsn, object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn, object num=null, object regtype = null)
         {
-            this.Monitor_Get_03(sendbf, tempsn, 1);
+            byte functionCode=0;
+            switch (regtype)
+            {
+                case "线圈状态(RW)":
+                    functionCode = 0x01;
+                    break;
+                case "保持寄存器(RW)":
+                    //this.Monitor_Get_03(sendbf, tempsn, 1);
+                    functionCode = 0x03;
+                    break;
+            }
+
+            // 校验功能码合法性（可选，避免传入错误功能码）
+            if (functionCode != 0x01 && functionCode != 0x03)
+            {
+                throw new ArgumentException("仅支持01（读取线圈）和03（读取保持寄存器）功能码");
+            }
+
+            int crc;
+            // 清空发送缓冲区
+            Array.Clear(sendbf, 0, sendbf.Length);
+
+            // 1. 从站地址（默认0x01，可根据实际设备调整）
+            sendbf[0] = 0x01;
+            // 2. 功能码（通过形参传入，适配01/03）
+            sendbf[1] = functionCode;
+
+            // 3. 起始地址（2字节，高位在前）
+            byte[] temp_i = BitConverter.GetBytes(tempsn);
+            sendbf[2] = temp_i[1]; // 地址高位
+            sendbf[3] = temp_i[0]; // 地址低位
+
+            // 4. 读取数量（2字节，高位在前）
+            temp_i = BitConverter.GetBytes((bool)num);
+            sendbf[4] = temp_i[1]; // 数量高位
+            sendbf[5] = temp_i[0]; // 数量低位
+
+            // 5. 计算CRC16校验（前6字节）
+            crc = crc16_ccitt(sendbf, 6, 0);
+
+            // 6. 填充CRC校验值（低位在前，高位在后）
+            temp_i = BitConverter.GetBytes(crc);
+            sendbf[6] = temp_i[0]; // CRC低位
+            sendbf[7] = temp_i[1]; // CRC高位
+
+
             return 8;
         }
 

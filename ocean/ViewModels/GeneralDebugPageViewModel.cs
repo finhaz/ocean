@@ -48,7 +48,7 @@ namespace ocean.Communication
 
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
-        private string _sadd = "0"; // 初始值可根据你的业务调整
+        private string _sadd = "1"; // 初始值可根据你的业务调整
         public string Sadd // 推荐帕斯卡命名法（首字母大写），XAML绑定可兼容小写（但建议统一）
         {
             get => _sadd;
@@ -318,11 +318,13 @@ namespace ocean.Communication
                             // 同时根据当前行的DisplayType自动转换类型（保持和选择的呈现类型一致）
                             if (targetItem.DisplayType == "十进制整数")
                             {
+                                targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
                                 // 转为int类型赋值
                                 targetItem.Value = Convert.ToInt32(temp_Value.VALUE)* targetItem.Coefficient;
                             }
                             else
                             {
+                                targetItem.RValue = Convert.ToDouble(temp_Value.VALUE);
                                 // 转为double类型赋值（默认浮点数）
                                 targetItem.Value = Convert.ToDouble(temp_Value.VALUE)*targetItem.Coefficient;
                             }
@@ -512,7 +514,7 @@ namespace ocean.Communication
 
                     // 核心修改：直接取实体类的Addr属性（本身就是int，无需TryParse）
                     int addr = item.Addr;
-                    int send_num = _currentProtocol.MonitorGet(sendbf, addr, 1);
+                    int send_num = _currentProtocol.MonitorGet(sendbf, addr, 1, item.SelectedOption);
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);

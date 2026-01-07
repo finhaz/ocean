@@ -294,7 +294,7 @@ namespace ocean
             return sendbf[4] + 5;
         }
 
-        public int MonitorGet(byte[] sendbf, int tempsn,object num=null)
+        public int MonitorGet(byte[] sendbf, int tempsn,object num=null, object regtype = null)
         {
             byte index = (byte)(int)tempsn;
             byte command = 03;

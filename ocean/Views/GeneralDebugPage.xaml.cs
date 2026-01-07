@@ -85,7 +85,7 @@ namespace ocean.UI
                     Unit = "",
                     Rangle = "",
                     SelectedOption = _globalVM.ModbusSet.DSelectedOption,
-                    Addr = 0,
+                    Addr = radd,
                     Number = 0,
                     NOffSet = 0,
                     NBit = 0,

@@ -13,6 +13,7 @@ namespace ocean.ViewModels
         private int _id;
         private string _name;
         private object _value; // 核心：用object存储int/double
+        private object _rvalue; // 核心：用object存储int/double
         private double _command;
         private bool _isButtonClicked;
         private string _unit;
@@ -49,6 +50,12 @@ namespace ocean.ViewModels
         {
             get => _value;
             set => SetProperty(ref _value, value);
+        }
+
+        public object RValue // 核心属性：存储int或double
+        {
+            get => _rvalue;
+            set => SetProperty(ref _rvalue, value);
         }
 
         public double Command
@@ -108,7 +115,15 @@ namespace ocean.ViewModels
         public float Coefficient
         {
             get => _coefficient;
-            set => SetProperty(ref _coefficient, value);
+            //set => SetProperty(ref _coefficient, value);
+            set
+            {
+                // 核心逻辑：切换_coefficient时，自动转换Value值
+                if (SetProperty(ref _coefficient, value))
+                {
+                    ConvertValueByCoefficient();
+                }
+            }
         }
 
         public int Offset
@@ -206,6 +221,19 @@ namespace ocean.ViewModels
                 // 转换失败时设默认值
                 Value = DisplayType == "整形数" ? 0 : 0.0;
             }
+        }
+
+        private void ConvertValueByCoefficient()
+        {
+
+            // 先判断是否为数值类型
+            if (RValue is int || RValue is float || RValue is double || RValue is decimal)
+            {
+                float rValueFloat = Convert.ToSingle(RValue);
+                Value = rValueFloat * Coefficient;
+                //Console.WriteLine($"计算结果：{Value}");
+            }
+
         }
     }
 }
