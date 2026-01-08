@@ -106,7 +106,13 @@ namespace ocean.ViewModels
         public int Number
         {
             get => _number;
-            set => SetProperty(ref _number, value);
+            set
+            {
+                if (SetProperty(ref _number, value))
+                {
+                    ConvertValueByNumber();
+                }
+            }       
         }
 
         public int NOffSet
@@ -118,7 +124,14 @@ namespace ocean.ViewModels
         public int NBit
         {
             get => _nBit;
-            set => SetProperty(ref _nBit, value);
+            set 
+            {
+                if (SetProperty(ref _nBit, value))
+                {
+                    // 触发属性变更通知（ObservableObject的核心方法）
+                    OnPropertyChanged();
+                } 
+            }
         }
 
         public float Coefficient
@@ -244,6 +257,10 @@ namespace ocean.ViewModels
 
         }
 
+        private void ConvertValueByNumber()
+        {
+            NBit = Number * 16;
+        }
 
         private void ConvertValueBySelectedOption()
         {
@@ -260,9 +277,12 @@ namespace ocean.ViewModels
                     case "线圈状态(RW)":
                     case "离散输入(RO)":
                         DisplayType = "十进制整数";
+                        NBit = 1;
+                        TransferType = "位数据";
                         break;
                     case "保持寄存器(RW)":
                     case "输入寄存器(RO)":
+                        NBit = 16;
                         break;
                     default:
                         break;

@@ -4,7 +4,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:vm="clr-namespace:ocean.ViewModels"
+      xmlns:viewmodels="clr-namespace:ocean.ViewModels"
+      xmlns:converters="clr-namespace:ocean.Converters"
       Title="EthernetConfigPage"
       d:DesignHeight="450"
       d:DesignWidth="800"
@@ -13,12 +14,12 @@
 
     <!-- 绑定ViewModel -->
     <Page.DataContext>
-        <vm:EthernetConfigViewModel/>
+        <viewmodels:EthernetConfigViewModel/>
     </Page.DataContext>
 
     <!-- 简单转换器 -->
     <Page.Resources>
-        <vm:StringEqualsConverter x:Key="StringEqualsConverter"/>
+        <converters:StringEqualsConverter x:Key="StringEqualsConverter"/>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Page.Resources>
 

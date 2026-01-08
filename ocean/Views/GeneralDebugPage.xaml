@@ -4,7 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:ocean.ViewModels"
-      xmlns:mvvm="clr-namespace:ocean.Mvvm"
+      xmlns:converters="clr-namespace:ocean.Converters"
       xmlns:interactivity="http://schemas.microsoft.com/xaml/behaviors"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -17,8 +17,8 @@
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
             <local:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
-            <mvvm:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
-            <mvvm:ValueDisplayConverter x:Key="ValueDisplayConverter"/>
+            <converters:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
+            <converters:ValueDisplayConverter x:Key="ValueDisplayConverter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
@@ -189,7 +189,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
-                            <DataGridTextColumn Header="数量" Binding="{Binding Number}"/>
+                            <DataGridTextColumn Header="数量" Binding="{Binding Number,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="位偏移" Binding="{Binding NOffSet}"/>
                             <DataGridTextColumn Header="位数" Binding="{Binding NBit}"/>
                             <!-- 以下是需要隐藏/显示的高级列（默认隐藏） -->
@@ -224,7 +224,7 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        
+
                         <!-- ：选择框列 -->
                         <DataGridTemplateColumn Header="呈现类型" Width="120" 
                                                 Visibility="{Binding Data.IsAdvancedColumnsVisible, 

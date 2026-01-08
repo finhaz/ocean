@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace ocean.Mvvm
+namespace ocean.Converters
 {
     // 确保继承IMultiValueConverter（多值绑定必须用这个）
     public class ValueDisplayConverter : IMultiValueConverter

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace ocean.ViewModels
+namespace ocean.Converters
 {
     // 协议选择转换器
     public class StringEqualsConverter : IValueConverter
