@@ -19,7 +19,7 @@
             <local:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
             <converters:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
             <converters:ValueDisplayConverter x:Key="ValueDisplayConverter"/>
-            <converters:NBitToTransferTypeEnableConverter x:Key="NBitToTransferTypeEnableConverter"/>
+            <converters:TransferTypeEnableConverter x:Key="TransferTypeEnableConverter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
@@ -225,11 +225,15 @@
                                             <Style TargetType="ComboBoxItem">
                                                 <Setter Property="IsEnabled">
                                                     <Setter.Value>
-                                                        <MultiBinding Converter="{StaticResource NBitToTransferTypeEnableConverter}">
-                                                            <!-- 绑定NBit属性（核心） -->
+                                                        <MultiBinding Converter="{StaticResource TransferTypeEnableConverter}">
+                                                            <!-- 参数1：NBit属性 -->
                                                             <Binding Path="DataContext.NBit" 
                                                             RelativeSource="{RelativeSource AncestorType=DataGridRow}"/>
+                                                            <!-- 参数2：当前传输类型选项值 -->
                                                             <Binding Path="."/>
+                                                            <!-- 参数3：SelectedOption属性（新增） -->
+                                                            <Binding Path="DataContext.SelectedOption" 
+                                                            RelativeSource="{RelativeSource AncestorType=DataGridRow}"/>
                                                         </MultiBinding>
                                                     </Setter.Value>
                                                 </Setter>
