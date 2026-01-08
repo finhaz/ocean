@@ -259,7 +259,7 @@ namespace ocean.ViewModels
                 {
                     case "线圈状态(RW)":
                     case "离散输入(RO)":
-                        DisplayType = " 十进制整数";
+                        DisplayType = "十进制整数";
                         break;
                     case "保持寄存器(RW)":
                     case "输入寄存器(RO)":

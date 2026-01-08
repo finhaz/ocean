@@ -150,8 +150,7 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <!-- 给TextBlock绑定双击事件 -->
-                                    <TextBlock 
-                                                   Background="LightSkyBlue"  >
+                                    <TextBlock Background="LightSkyBlue"  >
                                         <TextBlock.Text>
                                             <!-- 多值绑定：同时传Value和DisplayType给转换器 -->
                                             <MultiBinding Converter="{StaticResource ValueDisplayConverter}">
@@ -159,7 +158,6 @@
                                                 <Binding Path="DisplayType"/>
                                             </MultiBinding>
                                         </TextBlock.Text>
-
                                     </TextBlock>
                                     <!-- 鼠标悬浮显示手型，提升体验 -->
                                     </DataTemplate>
