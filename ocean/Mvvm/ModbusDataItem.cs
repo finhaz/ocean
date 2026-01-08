@@ -276,13 +276,17 @@ namespace ocean.ViewModels
                 {
                     case "线圈状态(RW)":
                     case "离散输入(RO)":
+                        Number = 1;
                         DisplayType = "十进制整数";
                         NBit = 1;
                         TransferType = "位数据";
                         break;
                     case "保持寄存器(RW)":
                     case "输入寄存器(RO)":
+                        Number = 1;
+                        DisplayType = "浮点数";
                         NBit = 16;
+                        TransferType = "无符号整数";
                         break;
                     default:
                         break;
