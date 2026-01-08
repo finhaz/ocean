@@ -130,6 +130,7 @@ namespace ocean.ViewModels
                 {
                     // 触发属性变更通知（ObservableObject的核心方法）
                     OnPropertyChanged();
+                    ConvertValueByNBit();
                 } 
             }
         }
@@ -255,6 +256,12 @@ namespace ocean.ViewModels
                 //Console.WriteLine($"计算结果：{Value}");
             }
 
+        }
+
+        private void ConvertValueByNBit()
+        {
+            if (NBit > Number * 16)
+                NBit = Number * 16;
         }
 
         private void ConvertValueByNumber()

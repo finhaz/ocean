@@ -19,6 +19,7 @@
             <local:BindingProxy x:Key="ModbusSetProxy" Data="{Binding ModbusSet}"/>
             <converters:BoolToButtonTextConverter x:Key="BoolToButtonTextConverter"/>
             <converters:ValueDisplayConverter x:Key="ValueDisplayConverter"/>
+            <converters:NBitToTransferTypeEnableConverter x:Key="NBitToTransferTypeEnableConverter"/>
         </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="26*"/>
@@ -191,7 +192,7 @@
                             <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
                             <DataGridTextColumn Header="数量" Binding="{Binding Number,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="位偏移" Binding="{Binding NOffSet}"/>
-                            <DataGridTextColumn Header="位数" Binding="{Binding NBit}"/>
+                            <DataGridTextColumn Header="位数" Binding="{Binding NBit,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <!-- 以下是需要隐藏/显示的高级列（默认隐藏） -->
                             <DataGridTextColumn Header="系数" 
                                                 Binding="{Binding Coefficient}" 
@@ -211,16 +212,30 @@
                 
                             <!-- ：选择框列 -->
                         <DataGridTemplateColumn Header="传输类型" Width="120" 
-                                                Visibility="{Binding Data.IsAdvancedColumnsVisible, 
-                                                Source={StaticResource ModbusSetProxy}, 
-                                                Converter={StaticResource BoolToVisConverter}}" >
+                        Visibility="{Binding Data.IsAdvancedColumnsVisible, 
+                        Source={StaticResource ModbusSetProxy}, 
+                        Converter={StaticResource BoolToVisConverter}}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
-                                                      SelectedItem="{Binding TransferType, Mode=TwoWay}"
-                                                      ItemsSource="{Binding DataContext.ModbusSet.TransferTypeOptions, 
-                                                                    RelativeSource={RelativeSource AncestorType=DataGrid}}" />
-                                    <!-- 若选项是对象，需指定显示字段 -->
+                                        SelectedItem="{Binding TransferType, Mode=TwoWay}"
+                                        ItemsSource="{Binding DataContext.ModbusSet.TransferTypeOptions, 
+                                        RelativeSource={RelativeSource AncestorType=DataGrid}}">
+                                        <ComboBox.ItemContainerStyle>
+                                            <Style TargetType="ComboBoxItem">
+                                                <Setter Property="IsEnabled">
+                                                    <Setter.Value>
+                                                        <MultiBinding Converter="{StaticResource NBitToTransferTypeEnableConverter}">
+                                                            <!-- 绑定NBit属性（核心） -->
+                                                            <Binding Path="DataContext.NBit" 
+                                                            RelativeSource="{RelativeSource AncestorType=DataGridRow}"/>
+                                                            <Binding Path="."/>
+                                                        </MultiBinding>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ComboBox.ItemContainerStyle>
+                                    </ComboBox>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
