@@ -454,7 +454,7 @@ namespace ocean.Communication
                                 value = Convert.ToDouble(item.Command);
                             else
                             {
-                                MessageBox.Show("数字不对");
+                                MessageBox.Show("非正常数字");
                                 return;
                             }
                             break;
