@@ -189,9 +189,9 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="地址" Binding="{Binding Addr}"/>
+                            <DataGridTextColumn Header="地址" Binding="{Binding Addr,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="数量" Binding="{Binding Number,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                            <DataGridTextColumn Header="位偏移" Binding="{Binding NOffSet}"/>
+                        <DataGridTextColumn Header="位偏移" Binding="{Binding NOffSet,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTextColumn Header="位数" Binding="{Binding NBit,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                             <!-- 以下是需要隐藏/显示的高级列（默认隐藏） -->
                             <DataGridTextColumn Header="系数" 
@@ -218,7 +218,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
-                                        SelectedItem="{Binding TransferType, Mode=TwoWay}"
+                                        SelectedItem="{Binding TransferType, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                         ItemsSource="{Binding DataContext.ModbusSet.TransferTypeOptions, 
                                         RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                         <ComboBox.ItemContainerStyle>

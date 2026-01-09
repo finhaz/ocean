@@ -77,7 +77,7 @@ namespace ocean.Communication
             return 12; // 动态返回有效字节长度
         }
 
-        public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null, int regOccupyCount = 1)
         {
             // 1. 确定功能码（与串口版一致）
             byte functionCode = regtype switch

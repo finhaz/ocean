@@ -28,8 +28,8 @@ namespace ocean.ViewModels
         private int _decimalPlaces;
         private string _transferType;
         private string _displayType; // 浮点数/整形数
-        private int _byteOrder;
-        private int _wordOrder;
+        private string _byteOrder;
+        private string _wordOrder;
         private bool _isDrawCurve;
         private int _intervalTime;
 
@@ -180,13 +180,13 @@ namespace ocean.ViewModels
             }
         }
 
-        public int ByteOrder
+        public string ByteOrder
         {
             get => _byteOrder;
             set => SetProperty(ref _byteOrder, value);
         }
 
-        public int WordOrder
+        public string WordOrder
         {
             get => _wordOrder;
             set => SetProperty(ref _wordOrder, value);

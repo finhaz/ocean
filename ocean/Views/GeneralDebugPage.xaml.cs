@@ -94,8 +94,8 @@ namespace ocean.UI
                     DecimalPlaces = 2,
                     TransferType = _globalVM.ModbusSet.DSelectedTransferType,
                     DisplayType = _globalVM.ModbusSet.DSelectedDisplayType, // 默认显示类型
-                    ByteOrder = 0,
-                    WordOrder = 0,
+                    ByteOrder = "小端",
+                    WordOrder = "小端",
                     IsDrawCurve = false,
                     IntervalTime = 1000
                 });

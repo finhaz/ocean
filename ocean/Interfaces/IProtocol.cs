@@ -29,7 +29,7 @@ namespace ocean.Interfaces
         /// <param name="data">数据对象（FE协议专用，可选）</param>
         /// <param name="value">设置值</param>
         /// <returns>发送长度</returns>
-        int MonitorSet(byte[] sendbf, int tempsn, object value = null,object regtype = null);
+        int MonitorSet(byte[] sendbf, int tempsn, object value = null,object regtype = null, int regOccupyCount = 1);
 
         /// </summary>
         /// <param name="sendbf">发送字节数组</param>

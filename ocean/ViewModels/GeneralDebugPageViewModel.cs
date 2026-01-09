@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.ComponentModel;
 using System.Data;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.IO.Ports;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -272,8 +273,8 @@ namespace ocean.Communication
                 DecimalPlaces = 2,
                 TransferType = DSelectedTransferType,
                 DisplayType = DSelectedDisplayType, // 默认显示类型
-                ByteOrder = 0,
-                WordOrder = 0,
+                ByteOrder = "小端",
+                WordOrder = "小端",
                 IsDrawCurve = false,
                 IntervalTime = 1000
             });
@@ -323,15 +324,33 @@ namespace ocean.Communication
                                     case "位数据":
                                         tempbval = temp_Value.ByteArr[0];
                                         break;
+                                    case "浮点数":
+                                        if (targetItem.Number == 2)
+                                            tempbval = BitConverter.ToSingle(temp_Value.ByteArr, 0);
+                                        else if (targetItem.Number == 4)
+                                            tempbval = BitConverter.ToDouble(temp_Value.ByteArr, 0);
+                                        else
+                                        {
+                                            tempbval = 0;
+                                            MessageBox.Show("非正常数字！");
+                                            return;
+                                        }
+                                        break;
                                     case "无符号整数":
                                     default:
-                                        if(targetItem.Number<2)
+                                        if (targetItem.Number == 1)
                                             tempbval = BitConverter.ToUInt16(temp_Value.ByteArr, 0);
-                                        else if(targetItem.Number < 4)
+                                        else if (targetItem.Number == 2)
                                             tempbval = BitConverter.ToUInt32(temp_Value.ByteArr, 0);
-                                        else
+                                        else if (targetItem.Number == 4)
                                             tempbval = BitConverter.ToUInt64(temp_Value.ByteArr, 0);
-                                        break;
+                                        else
+                                        {
+                                            tempbval = 0;
+                                            MessageBox.Show("非正常数字！");
+                                            return;
+                                        }
+                                            break;
                                 }
 
                                 // 2. 核心赋值：直接给实体类的Value属性赋值
@@ -423,10 +442,39 @@ namespace ocean.Communication
 
                 try
                 {
+                    object value;
                     // 核心修改：从实体类的Command属性取值（原rowView["Command"]）
                     // 注意：Command在实体类中是double类型，转int保持原有逻辑
-                    int value = Convert.ToInt32(item.Command);
-                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value,item.SelectedOption );
+                    switch(item.TransferType)
+                    {
+                        case "浮点数":
+                            if (item.Number == 2)
+                                value = Convert.ToSingle(item.Command);
+                            else if (item.Number == 4)
+                                value = Convert.ToDouble(item.Command);
+                            else
+                            {
+                                MessageBox.Show("数字不对");
+                                return;
+                            }
+                            break;
+                        case "无符号整数":
+                        default:
+                            if (item.Number == 1)
+                                value = Convert.ToUInt16(item.Command);
+                            else if (item.Number == 2)
+                                value = Convert.ToUInt32(item.Command);
+                            else if (item.Number == 4)
+                                value = Convert.ToUInt64(item.Command);
+                            else
+                            {
+                                MessageBox.Show("数字不对");
+                                return;
+                            }
+                            break;
+                    }
+                    
+                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, value,item.SelectedOption, numr);
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);

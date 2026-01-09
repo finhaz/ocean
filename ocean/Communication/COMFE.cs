@@ -285,7 +285,7 @@ namespace ocean
         }
 
         // 新增：实现IProtocol接口的MonitorSet（适配统一调用）
-        public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null)
+        public int MonitorSet(byte[] sendbf, int tempsn, object value = null, object regtype = null, int regOccupyCount = 1)
         {
             byte command = 06;
             // 直接调用原有方法
