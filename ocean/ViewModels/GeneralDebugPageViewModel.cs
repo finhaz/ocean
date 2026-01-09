@@ -313,27 +313,48 @@ namespace ocean.Communication
                         {
                             //dtm.Rows[temp_Value.SN]["Value"] = temp_Value.VALUE;
                             var targetItem = ModbusDataList.FirstOrDefault(item => item.ID == (temp_Value.SN + 1));
+                            object tempbval;
 
                             if (targetItem != null)
                             {
+                                //1.先根据传输类型解析
+                                switch(targetItem.TransferType)
+                                {
+                                    case "位数据":
+                                        tempbval = temp_Value.ByteArr[0];
+                                        break;
+                                    case "无符号整数":
+                                    default:
+                                        if(targetItem.Number<2)
+                                            tempbval = BitConverter.ToUInt16(temp_Value.ByteArr, 0);
+                                        else if(targetItem.Number < 4)
+                                            tempbval = BitConverter.ToUInt32(temp_Value.ByteArr, 0);
+                                        else
+                                            tempbval = BitConverter.ToUInt64(temp_Value.ByteArr, 0);
+                                        break;
+                                }
+
                                 // 2. 核心赋值：直接给实体类的Value属性赋值
                                 // 同时根据当前行的DisplayType自动转换类型（保持和选择的呈现类型一致）
                                 switch (targetItem.DisplayType)
                                 {
                                     case "十进制整数":
-                                        targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
+                                        targetItem.RValue = Convert.ToInt32(tempbval);
                                         // 转为int类型赋值
-                                        targetItem.Value = Convert.ToInt32(temp_Value.VALUE) * targetItem.Coefficient;
+                                        targetItem.Value = Convert.ToInt32(tempbval) * targetItem.Coefficient;
                                         break;
                                     case "浮点数":
-                                        targetItem.RValue = Convert.ToDouble(temp_Value.VALUE);
+                                        targetItem.RValue = Convert.ToDouble(tempbval);
                                         // 转为double类型赋值（浮点数）
-                                        targetItem.Value = Convert.ToDouble(temp_Value.VALUE) * targetItem.Coefficient;
+                                        targetItem.Value = Convert.ToDouble(tempbval) * targetItem.Coefficient;
+                                        break;
+                                    case "位数据":
+                                        targetItem.Value = tempbval;
                                         break;
                                     default:
-                                        targetItem.RValue = Convert.ToInt32(temp_Value.VALUE);
+                                        targetItem.RValue = Convert.ToInt32(tempbval);
                                         // 转为int类型赋值
-                                        targetItem.Value = Convert.ToInt32(temp_Value.VALUE) * targetItem.Coefficient;
+                                        targetItem.Value = Convert.ToInt32(tempbval) * targetItem.Coefficient;
                                         break;
                                 }
                             }

@@ -217,20 +217,23 @@ namespace ocean
             data.COMMAND = buffer[1];
             data.SN = (int)Readpos;
             byte[] typeBytes = new byte[buffer[2]];
+            Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
             switch (data.COMMAND)
             {
-                case 0x01:
+                case 0x01:                   
                     data.VALUE = buffer[3];
+                    data.ByteArr = typeBytes;
                     data.RWX = 1;
                     break;
                 case 0x02:
                     data.VALUE = buffer[3];
+
                     data.RWX = 1;
                     break;
                 case 0x03:
-                    Array.Copy(buffer, 3, typeBytes, 0, buffer[2]);
                     Array.Reverse(typeBytes);
                     data.VALUE = BitConverter.ToInt16(typeBytes, 0);
+                    data.ByteArr = typeBytes;
                     data.RWX = 1;
                     break;
                 case 0x04:
