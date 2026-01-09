@@ -391,6 +391,7 @@ namespace ocean.Communication
             if (parameter is ModbusDataItem item)
             {
                 int addr = item.Addr; // 直接取实体类的属性，无需Convert
+                int numr = item.Number;
 
                 // 原有串口判断逻辑保留
                 if (!_comm.IsConnected)
@@ -404,7 +405,7 @@ namespace ocean.Communication
                     // 核心修改：从实体类的Command属性取值（原rowView["Command"]）
                     // 注意：Command在实体类中是double类型，转int保持原有逻辑
                     int value = Convert.ToInt32(item.Command);
-                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value,item.SelectedOption);
+                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, (float)value,item.SelectedOption );
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);
@@ -518,7 +519,8 @@ namespace ocean.Communication
 
                     // 核心修改：直接取实体类的Addr属性（本身就是int，无需TryParse）
                     int addr = item.Addr;
-                    int send_num = _currentProtocol.MonitorGet(sendbf, addr, 1, item.SelectedOption);
+                    int numr=item.Number;
+                    int send_num = _currentProtocol.MonitorGet(sendbf, addr, numr, item.SelectedOption);
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);
