@@ -262,11 +262,22 @@ namespace ocean.ViewModels
         {
             if (NBit > Number * 16)
                 NBit = Number * 16;
+            if (SelectedOption == "线圈状态(RW)" || SelectedOption == "离散输入(RO)")
+            {
+                Number = 1;
+                NBit = 1;
+            }
         }
 
         private void ConvertValueByNumber()
         {
-            NBit = Number * 16;
+            if (SelectedOption == "线圈状态(RW)" || SelectedOption == "离散输入(RO)")
+            {
+                Number = 1;
+                NBit = 1;
+            }
+            else
+                NBit = Number * 16;
         }
 
         private void ConvertValueBySelectedOption()
