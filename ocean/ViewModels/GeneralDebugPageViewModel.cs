@@ -464,8 +464,11 @@ namespace ocean.Communication
                     object value;
                     // 核心修改：从实体类的Command属性取值（原rowView["Command"]）
                     // 注意：Command在实体类中是double类型，转int保持原有逻辑
-                    switch(item.TransferType)
+                    switch (item.TransferType)
                     {
+                        case "位数据":
+                            value = Convert.ToByte(item.Command);
+                            break;
                         case "浮点数":
                             if (item.Number == 2)
                                 value = Convert.ToSingle(item.Command);
@@ -487,17 +490,24 @@ namespace ocean.Communication
                                 value = Convert.ToUInt64(item.Command);
                             else
                             {
-                                MessageBox.Show("数字不对");
+                                MessageBox.Show("非正常数字");
                                 return;
                             }
                             break;
                     }
+                    byte[] tempbyte;
+                    int send_num;
+                    if (item.TransferType != "位数据")
+                    {
+                        tempbyte = NumberToBytesHelper.ToBytes(value, item.Number * 2, item.ByteOrder, item.WordOrder);
+                        send_num = _currentProtocol.MonitorSet(sendbf, addr, tempbyte, item.SelectedOption, numr);
+                    }
 
-                    byte[] tempbyte= NumberToBytesHelper.ToBytes(value,item.Number*2, item.ByteOrder, item.WordOrder);
-
-
-                    //int send_num = _currentProtocol.MonitorSet(sendbf, addr, value,item.SelectedOption, numr);
-                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, tempbyte, item.SelectedOption, numr);
+                    else
+                    { 
+                        send_num = _currentProtocol.MonitorSet(sendbf, addr, value, item.SelectedOption, numr);
+                    }
+                    
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);
