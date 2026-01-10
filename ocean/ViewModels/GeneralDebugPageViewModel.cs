@@ -11,9 +11,11 @@ using System.ComponentModel;
 using System.ComponentModel;
 using System.Data;
 using System.Data;
+using System.Data.SqlClient;
 using System.Diagnostics.Eventing.Reader;
 using System.IO.Ports;
 using System.Linq;
+using System.Printing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -490,8 +492,12 @@ namespace ocean.Communication
                             }
                             break;
                     }
-                    
-                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, value,item.SelectedOption, numr);
+
+                    byte[] tempbyte= NumberToBytesHelper.ToBytes(value,item.Number*2, item.ByteOrder, item.WordOrder);
+
+
+                    //int send_num = _currentProtocol.MonitorSet(sendbf, addr, value,item.SelectedOption, numr);
+                    int send_num = _currentProtocol.MonitorSet(sendbf, addr, tempbyte, item.SelectedOption, numr);
 
                     // 原有发送逻辑保留
                     _comm.Send(sendbf, 0, send_num);
