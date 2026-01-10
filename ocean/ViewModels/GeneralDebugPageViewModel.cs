@@ -1,4 +1,5 @@
-﻿using ocean.database;
+﻿using ocean.Converters;
+using ocean.database;
 using ocean.Interfaces;
 using ocean.Mvvm;
 using ocean.ViewModels;
@@ -321,14 +322,21 @@ namespace ocean.Communication
                                 //1.先根据传输类型解析
                                 switch(targetItem.TransferType)
                                 {
+                                    
                                     case "位数据":
                                         tempbval = temp_Value.ByteArr[0];
                                         break;
                                     case "浮点数":
                                         if (targetItem.Number == 2)
+                                        {
+                                            temp_Value.ByteArr = ByteWordOrderHelper.ConvertOrder(temp_Value.ByteArr,targetItem.ByteOrder, targetItem.WordOrder);
                                             tempbval = BitConverter.ToSingle(temp_Value.ByteArr, 0);
+                                        }
                                         else if (targetItem.Number == 4)
+                                        {
+                                            temp_Value.ByteArr = ByteWordOrderHelper.ConvertOrder(temp_Value.ByteArr, targetItem.ByteOrder, targetItem.WordOrder);
                                             tempbval = BitConverter.ToDouble(temp_Value.ByteArr, 0);
+                                        }
                                         else
                                         {
                                             tempbval = 0;
@@ -339,11 +347,20 @@ namespace ocean.Communication
                                     case "无符号整数":
                                     default:
                                         if (targetItem.Number == 1)
+                                        {
+                                            temp_Value.ByteArr = ByteWordOrderHelper.ConvertOrder(temp_Value.ByteArr,targetItem.ByteOrder);
                                             tempbval = BitConverter.ToUInt16(temp_Value.ByteArr, 0);
+                                        }
                                         else if (targetItem.Number == 2)
+                                        {
+                                            temp_Value.ByteArr = ByteWordOrderHelper.ConvertOrder(temp_Value.ByteArr, targetItem.ByteOrder, targetItem.WordOrder);
                                             tempbval = BitConverter.ToUInt32(temp_Value.ByteArr, 0);
+                                        }
                                         else if (targetItem.Number == 4)
+                                        {
+                                            temp_Value.ByteArr = ByteWordOrderHelper.ConvertOrder(temp_Value.ByteArr, targetItem.ByteOrder, targetItem.WordOrder);
                                             tempbval = BitConverter.ToUInt64(temp_Value.ByteArr, 0);
+                                        }
                                         else
                                         {
                                             tempbval = 0;
