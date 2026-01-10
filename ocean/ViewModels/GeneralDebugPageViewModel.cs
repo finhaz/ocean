@@ -276,11 +276,49 @@ namespace ocean.Communication
                 DecimalPlaces = 2,
                 TransferType = DSelectedTransferType,
                 DisplayType = DSelectedDisplayType, // 默认显示类型
-                ByteOrder = "小端",
-                WordOrder = "小端",
+                ByteOrder = "大端",
+                WordOrder = "大端",
                 IsDrawCurve = false,
                 IntervalTime = 1000
             });
+        }
+
+        public void setsurehander(object sender, RoutedEventArgs e)
+        {
+            int radd = Int32.Parse(Sadd);
+            int rsnum = Int32.Parse(Snum);
+            int i = 0;
+            for (i = 0; i < rsnum; i++)
+            {
+                ModbusDataList.Add(new ModbusDataItem
+                {
+                    ID = ModbusDataList.Count + 1,
+                    Name = "默认名称",
+                    Value = 0.0, // 默认浮点数
+                    Command = 0.0,
+                    IsButtonClicked = false,
+                    Unit = "",
+                    Rangle = "",
+                    SelectedOption = DSelectedOption,
+                    Addr = radd,
+                    Number = 1,
+                    NOffSet = 0,
+                    NBit = 16,
+                    Coefficient = 1,
+                    Offset = 0,
+                    DecimalPlaces = 2,
+                    TransferType = DSelectedTransferType,
+                    DisplayType = DSelectedDisplayType, // 默认显示类型
+                    ByteOrder = "大端",
+                    WordOrder = "大端",
+                    IsDrawCurve = false,
+                    IntervalTime = 1000
+                });
+
+
+                radd = radd + 1;
+            }
+            Sadd = Convert.ToString(radd);
         }
 
 
