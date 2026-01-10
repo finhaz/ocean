@@ -261,12 +261,12 @@
                         </DataGridTemplateColumn>
 
                         <DataGridTextColumn Header="字节序" 
-                                                Binding="{Binding ByteOrder}" 
+                                                Binding="{Binding ByteOrder,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                                                  Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                  Source={StaticResource ModbusSetProxy}, 
                                                  Converter={StaticResource BoolToVisConverter}}"/>
                             <DataGridTextColumn Header="字序" 
-                                                Binding="{Binding WordOrder}" 
+                                                Binding="{Binding WordOrder,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
                                                  Visibility="{Binding Data.IsAdvancedColumnsVisible, 
                                                  Source={StaticResource ModbusSetProxy}, 
                                                  Converter={StaticResource BoolToVisConverter}}"/>

@@ -467,7 +467,7 @@ namespace ocean.Communication
                     switch (item.TransferType)
                     {
                         case "位数据":
-                            value = Convert.ToByte(item.Command);
+                            value = Convert.ToUInt16(item.Command);
                             break;
                         case "浮点数":
                             if (item.Number == 2)
@@ -497,16 +497,11 @@ namespace ocean.Communication
                     }
                     byte[] tempbyte;
                     int send_num;
-                    if (item.TransferType != "位数据")
-                    {
-                        tempbyte = NumberToBytesHelper.ToBytes(value, item.Number * 2, item.ByteOrder, item.WordOrder);
-                        send_num = _currentProtocol.MonitorSet(sendbf, addr, tempbyte, item.SelectedOption, numr);
-                    }
 
-                    else
-                    { 
-                        send_num = _currentProtocol.MonitorSet(sendbf, addr, value, item.SelectedOption, numr);
-                    }
+                    tempbyte = NumberToBytesHelper.ToBytes(value, item.Number * 2, item.ByteOrder, item.WordOrder);
+                    send_num = _currentProtocol.MonitorSet(sendbf, addr, tempbyte, item.SelectedOption, numr);
+                    
+
                     
 
                     // 原有发送逻辑保留
