@@ -82,7 +82,7 @@ namespace ocean.ViewModels
         #endregion
 
         #region 波特率相关
-        private ObservableCollection<int> _baudRates = new ObservableCollection<int> { 4800, 9600, 19200, 38400, 43000, 56000 };
+        private ObservableCollection<int> _baudRates = new ObservableCollection<int> { 4800, 9600, 19200, 38400, 43000, 56000,115200 };
         public ObservableCollection<int> BaudRates
         {
             get => _baudRates;

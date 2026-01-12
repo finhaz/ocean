@@ -25,11 +25,12 @@ namespace ocean.ViewModels
 
         private const string CommunicationMenuLabel = "通讯配置界面";
         // 通讯类型与页面的映射表（扩展时仅需修改这里）
+        //TTL转CAN暂时用和串口同一界面，以后考虑加入AT指令
         private readonly Dictionary<CommunicationType, (string Uri, Type PageType)> _commTypeMap = new()
         {
             { CommunicationType.SerialPort, ("Views/SerialConfigPage.xaml", typeof(SerialConfigPage)) },
             { CommunicationType.Ethernet, ("Views/EthernetConfigPage.xaml", typeof(EthernetConfigPage)) },
-            { CommunicationType.CAN, ("Views/CANConfigPage.xaml", typeof(CANConfigPage)) },
+            { CommunicationType.CAN, ("Views/SerialConfigPage.xaml", typeof(CANConfigPage)) },
             { CommunicationType.IIC, ("Views/IICConfigPage.xaml", typeof(IICConfigPage)) }
         };
 
@@ -70,6 +71,13 @@ namespace ocean.ViewModels
                 Label = "设备控制界面",
                 NavigationType = typeof(DeviceControlPage),
                 NavigationDestination = new Uri("Views/DeviceControlPage.xaml", UriKind.RelativeOrAbsolute)
+            });
+            this.Menu.Add(new MenuItem()
+            {
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FileArrowDownSolid },
+                Label = "DBC界面",
+                NavigationType = typeof(DbcViewPage),
+                NavigationDestination = new Uri("Views/DbcViewPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
             {

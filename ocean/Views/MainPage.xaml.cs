@@ -30,11 +30,14 @@ namespace ocean.Views
                     // 选择串口：创建串口实例（仅创建，不打开/不绑定事件）
                     CommunicationManager.Instance.CreateSerialInstance();
                     break;
+                case CommunicationType.CAN:
+                    // 针对TTL转CAN，创建串口实例（仅创建，不打开/不绑定事件）
+                    CommunicationManager.Instance.CreateSerialInstance();
+                    break;
                 case CommunicationType.Ethernet:
                     // 仅创建网络通讯空实例，不指定TCP/UDP
                     CommunicationManager.Instance.CreateEthernetInstance();
                     break;
-                case CommunicationType.CAN:
                 case CommunicationType.IIC:
                     // 预留，暂不处理
                     break;
