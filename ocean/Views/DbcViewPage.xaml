@@ -27,9 +27,16 @@
                 <Button x:Name="BtnLoadDbc" Content="加载DBC文件" Width="160" Height="40" 
                         FontSize="14" Background="#007ACC" Foreground="White"
                         Click="BtnLoadDbc_Click"/>
+                <!-- ✅ 新增：进入AT指令模式按钮 -->
                 <Button x:Name="BtnEnterATMode" Content="进入AT指令模式" Width="160" Height="36" Margin="0,10,0,0"
                 FontSize="12" Background="#007ACC" Foreground="White"
                 Click="BtnEnterATMode_Click"/>
+                <!-- ✅ ✅ ✅ 新增：AT模块状态文本框【核心】绑定ViewModel的AtModuleStatus属性 -->
+                <TextBlock x:Name="TxtAtStatus" 
+                   Text="{Binding AtModuleStatus}" 
+                   Margin="0,8,0,0" FontSize="11" 
+                   Width="160" TextWrapping="Wrap"
+                   Foreground="#007ACC"/>
                 <TextBlock Margin="0,20,0,0" FontSize="12" Foreground="#333" Text="{Binding DbcLoadState}"/>
                 <TextBlock Margin="0,10,0,0" FontSize="12" Foreground="#333" Text="{Binding FrameCountInfo}"/>
 

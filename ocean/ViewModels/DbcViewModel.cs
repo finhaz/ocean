@@ -28,6 +28,9 @@ namespace ocean.ViewModels
         private string _dbcLoadState = "状态：未加载DBC文件";
         private string _frameCountInfo = "解析到帧数量：0 个";
         private ObservableCollection<CanFrameDefine> _dbcFrameList = new ObservableCollection<CanFrameDefine>();
+        // ========== AT指令模式专用标记 (新增) ==========
+        private bool _isWaitingATOk = false; // 是否等待模块返回OK\r\n
+        private string _atStatusMsg = "";     // AT模式状态提示
 
         public string DbcLoadState
         {
@@ -66,6 +69,17 @@ namespace ocean.ViewModels
             set { _sendStatus = value; OnPropertyChanged(); }
         }
 
+        private string _atModuleStatus = "模块状态未知"; // ★核心绑定属性★ 默认值
+        // ★★★ 新增：AT模块状态 公共绑定属性 (必须写，UI文本框绑定这个) ★★★
+        public string AtModuleStatus
+        {
+            get => _atModuleStatus;
+            set
+            {
+                _atModuleStatus = value;
+                OnPropertyChanged(); // 必须触发通知，UI才会实时刷新
+            }
+        }
 
         #endregion
 
@@ -78,12 +92,52 @@ namespace ocean.ViewModels
 
         #endregion
 
+
         #region === 原生事件处理 ===
+        // <summary>
+        /// 进入AT指令模式（页面按钮直接调用这个方法）
+        /// 下发指令：AT+AT\r\n ，等待模块返回OK\r\n
+        /// </summary>
+        /// <summary>
+        /// 进入AT指令模式（页面按钮直接调用这个方法）
+        /// 下发指令：AT+AT\r\n ，等待模块返回OK\r\n
+        /// </summary>
+        public void EnterATMode()
+        {
+            try
+            {
+                var comm = ocean.Communication.CommunicationManager.Instance.GetCurrentCommunication();
+                if (comm == null || !comm.IsConnected)
+                {
+                    // ❌ 删掉弹窗 → ✅ 直接赋值状态文本
+                    AtModuleStatus = "❌ 串口未打开，请先打开串口";
+                    return;
+                }
+
+                // 1. 标记：开始等待模块返回OK\r\n
+                _isWaitingATOk = true;
+                // 2. 赋值状态：正在下发指令
+                AtModuleStatus = "🔵 正在下发AT指令，等待模块响应...";
+                // 3. 下发核心指令 AT+AT\r\n (你的要求的指令，标准ASCII)
+                byte[] atCmd = System.Text.Encoding.ASCII.GetBytes("AT+AT\r\n");
+                comm.Send(atCmd,0,atCmd.Length);
+            }
+            catch (Exception ex)
+            {
+                // ❌ 删掉弹窗 → ✅ 赋值异常状态
+                AtModuleStatus = $"❌ 下发指令失败：{ex.Message}";
+                _isWaitingATOk = false;
+            }
+        }
+
+
+
         private void HandleSerialDataWrapper(object sender, DataReceivedEventArgs e)
         {
             HandleSerialData(e.Buffer, e.LastIndex, e.BufferLength);
         }
 
+        /*
         private void HandleSerialData(byte[] buffer, int lastIndex, int bufferLength)
         {
             try
@@ -117,6 +171,58 @@ namespace ocean.ViewModels
                 System.Diagnostics.Debug.WriteLine($"DBC解析数据异常: {ex.Message}");
             }
         }
+
+        */
+
+        private void HandleSerialData(byte[] buffer, int lastIndex, int bufferLength)
+        {
+            try
+            {
+                // ================ ✅ 新增：AT指令响应解析 (最顶部，优先执行，不影响CAN解析) ================
+                if (_isWaitingATOk)
+                {
+                    // 串口数据转ASCII字符串，匹配模块返回的 OK\r\n
+                    string recvAscii = Encoding.ASCII.GetString(buffer, lastIndex, bufferLength);
+                    if (recvAscii.Contains("OK\r\n"))
+                    {
+                        // 收到模块返回的OK，确认AT模式进入成功
+                        _isWaitingATOk = false;
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            //  赋值成功状态，UI自动刷新
+                            AtModuleStatus = "✅ AT指令模式进入成功，CAN可正常工作";
+                            _isWaitingATOk = false;
+                            return; // 解析完AT响应，无需走下方CAN解析流程
+                        });
+                        return; // 解析完AT响应，无需走下方CAN解析流程
+                    }
+                }
+                // ================ ✅ 原有CAN解析逻辑 【完全不变、一字未改、全部保留】 =====================
+                if (_dbcParser.DbcFrameList.Count == 0) return;
+
+                byte[] realData = new byte[bufferLength];
+                Array.Copy(buffer, lastIndex, realData, 0, bufferLength);
+
+                // 解析AT指令
+                CanAtFrameInfo parsedFrame = CanAtFrameBuilder.ParseFrame(realData);
+
+                if (realData.Length >= CAN_FIXED_FRAME_LEN)
+                {
+                    uint canId = parsedFrame.IdInfo.ExtendedFrameId;
+                    byte[] canData = parsedFrame.Data;
+
+                    var targetFrame = _dbcParser.ParseCanData(canId, canData);
+                    if (targetFrame == null) return;
+
+                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, RefreshFrameList);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"DBC解析数据异常: {ex.Message}");
+            }
+        }
+
 
         #endregion
 
