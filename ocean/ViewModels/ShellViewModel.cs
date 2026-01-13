@@ -30,8 +30,7 @@ namespace ocean.ViewModels
         {
             { CommunicationType.SerialPort, ("Views/SerialConfigPage.xaml", typeof(SerialConfigPage)) },
             { CommunicationType.Ethernet, ("Views/EthernetConfigPage.xaml", typeof(EthernetConfigPage)) },
-            { CommunicationType.CAN, ("Views/SerialConfigPage.xaml", typeof(CANConfigPage)) },
-            { CommunicationType.IIC, ("Views/IICConfigPage.xaml", typeof(IICConfigPage)) }
+            { CommunicationType.CAN, ("Views/CANConfigPage.xaml", typeof(CANConfigPage)) }           
         };
 
 
@@ -55,7 +54,7 @@ namespace ocean.ViewModels
             {
                 Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.ServerSolid },
                 Label = "通讯配置界面",
-                NavigationType = typeof(BugsPage),
+                NavigationType = typeof(SerialConfigPage),
                 NavigationDestination = new Uri("Views/SerialConfigPage.xaml", UriKind.RelativeOrAbsolute)
             });
             this.Menu.Add(new MenuItem()
@@ -74,7 +73,7 @@ namespace ocean.ViewModels
             });
             this.Menu.Add(new MenuItem()
             {
-                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.FileArrowDownSolid },
+                Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.CanadianMapleLeafBrands},
                 Label = "DBC界面",
                 NavigationType = typeof(DbcViewPage),
                 NavigationDestination = new Uri("Views/DbcViewPage.xaml", UriKind.RelativeOrAbsolute)
