@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
 namespace ocean.ViewModels
@@ -70,11 +71,18 @@ namespace ocean.ViewModels
                 byte[] realData = new byte[bufferLength];
                 Array.Copy(buffer, lastIndex, realData, 0, bufferLength);
 
+                // 解析AT指令
+                CanAtFrameInfo parsedFrame = CanAtFrameBuilder.ParseFrame(realData);
+                //parsedFrame.
+
                 if (realData.Length >= CAN_FIXED_FRAME_LEN)
                 {
-                    uint canId = BitConverter.ToUInt32(realData, 0);
-                    byte[] canData = new byte[8];
-                    Array.Copy(realData, 5, canData, 0, Math.Min(realData[4], (byte)8));
+                    //uint canId = BitConverter.ToUInt32(realData, 0);
+                    uint canId=parsedFrame.IdInfo.ExtendedFrameId;
+                    //byte[] canData = new byte[8];
+                    //Array.Copy(realData, 5, canData, 0, Math.Min(realData[4], (byte)8));
+
+                    byte[] canData=parsedFrame.Data;
 
                     var targetFrame = _dbcParser.ParseCanData(canId, canData);
                     if (targetFrame == null) return;

@@ -615,10 +615,10 @@ namespace ocean.ViewModels
                 hexStringView += hexString.Substring(i, 2) + " ";
             }
 
-            // 若勾选AdvantechCmd，追加0D
+            // 若勾选AdvantechCmd，追加0D 0A
             if (IsAdvantechCmdChecked)
             {
-                hexStringView += "0D";
+                hexStringView += "0D 0A";
             }
 
             Tb16ViewText = hexStringView;

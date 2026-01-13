@@ -187,6 +187,7 @@ namespace ocean.UI
                 {
                     if (hexState == false)
                     {
+
                         byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
                         // 替换 CommonRes.mySerialPort.Write 为 Send 接口
                         _serialComm.Send(sendData, 0, sendData.Length);
@@ -194,9 +195,9 @@ namespace ocean.UI
 
                         if (ckAdvantechCmd.IsChecked == true)
                         {
-                            byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D");
-                            _serialComm.Send(sendAdvCmd, 0, 1);
-                            txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + 1); // 修正：原逻辑重复加了sendData.Length
+                            byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D 0A");
+                            _serialComm.Send(sendAdvCmd, 0, 2);
+                            txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + 2); // 修正：原逻辑重复加了sendData.Length
                         }
                     }
                     else

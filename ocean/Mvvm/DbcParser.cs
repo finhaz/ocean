@@ -87,7 +87,9 @@ namespace ocean.Mvvm
             {
                 var boParts = line.Trim().Replace("BO_ ", "").Split(':');
                 var frameIdAndName = boParts[0].Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                var frameId = uint.Parse(frameIdAndName[0]);
+                var canId_Composite = uint.Parse(frameIdAndName[0]);
+                var canId_flag = canId_Composite & 0xE0000000;
+                var frameId = canId_Composite & 0x1FFFFFFF;
                 var frameName = frameIdAndName[1];
                 var dataLength = byte.Parse(boParts[1].Trim().Split(' ')[0]);
 
