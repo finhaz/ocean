@@ -29,6 +29,26 @@
                         Click="BtnLoadDbc_Click"/>
                 <TextBlock Margin="0,20,0,0" FontSize="12" Foreground="#333" Text="{Binding DbcLoadState}"/>
                 <TextBlock Margin="0,10,0,0" FontSize="12" Foreground="#333" Text="{Binding FrameCountInfo}"/>
+
+                <!-- ================ ✅ 只加这一块 最小改动 完美贴合 其他全不变 ================ -->
+                <Border Margin="0,30,0,0" BorderBrush="#007ACC" BorderThickness="1" CornerRadius="3" Width="160">
+                    <StackPanel Margin="5">
+                        <TextBlock FontSize="12" FontWeight="Bold" Foreground="#007ACC" Text="CAN帧发送"/>
+                        <!-- 选择要发送的帧 -->
+                        <ComboBox x:Name="CbxSendFrame" Width="150" Height="30" Margin="0,10,0,0" FontSize="11"
+                                  ItemsSource="{Binding DbcFrameList}"
+                                  SelectedItem="{Binding SelectedSendFrame}"
+                                  DisplayMemberPath="FrameName"/>
+                        <!-- 发送按钮 -->
+                        <Button x:Name="BtnSendCanFrame" Content="发送CAN帧" Width="150" Height="35" Margin="0,10,0,0"
+                                FontSize="12" Background="#007ACC" Foreground="White"
+                                Click="BtnSendCanFrame_Click"/>
+                        <!-- 发送状态提示 -->
+                        <TextBlock Margin="0,10,0,0" FontSize="11" Foreground="#007ACC" Text="{Binding SendStatus}"/>
+                    </StackPanel>
+                </Border>
+                <!-- ================ ✅ 新增结束 ================ -->
+
             </StackPanel>
         </Border>
 
@@ -46,15 +66,17 @@
                                         <Binding Path="DataLength"/>
                                     </MultiBinding>
                                 </Expander.Header>
-                                <DataGrid ItemsSource="{Binding Signals}" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="30" FontSize="12" Margin="0,5,0,0">
+                                <!-- 修改后代码：删掉全局的IsReadOnly="True"，然后给【除了原始值外的所有列】单独加IsReadOnly="True" -->
+                                <DataGrid ItemsSource="{Binding Signals}" AutoGenerateColumns="False" RowHeight="30" FontSize="12" Margin="0,5,0,0">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="信号名称" Binding="{Binding SignalName}" Width="180"/>
-                                        <DataGridTextColumn Header="原始值" Binding="{Binding RawValue}" Width="100"/>
-                                        <DataGridTextColumn Header="物理值" Binding="{Binding PhysicalValue}" Width="120"/>
-                                        <DataGridTextColumn Header="单位" Binding="{Binding Unit}" Width="80"/>
-                                        <DataGridTextColumn Header="更新时间" Binding="{Binding UpdateTime}" Width="150"/>
-                                        <DataGridTextColumn Header="起始位" Binding="{Binding StartBit}" Width="80"/>
-                                        <DataGridTextColumn Header="位长" Binding="{Binding BitLength}" Width="80"/>
+                                        <DataGridTextColumn Header="信号名称" Binding="{Binding SignalName}" Width="180" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="原始值" Binding="{Binding RawValue, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                                        <!-- ✅ 可编辑+实时绑定更新 -->
+                                        <DataGridTextColumn Header="物理值" Binding="{Binding PhysicalValue}" Width="120" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="单位" Binding="{Binding Unit}" Width="80" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="更新时间" Binding="{Binding UpdateTime}" Width="150" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="起始位" Binding="{Binding StartBit}" Width="80" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="位长" Binding="{Binding BitLength}" Width="80" IsReadOnly="True"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Expander>

@@ -43,5 +43,12 @@ namespace ocean.Views
                 _viewModel.LoadDbcFile(ofd.FileName);
             }
         }
+
+        // ✅ 只新增这一个方法，仅此一行代码
+        private void BtnSendCanFrame_Click(object sender, RoutedEventArgs e)
+        {
+            var vm = this.DataContext as ViewModels.DbcViewModel;
+            vm?.SendCanFrameByDbc();
+        }
     }
 }
