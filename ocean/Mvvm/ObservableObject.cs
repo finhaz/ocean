@@ -14,7 +14,7 @@ namespace ocean.Mvvm
     /// 实现属性变更通知的基础类，用于MVVM架构中绑定数据模型与视图
     /// 所有需要实现属性双向绑定的实体类/ViewModel类均可继承此类
     /// </summary>
-    public class ObservableObject : INotifyPropertyChanged
+    public abstract class ObservableObject : INotifyPropertyChanged
     {
         /// <summary>
         /// 属性值发生变更时触发的多播事件
