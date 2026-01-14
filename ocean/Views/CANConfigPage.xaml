@@ -79,7 +79,6 @@
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                         <TextBlock Text="停止位：" Width="100" FontSize="14" Foreground="#666"/>
                         <ComboBox Width="200" Height="30" SelectedIndex="{Binding SelectedStopBit}">
-                            <ComboBoxItem>0.5位</ComboBoxItem>
                             <ComboBoxItem>1位</ComboBoxItem>
                             <ComboBoxItem>1.5位</ComboBoxItem>
                             <ComboBoxItem>2位</ComboBoxItem>

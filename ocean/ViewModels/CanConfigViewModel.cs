@@ -263,6 +263,9 @@ namespace ocean.ViewModels
         #endregion
 
         #region ==== 对外核心方法-读取/保存/恢复 (原有保留+串口校验强化) ====
+        /// <summary>
+        /// 读取模块当前所有配置【终极完善，解析所有三类查询指令，参数自动同步到界面】
+        /// </summary>
         public async Task ReadCanConfigAsync()
         {
             if (!CheckSerialConn()) return;
@@ -270,6 +273,7 @@ namespace ocean.ViewModels
             AtModuleStatus = "正在读取模块配置...";
             try
             {
+                // 进入AT配置模式
                 _isWaitingATOk = true;
                 bool enterOk = await SendAtCmdAsync("AT+CG\r\n");
                 if (!enterOk)
@@ -279,16 +283,58 @@ namespace ocean.ViewModels
                     return;
                 }
 
-                await SendAtCmdAsync("AT+CAN_MODE=?\r\n");
-                await SendAtCmdAsync("AT+CAN_BAUD=?\r\n");
-                await SendAtCmdAsync("AT+USART_PARAM=?\r\n");
-                await SendAtCmdAsync("AT+CAN_FRAMEFORMAT=?\r\n");
-                await SendAtCmdAsync("AT+CAN_FILTER0=?\r\n");
+                // ========== 1. 读取CAN工作模式 AT+CAN_MODE=? ==========
+                string modeResult = await SendAtQueryCmdAsync("AT+CAN_MODE=?\r\n");
+                if (!string.IsNullOrEmpty(modeResult) && modeResult != "ERROR")
+                {
+                    string modeVal = ParseAtResultValue(modeResult);
+                    if (int.TryParse(modeVal, out int mode))
+                    {
+                        SelectedWorkMode = mode;
+                    }
+                }
 
+                // ========== 2. 读取CAN波特率 AT+CAN_BAUD=? ==========
+                string baudResult = await SendAtQueryCmdAsync("AT+CAN_BAUD=?\r\n");
+                if (!string.IsNullOrEmpty(baudResult) && baudResult != "ERROR")
+                {
+                    string baudVal = ParseAtResultValue(baudResult);
+                    if (int.TryParse(baudVal, out int baud))
+                    {
+                        var matchItem = CanBaudList.Find(x => x.Value == baud);
+                        if (matchItem != null)
+                        {
+                            SelectedCanBaud = CanBaudList.IndexOf(matchItem);
+                        }
+                    }
+                }
+
+                // ========== 3. 读取串口参数 AT+USART_PARAM=? ✅核心解析✅ ==========
+                string usartResult = await SendAtQueryCmdAsync("AT+USART_PARAM=?\r\n");
+                if (!string.IsNullOrEmpty(usartResult) && usartResult != "ERROR")
+                {
+                    ParseUsartParam(usartResult);
+                }
+
+                // ========== 4. 读取CAN帧格式配置 AT+CAN_FRAMEFORMAT=? ✅核心解析✅ ==========
+                string frameResult = await SendAtQueryCmdAsync("AT+CAN_FRAMEFORMAT=?\r\n");
+                if (!string.IsNullOrEmpty(frameResult) && frameResult != "ERROR")
+                {
+                    ParseCanFrameFormat(frameResult);
+                }
+
+                // ========== 5. 读取CAN滤波器配置 AT+CAN_FILTER0=? ✅核心解析✅ ==========
+                string filterResult = await SendAtQueryCmdAsync("AT+CAN_FILTER0=?\r\n");
+                if (!string.IsNullOrEmpty(filterResult) && filterResult != "ERROR")
+                {
+                    ParseCanFilter(filterResult);
+                }
+
+                // 退出配置模式
                 await SendAtCmdAsync("AT+ET\r\n");
                 _isConfigMode = false;
                 _isWaitingATOk = false;
-                AtModuleStatus = "✅ 配置读取完成";
+                AtModuleStatus = "✅ 配置读取完成，所有参数已同步到界面";
             }
             catch (Exception ex)
             {
@@ -296,6 +342,7 @@ namespace ocean.ViewModels
                 _isWaitingATOk = false;
             }
         }
+
 
         public async Task SaveCanConfigAsync()
         {
@@ -436,13 +483,156 @@ namespace ocean.ViewModels
                 waitMs += 50;
                 lock (_recvBuffer)
                 {
-                    if (_recvBuffer.ToString().Contains("OK\r\n")) return true;
-                    if (_recvBuffer.ToString().Contains("ERROR\r\n")) return false;
+                    if (_recvBuffer.ToString().Contains("OK\r\n")) 
+                        return true;
+                    if (_recvBuffer.ToString().Contains("ERROR\r\n")) 
+                        return false;
                 }
             }
             return false;
         }
+
+
+        /// <summary>
+        /// 版本2 - 发送查询类AT指令，返回完整的模块响应内容【核心适配多行/多参数返回】
+        /// 适用：所有带=?的查询指令，兼容单行/多行返回，自动过滤无效内容
+        /// 返回：纯净的指令返回行 如 +CAN_MODE:0 、+USART_PARAM:115200,8,1,0
+        /// </summary>
+        private async Task<string> SendAtQueryCmdAsync(string cmd)
+        {
+            lock (_recvBuffer) { _recvBuffer.Clear(); }
+            byte[] sendBytes = _encode.GetBytes(cmd);
+            _comm.Send(sendBytes, 0, sendBytes.Length);
+
+            int waitMs = 0;
+            while (waitMs < AtCmdTimeout)
+            {
+                await Task.Delay(30);
+                waitMs += 30;
+                lock (_recvBuffer)
+                {
+                    string recvStr = _recvBuffer.ToString();
+                    if (!string.IsNullOrEmpty(recvStr))
+                    {
+                        // 核心适配：过滤所有无效内容，只提取以 + 开头的有效指令返回行
+                        foreach (var line in recvStr.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            if (line.StartsWith("+"))
+                            {
+                                return line.Trim();
+                            }
+                        }
+                        // 如果匹配到ERROR，直接返回ERROR
+                        if (recvStr.Contains("ERROR"))
+                        {
+                            return "ERROR";
+                        }
+                    }
+                }
+            }
+            return string.Empty; //超时返回空
+        }
+
+        /// <summary>
+        /// 通用解析：提取AT指令返回的参数部分 如 +XXX:内容 → 内容
+        /// </summary>
+        private string ParseAtResultValue(string atResult)
+        {
+            if (string.IsNullOrEmpty(atResult) || !atResult.Contains(":") || atResult == "ERROR")
+                return string.Empty;
+            return atResult.Split(new[] { ':' }, 2)[1].Trim();
+        }
+
         #endregion
+
+        #region ✅ 新增：3个专用解析方法【精准解析三类查询指令的多参数返回】✅
+        /// <summary>
+        /// 解析 AT+USART_PARAM=? 返回值 → +USART_PARAM:<Baud>,<DataBit>,<StopBit>,<ParityBit>
+        /// 参数顺序：波特率,数据位,停止位,校验位
+        /// </summary>
+        private void ParseUsartParam(string usartResult)
+        {
+            string paramStr = ParseAtResultValue(usartResult);
+            if (string.IsNullOrEmpty(paramStr)) return;
+
+            string[] paramArr = paramStr.Split(',');
+            if (paramArr.Length != 4) return;
+
+            // 解析波特率 → 匹配下拉列表赋值
+            if (int.TryParse(paramArr[0], out int baud) && SerialBaudList.Contains(baud))
+            {
+                SelectedSerialBaud = SerialBaudList.IndexOf(baud);
+            }
+            // 解析数据位 →直接赋值 0=8位 1=9位
+            if (int.TryParse(paramArr[1], out int databit))
+            {
+                SelectedDataBit = databit;
+            }
+            // 解析停止位 → 直接赋值
+            if (int.TryParse(paramArr[2], out int stopbit))
+            {
+                SelectedStopBit = stopbit;
+            }
+            // 解析校验位 → 直接赋值
+            if (int.TryParse(paramArr[3], out int parity))
+            {
+                SelectedParity = parity;
+            }
+        }
+
+        /// <summary>
+        /// 解析 AT+CAN_FRAMEFORMAT=? 返回值 → +CAN_FRAMEFORMAT:<Enable>,<FrameFormat>,<StdID>,<ExtID>
+        /// 参数顺序：透传使能,帧格式,标准ID,扩展ID
+        /// </summary>
+        private void ParseCanFrameFormat(string frameResult)
+        {
+            string paramStr = ParseAtResultValue(frameResult);
+            if (string.IsNullOrEmpty(paramStr)) return;
+
+            string[] paramArr = paramStr.Split(',');
+            if (paramArr.Length != 4) return;
+
+            // 解析透传使能 → bool值
+            if (int.TryParse(paramArr[0], out int enable))
+            {
+                IsTransEnable = enable == 1;
+            }
+            // 解析帧格式 → 0=标准帧 1=扩展帧
+            if (int.TryParse(paramArr[1], out int frameFormat))
+            {
+                SelectedFrameFormat = frameFormat;
+            }
+            // 解析标准ID
+            StdId = paramArr[2].Trim();
+            // 解析扩展ID
+            ExtId = paramArr[3].Trim();
+        }
+
+        /// <summary>
+        /// 解析 AT+CAN_FILTER0=? 返回值 → +CAN_FILTER0:<Enable>,<Mode>,<Id>,<MaskId>
+        /// 参数顺序：滤波器使能,滤波模式,过滤ID,掩码ID
+        /// </summary>
+        private void ParseCanFilter(string filterResult)
+        {
+            string paramStr = ParseAtResultValue(filterResult);
+            if (string.IsNullOrEmpty(paramStr)) return;
+
+            string[] paramArr = paramStr.Split(',');
+            if (paramArr.Length != 4) return;
+
+            // 解析滤波器使能 → bool值
+            if (int.TryParse(paramArr[0], out int enable))
+            {
+                IsFilterEnable = enable == 1;
+            }
+            // 解析过滤ID
+            FilterId = paramArr[2].Trim();
+            // 解析掩码ID
+            MaskId = paramArr[3].Trim();
+        }
+        #endregion
+
+
 
         #region ==== 串口接收逻辑【你的原版写法，一字未改】核心重点 ====
         private void HandleSerialDataWrapper(object sender, DataReceivedEventArgs e)
@@ -459,6 +649,7 @@ namespace ocean.ViewModels
                     string recvAscii = Encoding.ASCII.GetString(buffer, lastIndex, bufferLength);
                     lock (_recvBuffer) { _recvBuffer.Append(recvAscii); }
 
+                    /*
                     if (recvAscii.Contains("OK\r\n"))
                     {
                         _isWaitingATOk = false;
@@ -479,21 +670,8 @@ namespace ocean.ViewModels
                         });
                         return;
                     }
+                    */
                 }
-
-                // ================ 你的原有CAN解析逻辑 直接粘贴这里 =====================
-                // if (_dbcParser.DbcFrameList.Count == 0) return;
-                // byte[] realData = new byte[bufferLength];
-                // Array.Copy(buffer, lastIndex, realData, 0, bufferLength);
-                // CanAtFrameInfo parsedFrame = CanAtFrameBuilder.ParseFrame(realData);
-                // if (realData.Length >= CAN_FIXED_FRAME_LEN)
-                // {
-                //     uint canId = parsedFrame.IdInfo.ExtendedFrameId;
-                //     byte[] canData = parsedFrame.Data;
-                //     var targetFrame = _dbcParser.ParseCanData(canId, canData);
-                //     if (targetFrame == null) return;
-                //     Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, RefreshFrameList);
-                // }
 
             }
             catch (Exception ex)
@@ -513,7 +691,7 @@ namespace ocean.ViewModels
         public void Dispose()
         {
             _comm.DataReceived -= HandleSerialDataWrapper;
-            _comm?.Dispose();
+            //_comm?.Dispose();
         }
         #endregion
     }

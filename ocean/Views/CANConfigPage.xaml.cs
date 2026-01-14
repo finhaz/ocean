@@ -14,11 +14,13 @@ namespace ocean.Views
     public partial class CANConfigPage : Page, IDisposable
     {
         private readonly CanConfigViewModel _viewModel;
+        ICommunication comm;
 
         public CANConfigPage()
         {
             InitializeComponent();
-            ICommunication comm = new SerialCommunication();
+            
+            comm = CommunicationManager.Instance.GetCurrentCommunication();
             _viewModel = new CanConfigViewModel(comm);
             this.DataContext = _viewModel;
         }
@@ -28,6 +30,8 @@ namespace ocean.Views
         {
             SerialConfigWindow window = new SerialConfigWindow(_viewModel);
             window.ShowDialog();
+
+
         }
 
         private async void BtnRead_Click(object sender, RoutedEventArgs e)
