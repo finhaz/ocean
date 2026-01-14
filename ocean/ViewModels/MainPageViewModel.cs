@@ -5,10 +5,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ocean.Mvvm;
 
 namespace ocean.ViewModels
 {
-    public class MainPageViewModel : INotifyPropertyChanged
+    public class MainPageViewModel : ObservableObject
     {
         // 绑定到全局AppViewModel
         private AppViewModel _appViewModel = AppViewModel.Instance;
@@ -28,11 +29,5 @@ namespace ocean.ViewModels
             get => _appViewModel.SelectedCommType;
             set => _appViewModel.SelectedCommType = value;
         }
-
-        #region INotifyPropertyChanged实现
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        #endregion
     }
 }

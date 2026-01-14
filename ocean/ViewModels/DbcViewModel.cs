@@ -15,7 +15,7 @@ using System.Windows.Threading;
 
 namespace ocean.ViewModels
 {
-    public class DbcViewModel : INotifyPropertyChanged, IDisposable
+    public class DbcViewModel : ObservableObject, IDisposable
     {
         #region === 核心变量 ===
         private readonly ICommunication _comm;
@@ -361,11 +361,6 @@ namespace ocean.ViewModels
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         #endregion
     }

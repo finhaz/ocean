@@ -14,11 +14,11 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using ocean.Communication;
+
 
 namespace ocean.ViewModels
 {
-    public class EthernetConfigViewModel : INotifyPropertyChanged
+    public class EthernetConfigViewModel : ObservableObject
     {
         // 原有字段补充UDP模式
         private string _udpMode = "Server"; // UDP Server/Client
@@ -320,12 +320,7 @@ namespace ocean.ViewModels
             });
         }
 
-        // INotifyPropertyChanged实现保留
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+
     }  
 
 }

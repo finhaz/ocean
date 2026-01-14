@@ -1,5 +1,6 @@
 ﻿using ocean.Communication;
 using ocean.Interfaces;
+using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +13,7 @@ using System.Windows.Threading;
 
 namespace ocean.ViewModels
 {
-    public class CanConfigViewModel : INotifyPropertyChanged, IDisposable
+    public class CanConfigViewModel : ObservableObject, IDisposable
     {
         #region ==== 核心字段(原有+新增串口配置字段，严格适配你的SerialConfig/SerialCommunication) ====
         private readonly ICommunication _comm;
@@ -682,11 +683,6 @@ namespace ocean.ViewModels
         #endregion
 
         #region ==== 接口实现 (原有保留+解绑事件) ====
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
 
         public void Dispose()
         {
