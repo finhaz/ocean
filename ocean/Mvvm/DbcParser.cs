@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.IO;
+using ocean.Communication;
 
 namespace ocean.Mvvm
 {

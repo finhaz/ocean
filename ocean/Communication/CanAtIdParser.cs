@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ocean.Mvvm
+namespace ocean.Communication
 {
     /// <summary>
     /// 模拟CAN协议AT指令ID解析工具类
@@ -30,13 +30,13 @@ namespace ocean.Mvvm
             {
                 RawId = rawId,
                 // 标准帧ID：高11位 (bit31-bit21)
-                StandardFrameId = (ushort)((rawId >> 21) & 0x7FF),
+                StandardFrameId = (ushort)(rawId >> 21 & 0x7FF),
                 // 扩展帧ID：高11位 + 中间18位 (bit31-bit3)
-                ExtendedFrameId = (uint)((rawId >> 3) & 0x1FFFFFFF),
+                ExtendedFrameId = rawId >> 3 & 0x1FFFFFFF,
                 // 扩展帧标识：bit2
-                IsExtendedFrame = ((rawId >> 2) & 0x01) == 1,
+                IsExtendedFrame = (rawId >> 2 & 0x01) == 1,
                 // 远程帧标识：bit1
-                IsRemoteFrame = ((rawId >> 1) & 0x01) == 1,
+                IsRemoteFrame = (rawId >> 1 & 0x01) == 1,
                 // Bit0固定为0
                 Bit0 = (byte)(rawId & 0x01)
             };
@@ -74,9 +74,9 @@ namespace ocean.Mvvm
             // 转换为大端序4字节数组
             return new[]
             {
-            (byte)((rawId >> 24) & 0xFF),
-            (byte)((rawId >> 16) & 0xFF),
-            (byte)((rawId >> 8) & 0xFF),
+            (byte)(rawId >> 24 & 0xFF),
+            (byte)(rawId >> 16 & 0xFF),
+            (byte)(rawId >> 8 & 0xFF),
             (byte)(rawId & 0xFF)
         };
         }

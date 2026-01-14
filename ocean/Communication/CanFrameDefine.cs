@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ocean.Mvvm
+namespace ocean.Communication
 {
     /// <summary>
     /// CAN帧实体 (对应DBC中的BO_)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ocean.Mvvm
+namespace ocean.Communication
 {
     /// <summary>
     /// 模拟CAN协议的AT指令帧生成器
@@ -28,7 +28,7 @@ namespace ocean.Mvvm
         public static byte[] BuildFrame(uint frameId, bool isExtendedFrame, bool isRemoteFrame, byte[] data = null)
         {
             // 远程帧数据长度必须为0
-            if (isRemoteFrame && (data != null && data.Length > 0))
+            if (isRemoteFrame && data != null && data.Length > 0)
                 throw new ArgumentException("远程帧不能包含数据", nameof(data));
 
             // 打包4字节原始ID
