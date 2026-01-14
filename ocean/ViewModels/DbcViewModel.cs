@@ -106,8 +106,7 @@ namespace ocean.ViewModels
         {
             try
             {
-                var comm = ocean.Communication.CommunicationManager.Instance.GetCurrentCommunication();
-                if (comm == null || !comm.IsConnected)
+                if (_comm == null || !_comm.IsConnected)
                 {
                     // ❌ 删掉弹窗 → ✅ 直接赋值状态文本
                     AtModuleStatus = "❌ 串口未打开，请先打开串口";
@@ -120,7 +119,7 @@ namespace ocean.ViewModels
                 AtModuleStatus = "🔵 正在下发AT指令，等待模块响应...";
                 // 3. 下发核心指令 AT+AT\r\n (你的要求的指令，标准ASCII)
                 byte[] atCmd = System.Text.Encoding.ASCII.GetBytes("AT+AT\r\n");
-                comm.Send(atCmd,0,atCmd.Length);
+                _comm.Send(atCmd,0,atCmd.Length);
             }
             catch (Exception ex)
             {

@@ -52,11 +52,11 @@ namespace ocean
         // 新增：实现IProtocol接口的MonitorRun（适配统一调用）
         public int MonitorRun(byte[] sendbf, bool brun, int addr = 0)
         {
-            float order = 0;
+            byte[] order = new byte[] { (byte)0x00, (byte)0xaa };
             if (brun)
-                order = 0xaa;
+                order[1]= (byte)0xaa;
             else
-                order = 0x55;
+                order[1] = (byte)0x55;
 
             MonitorSet(sendbf, addr, order);
             // 返回Modbus固定发送长度

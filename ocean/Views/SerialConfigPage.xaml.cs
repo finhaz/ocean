@@ -50,9 +50,9 @@ namespace ocean.UI
 
             try
             {
-                // 获取串口实例（替换 CommonRes.mySerialPort）
-                _serialComm = CommunicationManager.Instance.GetSerialInstance();
-                // 设置串口编码（替换 CommonRes.mySerialPort.Encoding）
+                // 获取串口实例
+                _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
+                // 设置串口编码
                 _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
             }
             catch (InvalidOperationException ex)
@@ -223,7 +223,7 @@ namespace ocean.UI
         {
             try
             {
-                _serialComm = CommunicationManager.Instance.GetSerialInstance();
+                _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
             }
             catch (InvalidOperationException ex)
             {

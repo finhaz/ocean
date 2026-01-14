@@ -21,36 +21,25 @@ namespace ocean.Communication
         private ICommunication _currentComm;
         // 当前通讯类型
         private CommunicationType _currentType;
-        // 串口实例缓存（专门供SerialConfigPage调用）
-        private SerialCommunication _serialInstance;
 
         // 创建串口实例
         public void CreateSerialInstance()
         {
-            // 释放原有串口实例
-            _serialInstance?.Dispose();
-            // 创建新串口实例并缓存
-            _serialInstance = new SerialCommunication();
+            // 释放原有实例
+            DisposeCurrentInstance();
             // 设置为当前通讯实例
-            _currentComm = _serialInstance;
+            _currentComm = new SerialCommunication(); ;
             _currentType = CommunicationType.SerialPort;
         }
 
         // 创建以太网实例（区分TCP/UDP）
         public void CreateEthernetInstance()
         {
+            // 释放原有实例
             DisposeCurrentInstance();
             // 先创建空的以太网实例（后续由EthernetConfigViewModel替换为TCP/UDP）
             _currentComm = new EmptyEthernetCommunication();
             _currentType = CommunicationType.Ethernet;
-        }
-
-        // GetSerialInstance 方法（SerialConfigPage 专用）
-        public SerialCommunication GetSerialInstance()
-        {
-            if (_serialInstance == null)
-                throw new InvalidOperationException("请先在MainPage选择“串口”创建实例！");
-            return _serialInstance;
         }
 
         //获取当前通讯实例
