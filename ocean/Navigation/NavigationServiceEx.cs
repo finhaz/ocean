@@ -1,5 +1,4 @@
-﻿using SomeNameSpace;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -68,15 +67,7 @@ namespace ocean.Navigation
         }
         public void WindowClosing()
         {
-            //MessageBox.Show("数据将保存！");
 
-            //DB_Access.UpdateDBTable(CommonRes.dt1, "PARAMETER_RUN");
-            //DB_Access.UpdateDBTable(CommonRes.dt2, "PARAMETER_SET");
-            //DB_Access.UpdateDBTable(CommonRes.dt3, "PARAMETER_FACTOR");
-
-            //DB_sqlite.UpdateDBTable(CommonRes.dt1, "PARAMETER_RUN");
-            //DB_sqlite.UpdateDBTable(CommonRes.dt2, "PARAMETER_SET");
-            //DB_sqlite.UpdateDBTable(CommonRes.dt3, "PARAMETER_FACTOR");
         }
 
 
