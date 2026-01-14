@@ -36,9 +36,9 @@ namespace ocean.UI
 
         // 缓存当前串口实例（避免重复获取）
         private SerialCommunication _serialComm;
-
-        // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
-        private ICommunication _comm;
+        //这里不用CommunicationManager单例特性，是因为本页面专门针对的是串口
+        //配置的时候专门针对串口优化，等其他页面使用就选择_comm，利用公共属性
+        //private ICommunication _comm;
 
         public SerialConfigPage()
         {
@@ -101,16 +101,6 @@ namespace ocean.UI
         /// </summary>
         private void btOpenCom_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _serialComm = CommunicationManager.Instance.GetSerialInstance();
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message);
-                return;
-            }
-
             if (_serialComm.IsConnected)
             {
                 // 关闭串口逻辑
@@ -171,16 +161,6 @@ namespace ocean.UI
 
         public void btSend_Event(string strSend, bool hexState)
         {
-            try
-            {
-                _serialComm = CommunicationManager.Instance.GetSerialInstance();
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message);
-                return;
-            }
-
             if (_serialComm.IsConnected)
             {
                 try
@@ -472,7 +452,6 @@ namespace ocean.UI
             }
             try
             {
-                _serialComm = CommunicationManager.Instance.GetSerialInstance();
                 // 绑定DataReceived事件（替代原CommonRes.CurrentDataHandler赋值）
                 _serialComm.DataReceived += DebugSerialDataHandler;
             }
