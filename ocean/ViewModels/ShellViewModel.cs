@@ -17,7 +17,7 @@ namespace ocean.ViewModels
         CAN,
         IIC
     }
-    public class ShellViewModel : BindableBase
+    public class ShellViewModel : ObservableObject
     {
         public ObservableCollection<MenuItem> Menu { get; } = new();
 
