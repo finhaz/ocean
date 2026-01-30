@@ -102,15 +102,28 @@ namespace ocean.Communication
 
             SerialTextBlock = new TextBlock<string>();
             // 初始化命令：执行逻辑 + 可执行判断
+            /*
             ButtonIncrease = new MyCommand(
                 execAction: ButtonIncreaseAction,
                 changeFunc: parameter => true     // 可选：可执行条件（始终返回true）
             );
+            */
+            // 直接绑定改造后的方法，无需lambda包装，逻辑更清晰
+            ButtonIncrease = new RelayCommand<object>(
+                ButtonIncreaseAction,  // 执行逻辑
+                CanButtonIncrease      // 可执行判断逻辑（也可继续直接写 parameter => true）
+            );
+
 
             InitTimer();
             
         }
-
+        // 可执行判断方法，匹配 Predicate<object> 签名
+        private bool CanButtonIncrease(object parameter)
+        {
+            // 保留原有逻辑：始终返回true（后续可修改为具体判断条件，如 return Count < 100;）
+            return true;
+        }
         // 协议切换（选择框事件调用）
         public void InitProtocol(string protocolNum)
         {

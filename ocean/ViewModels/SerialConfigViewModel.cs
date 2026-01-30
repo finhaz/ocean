@@ -25,7 +25,7 @@ namespace ocean.ViewModels
         public ICommand SaveReceiveDataCommand { get; }
 
         // 保存数据的核心方法
-        private void ExecuteSaveReceiveData()
+        private void ExecuteSaveReceiveData(object _)
         {
             try
             {
@@ -301,17 +301,17 @@ namespace ocean.ViewModels
         /// <summary>
         /// 16进制发送复选框点击命令
         /// </summary>
-        public ICommand HexSendClickCommand { get; }
+        //public ICommand HexSendClickCommand { get; }
 
         /// <summary>
         /// 自动发送复选框点击命令
         /// </summary>
-        public ICommand AutoSendClickCommand { get; }
+        //public ICommand AutoSendClickCommand { get; }
 
         /// <summary>
         /// 16进制显示复选框点击命令（新增）
         /// </summary>
-        public ICommand HexViewClickCommand { get; }
+        //public ICommand HexViewClickCommand { get; }
         #endregion
 
         #region 构造函数
@@ -320,7 +320,9 @@ namespace ocean.ViewModels
             InitPortNames();
             InitComStateStyle();
             // 初始化保存命令
-            SaveReceiveDataCommand = new ActionCommand(ExecuteSaveReceiveData);
+            //SaveReceiveDataCommand = new ActionCommand(ExecuteSaveReceiveData);
+
+            SaveReceiveDataCommand = new RelayCommand<object>(ExecuteSaveReceiveData);
             // 初始化命令
             //HexSendClickCommand = new RelayCommand(OnHexSendClicked);
             //AutoSendClickCommand = new RelayCommand(OnAutoSendClicked);
