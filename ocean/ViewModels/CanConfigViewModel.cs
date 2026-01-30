@@ -420,7 +420,7 @@ namespace ocean.ViewModels
         {
             SelectedWorkMode = 0;
             SelectedCanBaud = 3;
-            SelectedSerialBaud = 4;
+            SelectedSerialBaud = 1;
             SelectedDataBit = 0;
             SelectedStopBit = 1;
             SelectedParity = 0;
