@@ -67,7 +67,7 @@
                     <TextBlock Text="串口参数" FontSize="16" FontWeight="Medium" Margin="0,15,0,8" Foreground="#444"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                         <TextBlock Text="串口波特率：" Width="100" FontSize="14" Foreground="#666"/>
-                        <ComboBox Width="200" Height="30" SelectedIndex="{Binding SelectedSerialBaud}" ItemsSource="{Binding SerialBaudList}"/>
+                        <ComboBox Width="200" Height="30" SelectedIndex="{Binding SelectedSerialBaud}" ItemsSource="{Binding PortConfig.BaudRates}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                         <TextBlock Text="数据位：" Width="100" FontSize="14" Foreground="#666"/>

@@ -3,6 +3,7 @@ using ocean.Interfaces;
 using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO.Ports;
 using System.Runtime.CompilerServices;
@@ -23,13 +24,8 @@ namespace ocean.ViewModels
         private bool _isConfigMode = false;
         public bool _isWaitingATOk = false;
 
-        //==== 新增：串口配置字段 (和弹窗绑定，完全适配你的SerialConfig) ====
-        private string _selectedPortName = "COM3";
-        private int _selectedPortBaud = 115200;
-        private int _selectedPortDataBits = 8;
-        private string _selectedPortParity = "无";
-        private int _selectedPortStopBit = 1;
-        private List<string> _portNameList = new();
+        public SerialPortConfig PortConfig { get; set; } = new SerialPortConfig();
+
         #endregion
 
         #region ==== 界面双向绑定属性 (原有全部保留) ====
@@ -47,7 +43,7 @@ namespace ocean.ViewModels
             set { _selectedCanBaud = value; OnPropertyChanged(); }
         }
 
-        private int _selectedSerialBaud = 4;
+        private int _selectedSerialBaud = 1;
         public int SelectedSerialBaud
         {
             get => _selectedSerialBaud;
@@ -132,42 +128,6 @@ namespace ocean.ViewModels
         }
         #endregion
 
-        #region ==== 新增：串口配置弹窗绑定属性 (核心) ====
-        public string SelectedPortName
-        {
-            get => _selectedPortName;
-            set { _selectedPortName = value; OnPropertyChanged(); }
-        }
-        public int SelectedPortBaud
-        {
-            get => _selectedPortBaud;
-            set { _selectedPortBaud = value; OnPropertyChanged(); }
-        }
-        public int SelectedPortDataBits
-        {
-            get => _selectedPortDataBits;
-            set { _selectedPortDataBits = value; OnPropertyChanged(); }
-        }
-        public string SelectedPortParity
-        {
-            get => _selectedPortParity;
-            set { _selectedPortParity = value; OnPropertyChanged(); }
-        }
-        public int SelectedPortStopBit
-        {
-            get => _selectedPortStopBit;
-            set { _selectedPortStopBit = value; OnPropertyChanged(); }
-        }
-        public List<string> PortNameList
-        {
-            get => _portNameList;
-            set { _portNameList = value; OnPropertyChanged(); }
-        }
-        public List<int> PortBaudList { get; } = new() { 4800, 9600, 38400, 57600, 115200, 230400, 460800 };
-        public List<int> PortDataBitsList { get; } = new() { 7, 8, 9 };
-        public List<string> PortParityList { get; } = new() { "无", "奇校验", "偶校验" };
-        public List<int> PortStopBitList { get; } = new() { 0, 1, 2 };
-        #endregion
 
         #region ==== 下拉数据源 (原有保留) ====
         public List<CanBaudItem> CanBaudList { get; } = new()
@@ -181,7 +141,6 @@ namespace ocean.ViewModels
             new CanBaudItem{Value=1000000,Text="1Mbps"}
         };
 
-        public List<int> SerialBaudList { get; } = new() { 4800, 9600, 38400, 57600, 115200, 230400, 460800 };
         #endregion
 
         #region ==== 构造函数 (原有+初始化串口列表) ====
@@ -203,8 +162,8 @@ namespace ocean.ViewModels
         /// </summary>
         public void RefreshPortNameList()
         {
-            PortNameList = new List<string>(SerialPort.GetPortNames());
-            AtModuleStatus = PortNameList.Count > 0 ? "已加载串口号，请选择配置" : "未检测到可用串口";
+            PortConfig.PortNames= new ObservableCollection<string>(SerialPort.GetPortNames());
+            AtModuleStatus = PortConfig.PortNames.Count > 0 ? "已加载串口号，请选择配置" : "未检测到可用串口";
         }
 
         /// <summary>
@@ -221,14 +180,15 @@ namespace ocean.ViewModels
                 //实例化你的SerialConfig，赋值配置参数，严格适配你的类
                 SerialConfig config = new SerialConfig()
                 {
-                    SelectedPortName = SelectedPortName,
-                    SelectedBaudRate = SelectedPortBaud,
-                    SelectedDataBits = SelectedPortDataBits,
-                    SelectedParityName = SelectedPortParity,
-                    SelectedStopBit = SelectedPortStopBit
+                    SelectedPortName = PortConfig.SelectedPortName,
+                    SelectedBaudRate = PortConfig.SelectedBaudRate,
+                    SelectedDataBits = PortConfig.SelectedDataBit,
+                    SelectedParityName = PortConfig.SelectedParityName,
+                    SelectedStopBit = PortConfig.SelectedStopBit
                 };
                 _comm.Open(config);
-                AtModuleStatus = $"✅ 串口打开成功：{SelectedPortName} {SelectedPortBaud}bps";
+                //AtModuleStatus = $"✅ 串口打开成功：{SelectedPortName} {SelectedPortBaud}bps";
+                AtModuleStatus = $"✅ 串口打开成功：{PortConfig.SelectedPortName} {PortConfig.SelectedBaudRate}bps";
                 return "打开成功";
             }
             catch (Exception ex)
@@ -353,6 +313,7 @@ namespace ocean.ViewModels
             AtModuleStatus = "正在写入配置到模块...";
             try
             {
+                
                 _isWaitingATOk = true;
                 bool enterOk = await SendAtCmdAsync("AT+CG\r\n");
                 if (!enterOk)
@@ -364,8 +325,9 @@ namespace ocean.ViewModels
 
                 await SendAtCmdAsync($"AT+CAN_MODE={SelectedWorkMode}\r\n");
                 await SendAtCmdAsync($"AT+CAN_BAUD={CanBaudList[SelectedCanBaud].Value}\r\n");
-
-                int serialBaud = SerialBaudList[SelectedSerialBaud];
+                
+                //int serialBaud = SerialBaudList[SelectedSerialBaud];
+                int serialBaud = PortConfig.BaudRates[SelectedSerialBaud];
                 int dataBit = SelectedDataBit == 0 ? 8 : 9;
                 await SendAtCmdAsync($"AT+USART_PARAM={serialBaud},{dataBit},{SelectedStopBit},{SelectedParity}\r\n");
 
@@ -560,9 +522,9 @@ namespace ocean.ViewModels
             if (paramArr.Length != 4) return;
 
             // 解析波特率 → 匹配下拉列表赋值
-            if (int.TryParse(paramArr[0], out int baud) && SerialBaudList.Contains(baud))
+            if (int.TryParse(paramArr[0], out int baud) && PortConfig.BaudRates.Contains(baud))
             {
-                SelectedSerialBaud = SerialBaudList.IndexOf(baud);
+                SelectedSerialBaud = PortConfig.BaudRates.IndexOf(baud);
             }
             // 解析数据位 →直接赋值 0=8位 1=9位
             if (int.TryParse(paramArr[1], out int databit))

@@ -21,19 +21,19 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center">串口号：</TextBlock>
-        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding PortNameList}" SelectedItem="{Binding SelectedPortName}" Margin="0,5"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding PortConfig.PortNames}" SelectedItem="{Binding PortConfig.SelectedPortName}" Margin="0,5"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">波特率：</TextBlock>
-        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding PortBaudList}" SelectedItem="{Binding SelectedPortBaud}" Margin="0,5"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding PortConfig.BaudRates}" SelectedItem="{Binding PortConfig.SelectedBaudRate}" Margin="0,5"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">数据位：</TextBlock>
-        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding PortDataBitsList}" SelectedItem="{Binding SelectedPortDataBits}" Margin="0,5"/>
+        <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding PortConfig.DataBits}" SelectedItem="{Binding PortConfig.SelectedDataBit}" Margin="0,5"/>
 
         <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center">校验位：</TextBlock>
-        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding PortParityList}" SelectedItem="{Binding SelectedPortParity}" Margin="0,5"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding PortConfig.ParityNames}" SelectedItem="{Binding PortConfig.SelectedParityName}" Margin="0,5"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center">停止位：</TextBlock>
-        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding PortStopBitList}" SelectedItem="{Binding SelectedPortStopBit}" Margin="0,5"/>
+        <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding PortConfig.StopBitValues}" SelectedItem="{Binding PortConfig.SelectedStopBit}" Margin="0,5"/>
 
         <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
             <Button x:Name="BtnRefreshPort" Width="80" Height="35" Content="刷新串口" Click="BtnRefreshPort_Click"/>
