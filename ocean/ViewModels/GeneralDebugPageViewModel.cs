@@ -194,13 +194,21 @@ namespace ocean.Communication
             // 初始化数据（替代原AddDataTableColumns和添加行的逻辑）
             ModbusDataList = new ObservableCollection<ModbusDataItem>();
             AddModbusDataItem();
-            ButtonCommand = new RelayCommand(OnButtonClick);
+            //ButtonCommand = new RelayCommand(OnButtonClick);
+            ButtonCommand = new RelayCommand<object>(OnButtonClick);
             DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
 
             // 初始化命令（使用Microsoft.Xaml.Behaviors的DelegateCommand，也可自定义ICommand）
+            /*
             ToggleAdvancedColumnsCommand = new DelegateCommand(() =>
             {
                 // 切换布尔值
+                IsAdvancedColumnsVisible = !IsAdvancedColumnsVisible;
+            });
+            */
+            ToggleAdvancedColumnsCommand = new RelayCommand<object>(_ =>
+            {
+                // 切换布尔值（原有逻辑不变，一行都不用改）
                 IsAdvancedColumnsVisible = !IsAdvancedColumnsVisible;
             });
 

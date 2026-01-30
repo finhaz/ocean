@@ -155,10 +155,10 @@ namespace ocean.ViewModels
             UpdateLocalPortEnabledState(); // 初始状态
 
             // 原有命令初始化保留
-            ConnectCommand = new DelegateCommand(ExecuteConnect);
-            SaveCommand = new DelegateCommand(ExecuteSave);
-            SendDataCommand = new DelegateCommand(ExecuteSendData);
-            ClearLogCommand = new DelegateCommand(ExecuteClearLog);
+            ConnectCommand = new RelayCommand<object>(ExecuteConnect);
+            SaveCommand = new RelayCommand<object>(ExecuteSave);
+            SendDataCommand = new RelayCommand<object>(ExecuteSendData);
+            ClearLogCommand = new RelayCommand<object>(ExecuteClearLog);
         }
 
         // 核心：更新LocalPort启用状态（仅服务器模式可用）
@@ -222,7 +222,7 @@ namespace ocean.ViewModels
 
 
         // 连接/断开逻辑（原有逻辑适配）
-        private void ExecuteConnect()
+        private void ExecuteConnect(object _)
         {
             try
             {
@@ -265,7 +265,7 @@ namespace ocean.ViewModels
         }
 
         // 发送数据逻辑（原有逻辑适配）
-        private void ExecuteSendData()
+        private void ExecuteSendData(object _)
         {
             if (string.IsNullOrEmpty(SendData))
             {
@@ -294,7 +294,7 @@ namespace ocean.ViewModels
         }
 
         // 原有方法完全保留
-        private void ExecuteSave()
+        private void ExecuteSave(object _)
         {
             try
             {
@@ -307,7 +307,7 @@ namespace ocean.ViewModels
             }
         }
 
-        private void ExecuteClearLog()
+        private void ExecuteClearLog(object _)
         {
             DataLog = string.Empty;
         }
