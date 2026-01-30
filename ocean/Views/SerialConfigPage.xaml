@@ -47,39 +47,39 @@
                     <ComboBox Name="cbPortName" 
                     Grid.Column="1" Grid.Row="1" 
                     Margin="2,1,10,1" FontSize="10"
-                    ItemsSource="{Binding SerialConfig.PortNames, Mode=OneWay}"
-                    SelectedItem="{Binding SerialConfig.SelectedPortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding SerialConfig.PortConfig.PortNames, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.PortConfig.SelectedPortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
 
 
                     <ComboBox Name="cbBaudRate" 
                     Grid.Column="1" Grid.Row="2" 
                     Margin="2,1,10,1" FontSize="10"
-                    ItemsSource="{Binding SerialConfig.BaudRates, Mode=OneWay}"
-                    SelectedItem="{Binding SerialConfig.SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding SerialConfig.PortConfig.BaudRates, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.PortConfig.SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
 
 
                     <ComboBox Name="cbParity" 
                     Grid.Column="1" Grid.Row="3" 
                     Margin="2,1,10,1" FontSize="10"
-                    ItemsSource="{Binding SerialConfig.ParityNames, Mode=OneWay}"
-                    SelectedItem="{Binding SerialConfig.SelectedParityName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding SerialConfig.PortConfig.ParityNames, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.PortConfig.SelectedParityName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
 
                     <ComboBox Name="cbDataBits" 
                     Grid.Column="1" Grid.Row="4" 
                     Margin="2,1,10,1" FontSize="10"
-                    ItemsSource="{Binding SerialConfig.DataBits, Mode=OneWay}"
-                    SelectedItem="{Binding SerialConfig.SelectedDataBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding SerialConfig.PortConfig.DataBits, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.PortConfig.SelectedDataBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
                     
                     <!-- 停止位ComboBox：ItemsSource绑定到StopBitValues -->
                     <ComboBox Name="cbStopBits" 
                     Grid.Column="1" Grid.Row="5" 
                     Margin="2,1,10,1" FontSize="10"
-                    ItemsSource="{Binding SerialConfig.StopBitValues, Mode=OneWay}"
-                    SelectedItem="{Binding SerialConfig.SelectedStopBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding SerialConfig.PortConfig.StopBitValues, Mode=OneWay}"
+                    SelectedItem="{Binding SerialConfig.PortConfig.SelectedStopBit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     IsEnabled="{Binding SerialConfig.IsConfigEnabled, Mode=OneWay}"/>
 
                     <Ellipse Name="comState" Style="{Binding SerialConfig.ComStateStyle, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"

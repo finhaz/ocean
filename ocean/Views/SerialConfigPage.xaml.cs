@@ -114,7 +114,7 @@ namespace ocean.UI
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(_globalVM.SerialConfig.SelectedPortName))
+                    if (string.IsNullOrEmpty(_globalVM.SerialConfig.PortConfig.SelectedPortName))
                     {
                         MessageBox.Show("未选择串口！");
                         return;
@@ -122,10 +122,10 @@ namespace ocean.UI
 
                     var serialConfig = new SerialConfig
                     {
-                        SelectedPortName = _globalVM.SerialConfig.SelectedPortName,
-                        SelectedBaudRate = _globalVM.SerialConfig.SelectedBaudRate,
-                        SelectedParityName = _globalVM.SerialConfig.SelectedParityName,
-                        SelectedStopBit = _globalVM.SerialConfig.SelectedStopBit,
+                        SelectedPortName = _globalVM.SerialConfig.PortConfig.SelectedPortName,
+                        SelectedBaudRate = _globalVM.SerialConfig.PortConfig.SelectedBaudRate,
+                        SelectedParityName = _globalVM.SerialConfig.PortConfig.SelectedParityName,
+                        SelectedStopBit = _globalVM.SerialConfig.PortConfig.SelectedStopBit,
                         SelectedDataBits = int.Parse(cbDataBits.Text)
                     };
 
