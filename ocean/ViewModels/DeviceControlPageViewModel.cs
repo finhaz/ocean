@@ -127,8 +127,7 @@ namespace ocean.Communication
         // 协议切换（选择框事件调用）
         public void InitProtocol(string protocolNum)
         {
-            // 若需要运行时切换通讯方式，可定时/按需刷新实例（示例）
-            _comm = CommunicationManager.Instance.GetCurrentCommunication();
+
             // 直接赋值原有单例，无需新建对象
             _currentProtocol = protocolNum switch
             {
@@ -569,6 +568,8 @@ namespace ocean.Communication
 
         public void Page_LoadedD(object sender, RoutedEventArgs e)
         {
+            // 若需要运行时切换通讯方式，可定时/按需刷新实例（示例）
+            _comm = CommunicationManager.Instance.GetCurrentCommunication();
             /*
             // 仅对串口类型绑定数据接收事件（预留以太网扩展）
             if (_comm is SerialCommunication serialComm)

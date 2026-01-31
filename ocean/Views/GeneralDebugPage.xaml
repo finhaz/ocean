@@ -65,7 +65,7 @@
                 Grid.Row="0" 
                 Margin="60,1,0,1" 
                 Grid.ColumnSpan="2"
-                ItemsSource="{Binding ModbusSet.ProOptions}"
+                ItemsSource="{Binding ModbusSet.ProtocolConfig.ProtocolTypeOptions}"
                 SelectedItem="{Binding ModbusSet.ProSelectedOption, Mode=TwoWay}" SelectionChanged="cPro_SelectionChanged"/>
 
             <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
@@ -106,7 +106,7 @@
                           Grid.Column="1"  
                           Margin="0,1,0,1" 
                           Grid.ColumnSpan="2" 
-                          ItemsSource="{Binding ModbusSet.Options}"
+                          ItemsSource="{Binding ModbusSet.ProtocolConfig.DataTypeOptions}"
                           SelectedItem="{Binding ModbusSet.DSelectedOption, Mode=TwoWay}"/>
                 <TextBox Text="起始地址"
                          Grid.Row="3"/>
@@ -183,7 +183,7 @@
                                     <DataTemplate>
                                         <ComboBox FontSize="10" 
                                                   SelectedItem="{Binding SelectedOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                  ItemsSource="{Binding DataContext.ModbusSet.Options, 
+                                                  ItemsSource="{Binding DataContext.ModbusSet.ProtocolConfig.DataTypeOptions, 
                               RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                                         <!-- 若选项是对象，需指定显示字段 -->
                                     </DataTemplate>
@@ -219,7 +219,7 @@
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
                                         SelectedItem="{Binding TransferType, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                        ItemsSource="{Binding DataContext.ModbusSet.TransferTypeOptions, 
+                                        ItemsSource="{Binding DataContext.ModbusSet.ProtocolConfig.TransferTypeOptions, 
                                         RelativeSource={RelativeSource AncestorType=DataGrid}}">
                                         <ComboBox.ItemContainerStyle>
                                             <Style TargetType="ComboBoxItem">
@@ -253,7 +253,7 @@
                                 <DataTemplate>
                                     <ComboBox FontSize="10" 
                                                       SelectedItem="{Binding DisplayType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                      ItemsSource="{Binding DataContext.ModbusSet.DisplayTypeOptions, 
+                                                      ItemsSource="{Binding DataContext.ModbusSet.ProtocolConfig.DisplayTypeOptions, 
                                                                     RelativeSource={RelativeSource AncestorType=DataGrid}}" />
                                     <!-- 若选项是对象，需指定显示字段 -->
                                 </DataTemplate>
