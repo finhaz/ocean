@@ -73,35 +73,7 @@ namespace ocean.Communication
             set => SetProperty(ref _snum, value);
         }
 
-        private string _dSelectedOption = "保持寄存器(RW)";
-        public string DSelectedOption
-        {
-            get => _dSelectedOption;
-            set => SetProperty(ref _dSelectedOption, value);
-        }
 
-        private string _dSelectedTransferType = "无符号整数";
-        public string DSelectedTransferType
-        {
-            get => _dSelectedTransferType;
-            set => SetProperty(ref _dSelectedTransferType, value);
-        }
-
-        private string _dSelectedDisplayType = "浮点数";
-        public string DSelectedDisplayType
-        {
-            get => _dSelectedDisplayType;
-            set => SetProperty(ref _dSelectedDisplayType, value);
-        }
-
-        
-
-        private string _proSelectedOption = "Modbus RTU协议";
-        public string ProSelectedOption
-        {
-            get => _proSelectedOption;
-            set => SetProperty(ref _proSelectedOption, value);
-        }
 
         // 控制高级列显示/隐藏的布尔属性
         private bool _isAdvancedColumnsVisible=false;
@@ -111,22 +83,6 @@ namespace ocean.Communication
             set => SetProperty(ref _isAdvancedColumnsVisible, value);
         }
 
-
-
-        private string _intoSelectedOption = "Modbus RTU协议";
-        public string IntoSelectedOption
-        {
-            get => _intoSelectedOption;
-            set
-            {
-                // 调用基类的SetProperty赋值，若值变化则触发通知
-                if (SetProperty(ref _intoSelectedOption, value))
-                {
-                    // 关键：当选中的协议名称变更时，主动通知SelectedProtocol属性变更
-                    OnPropertyChanged(nameof(SelectedProtocol));
-                }
-            }
-        }
 
         private int _readpos;
         public int Readpos
@@ -138,34 +94,9 @@ namespace ocean.Communication
         public ProtocolConfig ProtocolConfig { get; set; } = new ProtocolConfig();
 
 
-        // 协议信息集合
-        public ObservableCollection<ProtocolInfo> ProtocolList { get; set; } = new ObservableCollection<ProtocolInfo>
-        {
-            new ProtocolInfo
-            {
-                Name = "Modbus RTU协议",
-                FrameStructure = "地址域(1字节) + 功能码(1字节) + 数据域(N字节) + CRC校验(2字节)",
-                Transport = "RTU/ASCII/TCP三种，RTU为二进制格式，效率更高",
-                Features = "常用功能码：03（读保持寄存器）、06（写单个寄存器）"
-            },
-            new ProtocolInfo
-            {
-                Name = "FE协议",
-                FrameStructure = "帧头(2字节: 0xFE 0x01) + 设备地址(1字节) + 数据长度(2字节) + 数据域(N字节) + 校验和(1字节)",
-                Transport = "基于串口的私有协议，波特率默认9600，8N1格式",
-                Features = "支持广播帧，数据域采用小端序存储"
-            }
-        };
 
-        // 新增：筛选后的当前协议（核心属性）
-        public ProtocolInfo SelectedProtocol
-        {
-            get
-            {
-                // 根据选中的协议名称，从ProtocolList中筛选对应对象
-                return ProtocolList.FirstOrDefault(p => p.Name == IntoSelectedOption);
-            }
-        }
+
+
 
         // 核心：当前选中的协议实例（直接复用原有单例）
         private IProtocol _currentProtocol;
@@ -183,7 +114,8 @@ namespace ocean.Communication
             //AddDataTableColumns(dtm);
             // 初始化数据（替代原AddDataTableColumns和添加行的逻辑）
             ModbusDataList = new ObservableCollection<ModbusDataItem>();
-            AddModbusDataItem();
+            //AddModbusDataItem();
+            setsurehander(null,null);
             //ButtonCommand = new RelayCommand(OnButtonClick);
             ButtonCommand = new RelayCommand<object>(OnButtonClick);
             DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
@@ -222,64 +154,6 @@ namespace ocean.Communication
         }
 
 
-        //public Message_modbus zcom { get; set; }
-        // 提取列初始化的通用方法（便于复用，可选）
-        private void AddDataTableColumns(DataTable dt)
-        {
-            dt.Columns.Add("ID", typeof(int));
-            dt.Columns.Add("Name", typeof(string));
-            dt.Columns.Add("Value", typeof(double));
-            dt.Columns.Add("Command", typeof(double));
-            dt.Columns.Add("IsButtonClicked", typeof(bool));
-            dt.Columns.Add("Unit", typeof(string));
-            dt.Columns.Add("Rangle", typeof(string));
-            dt.Columns.Add("SelectedOption", typeof(string));
-            dt.Columns.Add("Addr", typeof(int));
-            dt.Columns.Add("Number", typeof(int));
-            dt.Columns.Add("NOffSet", typeof(int));
-            dt.Columns.Add("NBit", typeof(int));
-            dt.Columns.Add("Coefficient", typeof(int));
-            dt.Columns.Add("Offset",typeof(int));
-            dt.Columns.Add("DecimalPlaces", typeof(int));
-            dt.Columns.Add("TransferType", typeof(string));
-            dt.Columns.Add("DisplayType", typeof(string));
-            dt.Columns.Add("ByteOrder", typeof(int));
-            dt.Columns.Add("WordOrder", typeof(int));
-            dt.Columns.Add("IsDrawCurve", typeof(bool));
-            dt.Columns.Add("IntervalTime", typeof(int));
-        }
-
-        /// <summary>
-        /// 添加新行（替代原DataTable的AddRow逻辑）
-        /// </summary>
-        public void AddModbusDataItem()
-        {
-            ModbusDataList.Add(new ModbusDataItem
-            {
-                ID = ModbusDataList.Count + 1,
-                Name = "默认名称",
-                Value = 0.0, // 默认浮点数
-                Command = 0.0,
-                IsButtonClicked = false,
-                Unit = "",
-                Rangle = "",
-                SelectedOption = DSelectedOption,
-                Addr = 0,
-                Number = 1,
-                NOffSet = 0,
-                NBit = 16,
-                Coefficient = 1,
-                Offset = 0,
-                DecimalPlaces = 2,
-                TransferType = DSelectedTransferType,
-                DisplayType = DSelectedDisplayType, // 默认显示类型
-                ByteOrder = "大端",
-                WordOrder = "大端",
-                IsDrawCurve = false,
-                IntervalTime = 1000
-            });
-        }
-
         public void setsurehander(object sender, RoutedEventArgs e)
         {
             int radd = Int32.Parse(Sadd);
@@ -296,7 +170,7 @@ namespace ocean.Communication
                     IsButtonClicked = false,
                     Unit = "",
                     Rangle = "",
-                    SelectedOption = DSelectedOption,
+                    SelectedOption = ProtocolConfig.SelectedDataType,
                     Addr = radd,
                     Number = 1,
                     NOffSet = 0,
@@ -304,8 +178,8 @@ namespace ocean.Communication
                     Coefficient = 1,
                     Offset = 0,
                     DecimalPlaces = 2,
-                    TransferType = DSelectedTransferType,
-                    DisplayType = DSelectedDisplayType, // 默认显示类型
+                    TransferType = ProtocolConfig.DSelectedTransferType,
+                    DisplayType = ProtocolConfig.DSelectedDisplayType, // 默认显示类型
                     ByteOrder = "大端",
                     WordOrder = "大端",
                     IsDrawCurve = false,

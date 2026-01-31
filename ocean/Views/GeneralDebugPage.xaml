@@ -66,7 +66,7 @@
                 Margin="60,1,0,1" 
                 Grid.ColumnSpan="2"
                 ItemsSource="{Binding ModbusSet.ProtocolConfig.ProtocolTypeOptions}"
-                SelectedItem="{Binding ModbusSet.ProSelectedOption, Mode=TwoWay}" SelectionChanged="cPro_SelectionChanged"/>
+                SelectedItem="{Binding ModbusSet.ProtocolConfig.SelectedProtocolType, Mode=TwoWay}" SelectionChanged="cPro_SelectionChanged"/>
 
             <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
             <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
@@ -107,7 +107,7 @@
                           Margin="0,1,0,1" 
                           Grid.ColumnSpan="2" 
                           ItemsSource="{Binding ModbusSet.ProtocolConfig.DataTypeOptions}"
-                          SelectedItem="{Binding ModbusSet.DSelectedOption, Mode=TwoWay}"/>
+                          SelectedItem="{Binding ModbusSet.ProtocolConfig.SelectedDataType, Mode=TwoWay}"/>
                 <TextBox Text="起始地址"
                          Grid.Row="3"/>
                 <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}"

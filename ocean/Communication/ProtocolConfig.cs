@@ -54,6 +54,13 @@ namespace ocean.Communication
             },
             new ProtocolInfo
             {
+                Name = "Modbus TCP协议",
+                FrameStructure = "MBAP报文头(7字节) + 功能码(1字节) + 数据域(N字节)（无CRC校验）",
+                Transport = "基于TCP/IP网络传输，默认端口502，字节序为大端序（网络字节序）",
+                Features = "常用功能码：03（读保持寄存器）、06（写单个寄存器）、16（写多个寄存器）；MBAP头包含事务标识、协议标识、长度、单元标识"
+            },
+            new ProtocolInfo
+            {
                 Name = "FE协议",
                 FrameStructure = "帧头(2字节: 0xFE 0x01) + 设备地址(1字节) + 数据长度(2字节) + 数据域(N字节) + 校验和(1字节)",
                 Transport = "基于串口的私有协议，波特率默认9600，8N1格式",
@@ -81,8 +88,8 @@ namespace ocean.Communication
             {
                 if (SetProperty(ref _selectedProtocolType, value))
                 {
-                    // 可选：选中协议后联动逻辑（比如加载对应协议的详情）
-                    OnProtocolTypeChanged(value);
+                    // 关键：当选中的协议名称变更时，主动通知SelectedProtocol属性变更
+                    OnPropertyChanged(nameof(SelectedProtocol));
                 }
             }
         }
@@ -96,6 +103,34 @@ namespace ocean.Communication
             get => _selectedDataType;
             set => SetProperty(ref _selectedDataType, value);
         }
+
+
+        // 筛选后的当前协议（核心属性）
+        public ProtocolInfo SelectedProtocol
+        {
+            get
+            {
+                // 根据选中的协议名称，从ProtocolList中筛选对应对象
+                return ProtocolDetailList.FirstOrDefault(p => p.Name == SelectedProtocolType);
+            }
+        }
+
+        private string _dSelectedTransferType = "无符号整数";
+        public string DSelectedTransferType
+        {
+            get => _dSelectedTransferType;
+            set => SetProperty(ref _dSelectedTransferType, value);
+        }
+
+        private string _dSelectedDisplayType = "浮点数";
+        public string DSelectedDisplayType
+        {
+            get => _dSelectedDisplayType;
+            set => SetProperty(ref _dSelectedDisplayType, value);
+        }
+
+
+
         #endregion
 
         #region 可选扩展：业务逻辑方法
