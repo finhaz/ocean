@@ -35,45 +35,27 @@ namespace ocean.Communication
         int gb_index = 0;//缓冲区注入位置
         int get_index = 0;// 缓冲区捕捉位置
 
-        public DataTable dtm { get; set; }
-
-        // 核心：替换原DataTable为ObservableCollection
-        private ObservableCollection<ModbusDataItem> _modbusDataList;
-        public ObservableCollection<ModbusDataItem> ModbusDataList
-        {
-            get => _modbusDataList;
-            set => SetProperty(ref _modbusDataList, value);
-        }
-
-
         // 控件命令（供XAML绑定）
         public ICommand DataGridDoubleClickCommand { get; }
         public ICommand ButtonCommand { get; }
 
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
-        private string _sadd = "1"; // 初始值可根据你的业务调整
-        public string Sadd // 推荐帕斯卡命名法（首字母大写），XAML绑定可兼容小写（但建议统一）
+        // 条目地址
+        private string _sadd = "1"; 
+        public string Sadd 
         {
             get => _sadd;
-            set => SetProperty(ref _sadd, value); // 一行搞定，无需重复逻辑
+            set => SetProperty(ref _sadd, value); 
         }
 
-        private string _boxStr = string.Empty;
-        public string BoxStr
-        {
-            get => _boxStr;
-            set => SetProperty(ref _boxStr, value); // 一行搞定，无需重复逻辑
-        }
-
+        //条目总数目
         private string _snum = "1";
         public string Snum
         {
             get => _snum;
             set => SetProperty(ref _snum, value);
         }
-
-
 
         // 控制高级列显示/隐藏的布尔属性
         private bool _isAdvancedColumnsVisible=false;
@@ -83,7 +65,7 @@ namespace ocean.Communication
             set => SetProperty(ref _isAdvancedColumnsVisible, value);
         }
 
-
+        //索引位置
         private int _readpos;
         public int Readpos
         {
@@ -91,12 +73,23 @@ namespace ocean.Communication
             set => SetProperty(ref _readpos, value);
         }
 
+        //报文内容
+        private string _boxStr = string.Empty;
+        public string BoxStr
+        {
+            get => _boxStr;
+            set => SetProperty(ref _boxStr, value); 
+        }
+
+        // 界面UI数目条目的多项属性
+        private ObservableCollection<ModbusDataItem> _modbusDataList;
+        public ObservableCollection<ModbusDataItem> ModbusDataList
+        {
+            get => _modbusDataList;
+            set => SetProperty(ref _modbusDataList, value);
+        }
+        //协议相关配置
         public ProtocolConfig ProtocolConfig { get; set; } = new ProtocolConfig();
-
-
-
-
-
 
         // 核心：当前选中的协议实例（直接复用原有单例）
         private IProtocol _currentProtocol;
