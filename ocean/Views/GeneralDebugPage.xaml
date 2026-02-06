@@ -10,8 +10,83 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="GeneralDebugPage" Unloaded="Page_Unloaded" Loaded="Page_Loaded">
 
-    
-    
+    <Page.Resources>
+        <!-- 已有的图标资源、按钮样式 保留不动 -->
+        <Geometry x:Key="DownloadGeometry">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h3l-4 4-4-4h3V7z</Geometry>
+        <Geometry x:Key="AddGeometry">M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z</Geometry>
+        <Geometry x:Key="DeleteGeometry">M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</Geometry>
+        <Geometry x:Key="ExportGeometry">M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z</Geometry>
+        <Geometry x:Key="ImportGeometry">M19 15v2H5v-2h14zm-7-8l-4 4h3v6h2v-6h3l-4-4z</Geometry>
+        <Geometry x:Key="ToggleGeometry">M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z</Geometry>
+
+        <!-- 已有的圆角按钮样式（带交互效果） -->
+        <Style x:Key="RoundedButtonStyle" TargetType="Button">
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6" 
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#B2DFDB"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#80CBC4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 修复版：TextBox圆角样式，重写模板实现圆角 -->
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#00796B"/>
+            <Setter Property="Background" Value="#E0F2F1"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <!-- 重写控件模板，使用Border实现圆角 -->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="6"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <!-- 交互触发器 -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F8F7"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Background" Value="White"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="BorderBrush" Value="#00796B"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <!-- 仅设置基础样式，无模板重写，无任何功能风险 -->
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#00796B"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Page.Resources>
+
     <Grid>
         <!-- 添加资源：布尔值转可见性的转换器 -->
         <Grid.Resources>
@@ -50,13 +125,12 @@
                 <RowDefinition Height="20*"/>
                 <RowDefinition Height="20*"/>
             </Grid.RowDefinitions>
-            <TextBlock 
+            <TextBox 
                       HorizontalAlignment="Left" 
                       Grid.Row="0"
                       Text="协议类型"
                       FontSize="10" 
                       Grid.ColumnSpan="2"  
-                      Margin="10,0,0,0"
                       TextAlignment="Center"
                       VerticalAlignment="Center"/>
             <ComboBox
@@ -68,18 +142,66 @@
                 ItemsSource="{Binding ModbusSet.ProtocolConfig.ProtocolTypeOptions}"
                 SelectedItem="{Binding ModbusSet.ProtocolConfig.SelectedProtocolType, Mode=TwoWay}" SelectionChanged="cPro_SelectionChanged"/>
 
-            <Button  Content="添加条目"  Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click"  />
-            <Button  Content="删除条目" Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click"></Button>
-            <Button Content="导出配置" Grid.Row="3" Grid.ColumnSpan="2" Click="ExportConfig_Click"/>
-            <Button Content="导入配置" Grid.Row="4" Grid.ColumnSpan="2" Click="ImportConfig_Click"/>
-                        <!-- 新增的切换按钮 -->
+            <Button x:Name="ButtonAdd" Width="100" Height="38" Margin="0,0,10,0" 
+                Background="#E0F2F1" Foreground="#00796B" 
+                Style="{StaticResource RoundedButtonStyle}" 
+                Grid.Row="1" Grid.ColumnSpan="2" Click="ButtonAdd_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path Width="16" Height="16" Fill="#00796B" Data="{StaticResource AddGeometry}" Margin="0,0,5,0"/>
+                    <TextBlock Text="添加条目"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="ButtonDelete" Width="100" Height="38" Margin="0,0,10,0" 
+                Background="#E0F2F1" Foreground="#00796B" 
+                Style="{StaticResource RoundedButtonStyle}" 
+                Grid.Row="2" Grid.ColumnSpan="2" Click="ButtonDelete_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path Width="16" Height="16" Fill="#00796B" Data="{StaticResource DeleteGeometry}" Margin="0,0,5,0"/>
+                    <TextBlock Text="删除条目"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="ExportConfigBtn" Width="100" Height="38" Margin="0,0,10,0" 
+                Background="#E0F2F1" Foreground="#00796B" 
+                Style="{StaticResource RoundedButtonStyle}" 
+                Grid.Row="3" Grid.ColumnSpan="2" Click="ExportConfig_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path Width="16" Height="16" Fill="#00796B" Data="{StaticResource ExportGeometry}" Margin="0,0,5,0"/>
+                    <TextBlock Text="导出配置"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="ImportConfigBtn" Width="100" Height="38" Margin="0,0,10,0" 
+                Background="#E0F2F1" Foreground="#00796B" 
+                Style="{StaticResource RoundedButtonStyle}" 
+                Grid.Row="4" Grid.ColumnSpan="2" Click="ImportConfig_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path Width="16" Height="16" Fill="#00796B" Data="{StaticResource ImportGeometry}" Margin="0,0,5,0"/>
+                    <TextBlock Text="导入配置"/>
+                </StackPanel>
+            </Button>
+            
             <Button 
                 Grid.Row="5" 
                 Grid.ColumnSpan="2"
-                Content="{Binding ModbusSet.IsAdvancedColumnsVisible, 
-                          Converter={StaticResource BoolToButtonTextConverter}}"
-                Command="{Binding ModbusSet.ToggleAdvancedColumnsCommand}"/>
-            <Grid Name="Setadd" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden">
+                Width="100" 
+                Height="38" 
+                Margin="0,0,10,0" 
+                Background="#E0F2F1" 
+                Foreground="#00796B"
+                Style="{StaticResource RoundedButtonStyle}"
+                Command="{Binding ModbusSet.ToggleAdvancedColumnsCommand}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Path Width="16" Height="16" Fill="#00796B" Data="{StaticResource ToggleGeometry}" Margin="0,0,5,0"/>
+                    <!-- 绑定动态文本，替代原Content属性 -->
+                    <TextBlock Text="{Binding ModbusSet.IsAdvancedColumnsVisible, 
+                          Converter={StaticResource BoolToButtonTextConverter}}"/>
+                </StackPanel>
+            </Button>
+
+
+            <Grid Name="Setadd" Grid.Row="6" Grid.ColumnSpan="2" Visibility="Hidden" Cursor="">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20*"/>
                     <ColumnDefinition Width="40*"/>
@@ -92,31 +214,56 @@
                     <RowDefinition Height="20*"/>
                     <RowDefinition Height="10*"/>
                 </Grid.RowDefinitions>
-                <TextBox Text="参数名" 
-                         Grid.Row="0" />
-                <TextBox Text="数值" Grid.Row="0" 
-                         Grid.Column="1" />
-                <TextBox Text="数据条数" Grid.Row="1"></TextBox>
-                <TextBox Text="{Binding ModbusSet.Snum, Mode=TwoWay}" 
-                         Grid.Row="1" Grid.Column="1"></TextBox>
-                <TextBox Text="类型" Grid.Row="2"></TextBox>
-                <ComboBox Name="cbProcho" 
-                          FontSize="10" 
-                          Grid.Row="2" 
-                          Grid.Column="1"  
-                          Margin="0,1,0,1" 
-                          Grid.ColumnSpan="2" 
-                          ItemsSource="{Binding ModbusSet.ProtocolConfig.DataTypeOptions}"
-                          SelectedItem="{Binding ModbusSet.ProtocolConfig.SelectedDataType, Mode=TwoWay}"/>
-                <TextBox Text="起始地址"
-                         Grid.Row="3"/>
-                <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}"
-                         Grid.Row="3" 
-                         Grid.Column="1"/>
+
+                <!-- 固定标签：参数名 -->
+                <TextBox Text="参数名" Grid.Row="0" IsReadOnly="True"/>
+                <!-- 绑定输入：参数名输入框 -->
+                <TextBox Grid.Row="0" Grid.Column="1" />
+
+                <!-- 固定标签：数值 -->
+                <TextBox Text="数值" Grid.Row="1" IsReadOnly="True"/>
+                <!-- 绑定输入：数据条数 -->
+                <TextBox Text="{Binding ModbusSet.Snum, Mode=TwoWay}" Grid.Row="1" Grid.Column="1"/>
+
+                <!-- 固定标签：类型 -->
+                <TextBox Text="类型" Grid.Row="2" IsReadOnly="True"/>
+                <!-- 下拉选择框：修复冗余Grid.ColumnSpan=2，适配统一样式 -->
+                <!-- 原位置替换为这段代码，仅外层包了Border，控件本体无任何修改 -->
+                <Border 
+                    Grid.Row="2" 
+                    Grid.Column="1" 
+                    CornerRadius="6" 
+                    Background="#E0F2F1"
+                    Margin="8"
+                    ClipToBounds="True">
+                        <ComboBox Name="cbProcho" 
+                            FontSize="10" 
+                            ItemsSource="{Binding ModbusSet.ProtocolConfig.DataTypeOptions}"
+                            SelectedItem="{Binding ModbusSet.ProtocolConfig.SelectedDataType, Mode=TwoWay}"
+                            Background="Transparent" 
+                            BorderThickness="0"
+                            VerticalContentAlignment="Center"
+                            Padding="6,0"/>
+                </Border>
+
+                <!-- 固定标签：起始地址 -->
+                <TextBox Text="起始地址" Grid.Row="3" IsReadOnly="True"/>
+                <!-- 绑定输入：起始地址 -->
+                <TextBox Text="{Binding ModbusSet.Sadd, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"/>
+
+                <!-- 确定按钮：应用统一样式、尺寸、配色 -->
                 <Button Content="确定" Grid.Row="5" Grid.Column="0" 
-                        Click="setsure_click" ></Button>
+                    Width="80" Height="38"
+                    Background="#E0F2F1" Foreground="#00796B"
+                    Style="{StaticResource RoundedButtonStyle}"
+                    Click="setsure_click" />
+
+                <!-- 取消按钮：应用统一样式、尺寸、配色 -->
                 <Button Content="取消" Grid.Row="5" Grid.Column="1" 
-                        Click="setcancel_click" ></Button>
+                    Width="80" Height="38"
+                    Background="#E0F2F1" Foreground="#00796B"
+                    Style="{StaticResource RoundedButtonStyle}"
+                    Click="setcancel_click" />
             </Grid>
 
 
