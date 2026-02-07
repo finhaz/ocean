@@ -5,6 +5,7 @@
       xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewmodels="clr-namespace:ocean.ViewModels"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       Title="MainPage"
       d:DesignHeight="300"
       d:DesignWidth="300"
@@ -41,7 +42,15 @@
                       ItemsSource="{Binding CommTypeOptions}"
                       DisplayMemberPath="Key"
                       SelectedValuePath="Value"
-                      SelectedValue="{Binding SelectedCommType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="CmbCommunicationType_SelectionChanged"/>
+                      SelectedValue="{Binding SelectedCommType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                 >
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding ComboBoxSelectCommand}" 
+                                           CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=ComboBox}}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
 
     </StackPanel>
 </Page>
