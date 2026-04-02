@@ -658,5 +658,41 @@ namespace ocean.ViewModels
             }
             
         }
+
+
+        public void tbSend_TextChanged()
+        {
+            if (IsAsciiView == true)
+            {
+                StringBuilder asciiBuilder = new StringBuilder();
+                Tb16ViewText = string.Empty;
+
+                foreach (char c in TbSendText)
+                {
+                    if (char.IsWhiteSpace(c))
+                    {
+                        continue;
+                    }
+
+                    int asciiCode = (int)c;
+                    if (asciiCode >= 0 && asciiCode <= 127)
+                    {
+                        string hexCode = asciiCode.ToString("X2");
+                        asciiBuilder.Append($"{hexCode} ");
+                    }
+                    else
+                    {
+                        asciiBuilder.Append("[NA] ");
+                    }
+                }
+
+                if (IsAdvantechCmdChecked == true)
+                {
+                    asciiBuilder.Append("0D ");
+                }
+                Tb16ViewText = asciiBuilder.ToString().TrimEnd();
+            }
+        }
+
     }
 }

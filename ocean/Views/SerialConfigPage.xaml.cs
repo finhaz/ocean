@@ -308,36 +308,7 @@ namespace ocean.UI
 
         private void tbSend_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (ckAsciiView.IsChecked == true)
-            {
-                StringBuilder asciiBuilder = new StringBuilder();
-                _globalVM.SerialConfig.Tb16ViewText = string.Empty;
-
-                foreach (char c in tbSend.Text)
-                {
-                    if (char.IsWhiteSpace(c))
-                    {
-                        continue;
-                    }
-
-                    int asciiCode = (int)c;
-                    if (asciiCode >= 0 && asciiCode <= 127)
-                    {
-                        string hexCode = asciiCode.ToString("X2");
-                        asciiBuilder.Append($"{hexCode} ");
-                    }
-                    else
-                    {
-                        asciiBuilder.Append("[NA] ");
-                    }
-                }
-
-                if (ckAdvantechCmd.IsChecked == true)
-                {
-                    asciiBuilder.Append("0D ");
-                }
-                _globalVM.SerialConfig.Tb16ViewText = asciiBuilder.ToString().TrimEnd();
-            }
+            _globalVM.SerialConfig.tbSend_TextChanged();         
         }
 
         private void ckAsciiView_Click(object sender, RoutedEventArgs e)
