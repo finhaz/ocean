@@ -33,6 +33,9 @@ namespace ocean.ViewModels
         // 保存数据的命令
         public ICommand SaveReceiveDataCommand { get; }
 
+        // 缓存当前串口实例（避免重复获取）
+        private SerialCommunication _serialComm;
+
         // 保存数据的核心方法
         private void ExecuteSaveReceiveData(object _)
         {
@@ -517,7 +520,7 @@ namespace ocean.ViewModels
         #endregion
 
 
-        /*
+        
         public void btSend_Event(string strSend, bool hexState)
         {
             if (_serialComm.IsConnected)
@@ -532,7 +535,7 @@ namespace ocean.ViewModels
                         _serialComm.Send(sendData, 0, sendData.Length);
                         SendCount = Convert.ToString(Convert.ToInt32(SendCount) + sendData.Length);
 
-                        if (ckAdvantechCmd.IsChecked == true)
+                        if (IsAdvantechCmdChecked == true)
                         {
                             byte[] sendAdvCmd = HexStringToByteArray("0D 0A");
                             _serialComm.Send(sendAdvCmd, 0, 2);
@@ -556,7 +559,7 @@ namespace ocean.ViewModels
                 MessageBox.Show("串口没有打开，请检查！");
             }
         }
-        */
+        
 
         private void getData(string sendData)
         {
@@ -632,6 +635,10 @@ namespace ocean.ViewModels
         }
         public void Page_LoadedD(object sender, RoutedEventArgs e)
         {
+            // 获取串口实例
+            _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
+            // 设置串口编码
+            _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
             /*
             if (!_serialComm.IsConnected)
             {
