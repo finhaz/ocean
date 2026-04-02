@@ -46,6 +46,12 @@ namespace ocean.UI
                 tbReceive.ScrollToEnd();
             };
 
+            _globalVM.SerialConfig.ShowMessage += msg => 
+            {                 
+                MessageBox.Show(msg);
+            };
+
+
             bdExpend.Visibility = Visibility.Hidden;
 
             if (_globalVM.SerialConfig._serialComm != null && _globalVM.SerialConfig._serialComm.IsConnected)

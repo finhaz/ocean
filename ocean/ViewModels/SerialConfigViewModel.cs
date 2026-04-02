@@ -29,6 +29,9 @@ namespace ocean.ViewModels
         delegate void txtGotoEndDelegate();
         // ViewModel 内部：添加一个公共事件
         public event Action ScrollToEndRequested;
+        // 定义事件
+        public event Action<string> ShowMessage;
+
 
         // 保存数据的命令
         public ICommand SaveReceiveDataCommand { get; }
@@ -105,7 +108,8 @@ namespace ocean.ViewModels
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"获取串口名失败：{ex.Message}");
+                //Console.WriteLine($"获取串口名失败：{ex.Message}");
+                ShowMessage?.Invoke($"获取串口名失败：{ex.Message}");
             }
         }
         #endregion
@@ -553,13 +557,15 @@ namespace ocean.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("发送失败：" + ex.Message);
+                    //MessageBox.Show("发送失败：" + ex.Message);
+                    ShowMessage?.Invoke("发送失败：" + ex.Message);
                 }
             }
             else
             {
                 TbComStateText = "串口未开";
-                MessageBox.Show("串口没有打开，请检查！");
+                //MessageBox.Show("串口没有打开，请检查！");
+                ShowMessage?.Invoke("串口没有打开，请检查！");
             }
         }
         
@@ -723,7 +729,8 @@ namespace ocean.ViewModels
                 {
                     if (string.IsNullOrEmpty(PortConfig.SelectedPortName))
                     {
-                        MessageBox.Show("未选择串口！");
+                        //MessageBox.Show("未选择串口！");
+                        ShowMessage?.Invoke("未选择串口！");
                         return;
                     }
 
@@ -743,12 +750,12 @@ namespace ocean.ViewModels
                     if (ex.Message.Contains("占用"))
                     {
                         TbComStateText = PortConfig.SelectedPortName + "串口被占用！";
-                        MessageBox.Show("串口被占用！");
+                        ShowMessage?.Invoke("串口被占用！");
                     }
                     else
                     {
                         TbComStateText = "串口打开失败：" + ex.Message;
-                        MessageBox.Show("串口打开失败：" + ex.Message);
+                        ShowMessage?.Invoke("串口打开失败：" + ex.Message);
                     }
                     return;
                 }
