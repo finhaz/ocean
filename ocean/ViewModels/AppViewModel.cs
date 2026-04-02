@@ -34,8 +34,8 @@ namespace ocean.ViewModels
             // 1. 创建全局唯一的消息服务
             MessageService = new MessageService();
             // 初始化Modbusset实例
-            _modbusSet = new GeneralDebugPageViewModel();
-            _mcctronller = new DeviceControlPageViewModel();
+            _modbusSet = new GeneralDebugPageViewModel(MessageService);
+            _mcctronller = new DeviceControlPageViewModel(MessageService);
 
             SerialConfig = new SerialConfigViewModel(MessageService);
 

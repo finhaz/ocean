@@ -97,7 +97,8 @@ namespace ocean.Communication
         // 利用CommunicationManager单例特性，保证和SerialConfigView的串口实例完全一致
         private ICommunication _comm;
 
-        public DeviceControlPageViewModel() 
+        private readonly IMessageService _msg;
+        public DeviceControlPageViewModel(IMessageService msg) 
         {
 
             SerialTextBlock = new TextBlock<string>();
@@ -116,7 +117,7 @@ namespace ocean.Communication
 
 
             InitTimer();
-            
+            _msg = msg;
         }
         // 可执行判断方法，匹配 Predicate<object> 签名
         private bool CanButtonIncrease(object parameter)
@@ -287,7 +288,7 @@ namespace ocean.Communication
             }
             else
             {
-                MessageBox.Show("请打开串口！");
+                _msg.Show("请打开串口！");
             }
         }
 
@@ -331,7 +332,7 @@ namespace ocean.Communication
 
         private void ButtonIncreaseAction(object parameter)
         {
-            MessageBox.Show("h!");
+            _msg.Show("h!");
             if (_comm.IsConnected)
             {
                 bshow = !bshow;
@@ -348,7 +349,7 @@ namespace ocean.Communication
             }
             else
             {
-                MessageBox.Show("打开串口！");
+                _msg.Show("打开串口！");
             }
         }
 
@@ -454,7 +455,7 @@ namespace ocean.Communication
         {
             if (string.IsNullOrEmpty(DbFilePath) || _dbOperation == null)
             {
-                MessageBox.Show("请先选择有效的数据库文件！");
+                _msg.Show("请先选择有效的数据库文件！");
                 return;
             }
 
@@ -463,7 +464,7 @@ namespace ocean.Communication
                 // 先检查表是否存在
                 if (!_dbOperation.IsTableExist("PARAMETER_RUN"))
                 {
-                    MessageBox.Show("表PARAMETER_RUN不存在！");
+                    _msg.Show("表PARAMETER_RUN不存在！");
                     return;
                 }
 
@@ -472,11 +473,11 @@ namespace ocean.Communication
                 Dtset = _dbOperation.GetDBTable("PARAMETER_SET");
                 Dtfactor = _dbOperation.GetDBTable("PARAMETER_FACTOR");
                 runnum = Dtrun.Rows.Count;
-                MessageBox.Show("数据表读取成功！");
+                _msg.Show("数据表读取成功！");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"读取失败：{ex.Message}");
+                _msg.Show($"读取失败：{ex.Message}");
             }
         }
         #endregion
@@ -535,7 +536,7 @@ namespace ocean.Communication
             // 校验：未选择数据库/无数据时提示
             if (string.IsNullOrEmpty(DbFilePath) || _dbOperation == null)
             {
-                MessageBox.Show("请先选择有效的数据库文件！");
+                _msg.Show("请先选择有效的数据库文件！");
                 return;
             }
 
@@ -555,11 +556,11 @@ namespace ocean.Communication
                     _dbOperation.UpdateDBTable(Dtfactor, "PARAMETER_FACTOR");
                 }
 
-                MessageBox.Show("所有数据已成功保存到数据库！");
+                _msg.Show("所有数据已成功保存到数据库！");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"保存失败：{ex.Message}");
+                _msg.Show($"保存失败：{ex.Message}");
             }
         }
         #endregion

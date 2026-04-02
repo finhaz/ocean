@@ -36,6 +36,7 @@ namespace ocean.Communication
         public ICommand DataGridDoubleClickCommand { get; }
         public ICommand ButtonCommand { get; }
 
+        private readonly IMessageService _msg;
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
         // 条目地址
@@ -98,14 +99,14 @@ namespace ocean.Communication
         // 切换列显示/隐藏的命令
         public ICommand ToggleAdvancedColumnsCommand { get; }
 
-        public GeneralDebugPageViewModel()
+        public GeneralDebugPageViewModel(IMessageService msg)
         {
             //dtm = new DataTable();
             //AddDataTableColumns(dtm);
             // 初始化数据（替代原AddDataTableColumns和添加行的逻辑）
             ModbusDataList = new ObservableCollection<ModbusDataItem>();
             //AddModbusDataItem();
-            setsurehander(null,null);
+            setsurehander(null, null);
             //ButtonCommand = new RelayCommand(OnButtonClick);
             ButtonCommand = new RelayCommand<object>(OnButtonClick);
             DataGridDoubleClickCommand = new RelayCommand<DataGrid>(ExecuteDataGridDoubleClick);
@@ -123,7 +124,7 @@ namespace ocean.Communication
                 // 切换布尔值（原有逻辑不变，一行都不用改）
                 IsAdvancedColumnsVisible = !IsAdvancedColumnsVisible;
             });
-
+            _msg = msg;
         }
 
 
@@ -241,7 +242,7 @@ namespace ocean.Communication
                                         else
                                         {
                                             tempbval = 0;
-                                            MessageBox.Show("非正常数字！");
+                                            _msg.Show("非正常数字！");
                                             return;
                                         }
                                         break;
@@ -265,7 +266,7 @@ namespace ocean.Communication
                                         else
                                         {
                                             tempbval = 0;
-                                            MessageBox.Show("非正常数字！");
+                                            _msg.Show("非正常数字！");
                                             return;
                                         }
                                             break;
@@ -321,7 +322,7 @@ namespace ocean.Communication
                 // 直接使用全局_comm，无需重复获取（与SerialConfigView实例一致）
                 if (!_comm.IsConnected)
                 {
-                    MessageBox.Show("请打开串口！");
+                    _msg.Show("请打开串口！");
                     return;
                 }
                 try
@@ -337,7 +338,7 @@ namespace ocean.Communication
                 }
                 catch
                 {
-                    MessageBox.Show("输入命令不能为空！");
+                    _msg.Show("输入命令不能为空！");
                 }
             }
         }
@@ -354,7 +355,7 @@ namespace ocean.Communication
                 // 原有串口判断逻辑保留
                 if (!_comm.IsConnected)
                 {
-                    MessageBox.Show("请打开串口！");
+                    _msg.Show("请打开串口！");
                     return;
                 }
 
@@ -375,7 +376,7 @@ namespace ocean.Communication
                                 value = Convert.ToDouble(item.Command);
                             else
                             {
-                                MessageBox.Show("非正常数字");
+                                _msg.Show("非正常数字");
                                 return;
                             }
                             break;
@@ -389,7 +390,7 @@ namespace ocean.Communication
                                 value = Convert.ToUInt64(item.Command);
                             else
                             {
-                                MessageBox.Show("非正常数字");
+                                _msg.Show("非正常数字");
                                 return;
                             }
                             break;
@@ -414,22 +415,22 @@ namespace ocean.Communication
                     // 优化异常提示：区分空值和其他异常
                     if (ex is FormatException || ex is InvalidCastException)
                     {
-                        MessageBox.Show("输入命令必须是有效的数字！");
+                        _msg.Show("输入命令必须是有效的数字！");
                     }
                     else if (ex is NullReferenceException)
                     {
-                        MessageBox.Show("输入命令不能为空！");
+                        _msg.Show("输入命令不能为空！");
                     }
                     else
                     {
-                        MessageBox.Show($"发送失败：{ex.Message}");
+                        _msg.Show($"发送失败：{ex.Message}");
                     }
                 }
             }
             else
             {
                 // 兼容旧数据或参数异常的情况
-                MessageBox.Show("无法识别当前行数据！");
+                _msg.Show("无法识别当前行数据！");
             }
         }
 
@@ -454,7 +455,7 @@ namespace ocean.Communication
                 {
                     object value = rowView["Value"];
                     value = value == DBNull.Value ? "空值" : value;
-                    MessageBox.Show($"当前数值：{value}", "数值详情");
+                    _msg.Show($"当前数值：{value}", "数值详情");
 
                     if (int.TryParse(rowView["Addr"].ToString(), out int addr))
                     {
@@ -511,7 +512,7 @@ namespace ocean.Communication
                 {
                     // 核心修改：直接取实体类的Value属性，替换原rowView["Value"]
                     object value = item.Value ?? "空值"; // 实体类用null，替代原DBNull.Value
-                    MessageBox.Show($"当前数值：{value}", "数值详情");
+                    _msg.Show($"当前数值：{value}", "数值详情");
 
                     // 核心修改：直接取实体类的Addr属性（本身就是int，无需TryParse）
                     int addr = item.Addr;
