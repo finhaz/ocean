@@ -30,15 +30,6 @@ namespace ocean.UI
         private AppViewModel _globalVM = AppViewModel.Instance;
         public DispatcherTimer time1 = new DispatcherTimer();
 
-        delegate void HanderInterfaceUpdataDelegate(string mySendData);
-        HanderInterfaceUpdataDelegate myUpdataHander;
-        delegate void txtGotoEndDelegate();
-
-        // 缓存当前串口实例（避免重复获取）
-        private SerialCommunication _serialComm;
-        //这里不用CommunicationManager单例特性，是因为本页面专门针对的是串口
-        //配置的时候专门针对串口优化，等其他页面使用就选择_comm，利用公共属性
-        //private ICommunication _comm;
 
         public SerialConfigPage()
         {
@@ -55,23 +46,9 @@ namespace ocean.UI
                 tbReceive.ScrollToEnd();
             };
 
-            try
-            {
-                // 获取串口实例
-                _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
-                // 设置串口编码
-                _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
-            }
-            catch (InvalidOperationException ex)
-            {
-                // 未选择串口时提示（可选）
-                _globalVM.SerialConfig.TbComStateText = "未初始化串口：" + ex.Message;
-            }
-
             bdExpend.Visibility = Visibility.Hidden;
 
-            // 替换 CommonRes.mySerialPort.IsOpen 判断
-            if (_serialComm != null && _serialComm.IsConnected)
+            if (_globalVM.SerialConfig._serialComm != null && _globalVM.SerialConfig._serialComm.IsConnected)
             {
                 btOpenCom.Content = "关闭串口";
                 comState.Style = (Style)FindResource("EllipseStyleGreen");
@@ -80,8 +57,7 @@ namespace ocean.UI
 
         private void time1_Tick(object sender, EventArgs e)
         {
-            // 替换 CommonRes.mySerialPort.IsOpen 判断
-            if (_serialComm != null && _serialComm.IsConnected)
+            if (_globalVM.SerialConfig._serialComm != null && _globalVM.SerialConfig._serialComm.IsConnected)
             {
                 _globalVM.SerialConfig.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
             }
@@ -110,7 +86,7 @@ namespace ocean.UI
         {
             _globalVM.SerialConfig.btOpenCom_Click();
 
-            if (_serialComm.IsConnected)
+            if (_globalVM.SerialConfig._serialComm.IsConnected)
             {
                 comState.Style = (Style)this.FindResource("EllipseStyleGreen");
                 
@@ -150,18 +126,8 @@ namespace ocean.UI
 
         private void ckAutoSend_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message);
-                ckAutoSend.IsChecked = false;
-                return;
-            }
 
-            if (!_serialComm.IsConnected)
+            if (!_globalVM.SerialConfig._serialComm.IsConnected)
             {
                 MessageBox.Show("串口未开！");
                 ckAutoSend.IsChecked = false;
@@ -194,24 +160,19 @@ namespace ocean.UI
 
         private void ck16Send_Click(object sender, RoutedEventArgs e)
         {
-            get16View((bool)ck16Send.IsChecked);
+            _globalVM.SerialConfig.Toggle16View((bool)ck16Send.IsChecked);
         }
 
-        #region 简化后的get16View方法（仅触发ViewModel逻辑）
-        private void get16View(bool isHex)
-        {
-            _globalVM.SerialConfig.Toggle16View(isHex);
-        }
 
         private void ckAdvantechCmd_Click(object sender, RoutedEventArgs e)
         {
             ck16Send_Click(sender, e);
             if (ckAsciiView.IsChecked == true)
             {
-                get16View((bool)ckAsciiView.IsChecked);
+                _globalVM.SerialConfig.Toggle16View((bool)ckAsciiView.IsChecked);
             }
         }
-        #endregion
+
 
         private void btExpend_Click(object sender, RoutedEventArgs e)
         {
@@ -273,7 +234,7 @@ namespace ocean.UI
 
         private void ckAsciiView_Click(object sender, RoutedEventArgs e)
         {
-            get16View((bool)ckAsciiView.IsChecked);
+            _globalVM.SerialConfig.Toggle16View((bool)ckAsciiView.IsChecked);
         }
 
 
@@ -285,12 +246,11 @@ namespace ocean.UI
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!_serialComm.IsConnected)
+            _globalVM.SerialConfig.Page_LoadedD(sender, e);
+            if (!_globalVM.SerialConfig._serialComm.IsConnected)
             {
                 comState.Style = (Style)FindResource("EllipseStyleRed");
             }
-            _globalVM.SerialConfig.Page_LoadedD(sender, e);
-
         }
     }
 }

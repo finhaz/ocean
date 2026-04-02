@@ -34,7 +34,10 @@ namespace ocean.ViewModels
         public ICommand SaveReceiveDataCommand { get; }
 
         // 缓存当前串口实例（避免重复获取）
-        private SerialCommunication _serialComm;
+        public SerialCommunication _serialComm;
+        //这里不用CommunicationManager单例特性，是因为本页面专门针对的是串口
+        //配置的时候专门针对串口优化，等其他页面使用就选择_comm，利用公共属性
+        //private ICommunication _comm;
 
         // 保存数据的核心方法
         private void ExecuteSaveReceiveData(object _)
@@ -635,11 +638,19 @@ namespace ocean.ViewModels
         }
         public void Page_LoadedD(object sender, RoutedEventArgs e)
         {
-            // 获取串口实例
-            _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
-            // 设置串口编码
-            _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
-            
+            try
+            {
+                // 获取串口实例
+                _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
+                // 设置串口编码
+                _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // 未选择串口时提示（可选）
+                TbComStateText = "未初始化串口：" + ex.Message;
+            }
+
             if (!_serialComm.IsConnected)
             {
                 IsConfigEnabled = true;
