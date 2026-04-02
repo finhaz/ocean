@@ -5,6 +5,7 @@ using ocean.Mvvm;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.IO.Ports; // 必须引入：包含StopBits、Parity枚举
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -12,7 +13,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using System.IO;
+using System.Windows.Threading;
+using ocean.Interfaces;
 
 namespace ocean.ViewModels
 {
@@ -21,6 +23,13 @@ namespace ocean.ViewModels
     /// </summary>
     public class SerialConfigViewModel : ObservableObject
     {
+
+        delegate void HanderInterfaceUpdataDelegate(string mySendData);
+        HanderInterfaceUpdataDelegate myUpdataHander;
+        delegate void txtGotoEndDelegate();
+        // ViewModel 内部：添加一个公共事件
+        public event Action ScrollToEndRequested;
+
         // 保存数据的命令
         public ICommand SaveReceiveDataCommand { get; }
 
@@ -397,10 +406,10 @@ namespace ocean.ViewModels
         /// 接收统计文本（txtRecive.Text），初始值"0"
         /// </summary>
         private string _receiveCount = "0";
-        public string ReceiveCount 
-        { 
-            get => _receiveCount; 
-            set => SetProperty(ref _receiveCount, value); 
+        public string ReceiveCount
+        {
+            get => _receiveCount;
+            set => SetProperty(ref _receiveCount, value);
         }
 
         /// <summary>
@@ -507,7 +516,98 @@ namespace ocean.ViewModels
         }
         #endregion
 
+        private void getData(string sendData)
+        {
+            TbReceiveText += sendData;
+        }
+
+        private void txtGotoEnd()
+        {
+            // 触发事件，通知View去滚动
+            ScrollToEndRequested?.Invoke();
+        }
+
+        private void txtReciveEvent(string byteNum)
+        {
+            ReceiveCount = Convert.ToString(Convert.ToInt32(ReceiveCount) + Convert.ToInt32(byteNum));
+        }
 
 
+        #region 核心：适配SerialCommunication.DataReceived的串口数据处理方法
+        /// <summary>
+        /// 适配SerialCommunication.DataReceived事件的处理方法
+        /// </summary>
+        private void DebugSerialDataHandler(object sender, DataReceivedEventArgs e)
+        {
+            byte[] buf = new byte[e.BufferLength];
+            Array.Copy(e.Buffer, e.LastIndex, buf, 0, e.BufferLength);
+
+            myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
+            txtGotoEndDelegate myGotoend = txtGotoEnd;
+            HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
+
+            string abc = string.Empty;
+            if (IsHexView == true)
+            {
+                abc = ByteArrayToHexString(buf);
+                string hexStringView = "";
+                for (int i = 0; i < abc.Length; i += 2)
+                {
+                    hexStringView += abc.Substring(i, 2) + " ";
+                }
+                abc = hexStringView;
+                string abc1 = abc.Replace(" ", "");
+                if (abc1.Length >= 2 && abc1.Substring(abc1.Length - 2, 2) == "0D")
+                {
+                    abc += "\n";
+                }
+            }
+            else
+            {
+                abc = System.Text.Encoding.Default.GetString(buf);
+            }
+
+            System.Windows.Application.Current.Dispatcher.Invoke(myUpdataHander, abc);
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                ScrollToEndRequested?.Invoke();
+            });
+            System.Windows.Application.Current.Dispatcher.Invoke(myUpdata1, e.BufferLength.ToString());
+        }
+        #endregion
+
+
+
+        public void Page_UnLoadedD(object sender, RoutedEventArgs e)
+        {
+            /*
+            // 移除DataReceived事件绑定（替代原CommonRes.CurrentDataHandler清空）
+            if (_serialComm != null)
+            {
+                _serialComm.DataReceived -= DebugSerialDataHandler;
+            }
+            */
+        }
+        public void Page_LoadedD(object sender, RoutedEventArgs e)
+        {
+            /*
+            if (!_serialComm.IsConnected)
+            {
+                _globalVM.SerialConfig.IsConfigEnabled = true;
+                btOpenCom.Content = "打开串口";
+                TbComStateText = cbPortName.Text + "已关闭";
+                comState.Style = (Style)FindResource("EllipseStyleRed");
+            }
+            try
+            {
+                // 绑定DataReceived事件（替代原CommonRes.CurrentDataHandler赋值）
+                _serialComm.DataReceived += DebugSerialDataHandler;
+            }
+            catch (InvalidOperationException ex)
+            {
+                TbComStateText = "数据接收绑定失败：" + ex.Message;
+            }
+            */
+        }
     }
 }

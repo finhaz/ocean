@@ -48,6 +48,13 @@ namespace ocean.UI
             time1.Tick += new EventHandler(time1_Tick);
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
+
+            _globalVM.SerialConfig.ScrollToEndRequested += () =>
+            {
+                // 这里可以直接访问 tbReceive
+                tbReceive.ScrollToEnd();
+            };
+
             try
             {
                 // 获取串口实例
@@ -438,6 +445,8 @@ namespace ocean.UI
             {
                 _serialComm.DataReceived -= DebugSerialDataHandler;
             }
+
+            _globalVM.SerialConfig.Page_UnLoadedD(sender,e);
             time1.Stop();
         }
 
@@ -459,6 +468,10 @@ namespace ocean.UI
             {
                 _globalVM.SerialConfig.TbComStateText = "数据接收绑定失败：" + ex.Message;
             }
+
+
+            _globalVM.SerialConfig.Page_LoadedD(sender, e);
+
         }
     }
 }
