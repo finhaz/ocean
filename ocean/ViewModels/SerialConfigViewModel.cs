@@ -537,7 +537,7 @@ namespace ocean.ViewModels
         /// <summary>
         /// 适配SerialCommunication.DataReceived事件的处理方法
         /// </summary>
-        private void DebugSerialDataHandler(object sender, DataReceivedEventArgs e)
+        public void DebugSerialDataHandler(object sender, DataReceivedEventArgs e)
         {
             byte[] buf = new byte[e.BufferLength];
             Array.Copy(e.Buffer, e.LastIndex, buf, 0, e.BufferLength);
@@ -593,7 +593,7 @@ namespace ocean.ViewModels
             /*
             if (!_serialComm.IsConnected)
             {
-                _globalVM.SerialConfig.IsConfigEnabled = true;
+                IsConfigEnabled = true;
                 btOpenCom.Content = "打开串口";
                 TbComStateText = cbPortName.Text + "已关闭";
                 comState.Style = (Style)FindResource("EllipseStyleRed");

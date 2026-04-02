@@ -383,67 +383,13 @@ namespace ocean.UI
             get16View((bool)ckAsciiView.IsChecked);
         }
 
-        private void getData(string sendData)
-        {
-            tbReceive.Text += sendData;
-        }
-
-        private void txtGotoEnd()
-        {
-            tbReceive.ScrollToEnd();
-        }
-
-        private void txtReciveEvent(string byteNum)
-        {
-            txtRecive.Text = Convert.ToString(Convert.ToInt32(txtRecive.Text) + Convert.ToInt32(byteNum));
-        }
-
-        #region 核心：适配SerialCommunication.DataReceived的串口数据处理方法
-        /// <summary>
-        /// 适配SerialCommunication.DataReceived事件的处理方法
-        /// </summary>
-        private void DebugSerialDataHandler(object sender, DataReceivedEventArgs e)
-        {
-            byte[] buf = new byte[e.BufferLength];
-            Array.Copy(e.Buffer, e.LastIndex, buf, 0, e.BufferLength);
-
-            myUpdataHander = new HanderInterfaceUpdataDelegate(getData);
-            txtGotoEndDelegate myGotoend = txtGotoEnd;
-            HanderInterfaceUpdataDelegate myUpdata1 = new HanderInterfaceUpdataDelegate(txtReciveEvent);
-
-            string abc = string.Empty;
-            if (_globalVM.SerialConfig.IsHexView == true)
-            {
-                abc = _globalVM.SerialConfig.ByteArrayToHexString(buf);
-                string hexStringView = "";
-                for (int i = 0; i < abc.Length; i += 2)
-                {
-                    hexStringView += abc.Substring(i, 2) + " ";
-                }
-                abc = hexStringView;
-                string abc1 = abc.Replace(" ", "");
-                if (abc1.Length >= 2 && abc1.Substring(abc1.Length - 2, 2) == "0D")
-                {
-                    abc += "\n";
-                }
-            }
-            else
-            {
-                abc = System.Text.Encoding.Default.GetString(buf);
-            }
-
-            Dispatcher.Invoke(myUpdataHander, abc);
-            Dispatcher.Invoke(myGotoend);
-            Dispatcher.Invoke(myUpdata1, e.BufferLength.ToString());
-        }
-        #endregion
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             // 移除DataReceived事件绑定（替代原CommonRes.CurrentDataHandler清空）
             if (_serialComm != null)
             {
-                _serialComm.DataReceived -= DebugSerialDataHandler;
+                _serialComm.DataReceived -= _globalVM.SerialConfig.DebugSerialDataHandler;
             }
 
             _globalVM.SerialConfig.Page_UnLoadedD(sender,e);
@@ -462,7 +408,7 @@ namespace ocean.UI
             try
             {
                 // 绑定DataReceived事件（替代原CommonRes.CurrentDataHandler赋值）
-                _serialComm.DataReceived += DebugSerialDataHandler;
+                _serialComm.DataReceived += _globalVM.SerialConfig.DebugSerialDataHandler;
             }
             catch (InvalidOperationException ex)
             {

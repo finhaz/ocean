@@ -18,7 +18,7 @@ namespace ocean.Communication
         public static CommunicationManager Instance => _instance.Value;
 
         // 当前通讯实例（串口/以太网）
-        private ICommunication _currentComm;
+        private ICommunication _currentComm= new SerialCommunication();
         // 当前通讯类型
         private CommunicationType _currentType;
 
