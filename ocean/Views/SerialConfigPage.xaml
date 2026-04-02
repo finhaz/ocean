@@ -84,7 +84,8 @@
 
                     <Ellipse Name="comState" Style="{Binding SerialConfig.ComStateStyle, Mode=TwoWay}" Grid.Row="6" HorizontalAlignment="Left"
                              Width="20" Margin="15,8,0,7"/>
-                    <Button Name="btOpenCom" Content="{Binding SerialConfig.OpenComButtonContent,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
+                    <Button Name="btOpenCom" 
+                            Content="{Binding SerialConfig.OpenComButtonContent,Mode=TwoWay}" Grid.Column="0" Margin="50,6,10,6" Grid.Row="6" Grid.ColumnSpan="2"
                             Click="btOpenCom_Click" />
                 </Grid>
                 <Grid Grid.Row="1">

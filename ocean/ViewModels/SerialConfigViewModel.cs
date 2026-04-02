@@ -625,13 +625,13 @@ namespace ocean.ViewModels
 
         public void Page_UnLoadedD(object sender, RoutedEventArgs e)
         {
-            /*
+            
             // 移除DataReceived事件绑定（替代原CommonRes.CurrentDataHandler清空）
             if (_serialComm != null)
             {
                 _serialComm.DataReceived -= DebugSerialDataHandler;
             }
-            */
+            
         }
         public void Page_LoadedD(object sender, RoutedEventArgs e)
         {
@@ -639,13 +639,13 @@ namespace ocean.ViewModels
             _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
             // 设置串口编码
             _serialComm.Encoding = System.Text.Encoding.GetEncoding("GB2312");
-            /*
+            
             if (!_serialComm.IsConnected)
             {
                 IsConfigEnabled = true;
-                btOpenCom.Content = "打开串口";
-                TbComStateText = cbPortName.Text + "已关闭";
-                comState.Style = (Style)FindResource("EllipseStyleRed");
+                OpenComButtonContent = "打开串口";
+                TbComStateText = PortConfig.SelectedPortName + "已关闭";
+                //comState.Style = (Style)FindResource("EllipseStyleRed");
             }
             try
             {
@@ -656,7 +656,7 @@ namespace ocean.ViewModels
             {
                 TbComStateText = "数据接收绑定失败：" + ex.Message;
             }
-            */
+            
         }
     }
 }

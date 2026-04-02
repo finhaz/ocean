@@ -348,12 +348,6 @@ namespace ocean.UI
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            // 移除DataReceived事件绑定（替代原CommonRes.CurrentDataHandler清空）
-            if (_serialComm != null)
-            {
-                _serialComm.DataReceived -= _globalVM.SerialConfig.DebugSerialDataHandler;
-            }
-
             _globalVM.SerialConfig.Page_UnLoadedD(sender,e);
             time1.Stop();
         }
@@ -362,22 +356,8 @@ namespace ocean.UI
         {
             if (!_serialComm.IsConnected)
             {
-                _globalVM.SerialConfig.IsConfigEnabled = true;
-                btOpenCom.Content = "打开串口";
-                _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "已关闭";
                 comState.Style = (Style)FindResource("EllipseStyleRed");
             }
-            try
-            {
-                // 绑定DataReceived事件（替代原CommonRes.CurrentDataHandler赋值）
-                _serialComm.DataReceived += _globalVM.SerialConfig.DebugSerialDataHandler;
-            }
-            catch (InvalidOperationException ex)
-            {
-                _globalVM.SerialConfig.TbComStateText = "数据接收绑定失败：" + ex.Message;
-            }
-
-
             _globalVM.SerialConfig.Page_LoadedD(sender, e);
 
         }
