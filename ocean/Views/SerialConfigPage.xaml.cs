@@ -108,56 +108,16 @@ namespace ocean.UI
         /// </summary>
         private void btOpenCom_Click(object sender, RoutedEventArgs e)
         {
+            _globalVM.SerialConfig.btOpenCom_Click();
+
             if (_serialComm.IsConnected)
             {
-                // 关闭串口逻辑
-                _serialComm.Close();
-                _globalVM.SerialConfig.IsConfigEnabled = true;
-                btOpenCom.Content = "打开串口";
-                _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "已关闭";
-                comState.Style = (Style)FindResource("EllipseStyleRed");
+                comState.Style = (Style)this.FindResource("EllipseStyleGreen");
+                
             }
             else
             {
-                try
-                {
-                    if (string.IsNullOrEmpty(_globalVM.SerialConfig.PortConfig.SelectedPortName))
-                    {
-                        MessageBox.Show("未选择串口！");
-                        return;
-                    }
-
-                    var serialConfig = new SerialConfig
-                    {
-                        SelectedPortName = _globalVM.SerialConfig.PortConfig.SelectedPortName,
-                        SelectedBaudRate = _globalVM.SerialConfig.PortConfig.SelectedBaudRate,
-                        SelectedParityName = _globalVM.SerialConfig.PortConfig.SelectedParityName,
-                        SelectedStopBit = _globalVM.SerialConfig.PortConfig.SelectedStopBit,
-                        SelectedDataBits = int.Parse(cbDataBits.Text)
-                    };
-
-                    _serialComm.Open(serialConfig);
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("占用"))
-                    {
-                        _globalVM.SerialConfig.TbComStateText = cbPortName.Text + "串口被占用！";
-                        MessageBox.Show("串口被占用！");
-                    }
-                    else
-                    {
-                        _globalVM.SerialConfig.TbComStateText = "串口打开失败：" + ex.Message;
-                        MessageBox.Show("串口打开失败：" + ex.Message);
-                    }
-                    return;
-                }
-
-                _globalVM.SerialConfig.IsConfigEnabled = false;
-                btOpenCom.Content = "关闭串口";
-                _globalVM.SerialConfig.TbComStateText = $"{cbPortName.Text},{cbBaudRate.Text}," +
-                    $"{cbParity.Text},{cbDataBits.Text},{cbStopBits.Text}";
-                comState.Style = (Style)this.FindResource("EllipseStyleGreen");
+                comState.Style = (Style)FindResource("EllipseStyleRed");
             }
         }
 

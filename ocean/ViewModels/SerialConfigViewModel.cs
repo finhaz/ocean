@@ -694,5 +694,61 @@ namespace ocean.ViewModels
             }
         }
 
+
+        public void btOpenCom_Click()
+        {
+            if (_serialComm.IsConnected)
+            {
+                // 关闭串口逻辑
+                _serialComm.Close();
+                IsConfigEnabled = true;
+                OpenComButtonContent = "打开串口";
+                TbComStateText = PortConfig.SelectedPortName + "已关闭";
+                //comState.Style = (Style)FindResource("EllipseStyleRed");
+            }
+            else
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(PortConfig.SelectedPortName))
+                    {
+                        MessageBox.Show("未选择串口！");
+                        return;
+                    }
+
+                    var serialConfig = new SerialConfig
+                    {
+                        SelectedPortName = PortConfig.SelectedPortName,
+                        SelectedBaudRate = PortConfig.SelectedBaudRate,
+                        SelectedParityName = PortConfig.SelectedParityName,
+                        SelectedStopBit = PortConfig.SelectedStopBit,
+                        SelectedDataBits = PortConfig.SelectedDataBit
+                    };
+
+                    _serialComm.Open(serialConfig);
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains("占用"))
+                    {
+                        TbComStateText = PortConfig.SelectedPortName + "串口被占用！";
+                        MessageBox.Show("串口被占用！");
+                    }
+                    else
+                    {
+                        TbComStateText = "串口打开失败：" + ex.Message;
+                        MessageBox.Show("串口打开失败：" + ex.Message);
+                    }
+                    return;
+                }
+
+                IsConfigEnabled = false;
+                OpenComButtonContent = "关闭串口";
+                TbComStateText = $"{PortConfig.SelectedPortName},{PortConfig.SelectedBaudRate}," +
+                    $"{PortConfig.SelectedParityName},{PortConfig.SelectedDataBit},{PortConfig.SelectedStopBit}";
+                //comState.Style = (Style)this.FindResource("EllipseStyleGreen");
+            }
+        }
+
     }
 }
