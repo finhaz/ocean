@@ -46,12 +46,6 @@ namespace ocean.UI
                 tbReceive.ScrollToEnd();
             };
 
-            _globalVM.SerialConfig.ShowMessage += (msg, title, btn, img) =>
-            {
-                MessageBox.Show(msg, title, btn, img);
-            };
-       
-
 
             bdExpend.Visibility = Visibility.Hidden;
 

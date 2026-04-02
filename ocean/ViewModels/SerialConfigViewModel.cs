@@ -29,8 +29,6 @@ namespace ocean.ViewModels
         delegate void txtGotoEndDelegate();
         // ViewModel 内部：添加一个公共事件
         public event Action ScrollToEndRequested;
-        // 定义事件
-        public event Action<string, string, MessageBoxButton, MessageBoxImage> ShowMessage;
 
 
         // 保存数据的命令
@@ -43,12 +41,11 @@ namespace ocean.ViewModels
         //private ICommunication _comm;
 
 
-        private void ShowMsg(string msg, string title = "提示",
-        MessageBoxButton btn = MessageBoxButton.OK,
-        MessageBoxImage img = MessageBoxImage.Information)
-        {
-            ShowMessage?.Invoke(msg, title, btn, img);
-        }
+
+
+
+        // 注入消息服务（所有VM都一样）
+        private readonly IMessageService _msg;
 
         // 保存数据的核心方法
         private void ExecuteSaveReceiveData(object _)
@@ -58,7 +55,7 @@ namespace ocean.ViewModels
                 // 如果文本为空，提示用户
                 if (string.IsNullOrWhiteSpace(TbReceiveText))
                 {
-                    ShowMsg("没有可保存的串口数据！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _msg.Show("没有可保存的串口数据！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
@@ -80,13 +77,13 @@ namespace ocean.ViewModels
                 {
                     // 将文本框内容写入文件
                     File.WriteAllText(saveFileDialog.FileName, TbReceiveText, Encoding.UTF8);
-                    ShowMsg($"数据已成功保存到：{saveFileDialog.FileName}", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                    _msg.Show($"数据已成功保存到：{saveFileDialog.FileName}", "保存成功", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
                 // 捕获异常并提示用户
-                ShowMsg($"保存失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                _msg.Show($"保存失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -117,7 +114,7 @@ namespace ocean.ViewModels
             catch (Exception ex)
             {
                 //Console.WriteLine($"获取串口名失败：{ex.Message}");
-                ShowMsg($"获取串口名失败：{ex.Message}");
+                _msg.Show($"获取串口名失败：{ex.Message}");
             }
         }
         #endregion
@@ -181,13 +178,13 @@ namespace ocean.ViewModels
             {
                 // 启动自动发送定时器（需在ViewModel中定义定时器）
                 // _autoSendTimer?.Start();
-                ShowMsg("自动发送已开启");
+                _msg.Show("自动发送已开启");
             }
             else
             {
                 // 停止自动发送定时器
                 // _autoSendTimer?.Stop();
-                ShowMsg("自动发送已关闭");
+                _msg.Show("自动发送已关闭");
             }
         }
         #endregion
@@ -222,8 +219,9 @@ namespace ocean.ViewModels
         #endregion
 
         #region 构造函数
-        public SerialConfigViewModel()
+        public SerialConfigViewModel(IMessageService msg)
         {
+            _msg = msg;
             InitPortNames();
             InitComStateStyle();
             // 初始化保存命令
@@ -235,6 +233,7 @@ namespace ocean.ViewModels
             //AutoSendClickCommand = new RelayCommand(OnAutoSendClicked);
             //HexViewClickCommand = new RelayCommand(OnHexViewClicked); // 新增命令初始化
         }
+
         #endregion
 
         #region 事件处理方法
@@ -566,14 +565,14 @@ namespace ocean.ViewModels
                 catch (Exception ex)
                 {
                     //MessageBox.Show("发送失败：" + ex.Message);
-                    ShowMsg("发送失败：" + ex.Message);
+                    _msg.Show("发送失败：" + ex.Message);
                 }
             }
             else
             {
                 TbComStateText = "串口未开";
                 //MessageBox.Show("串口没有打开，请检查！");
-                ShowMsg("串口没有打开，请检查！");
+                _msg.Show("串口没有打开，请检查！");
             }
         }
         
@@ -738,7 +737,7 @@ namespace ocean.ViewModels
                     if (string.IsNullOrEmpty(PortConfig.SelectedPortName))
                     {
                         //MessageBox.Show("未选择串口！");
-                        ShowMsg("未选择串口！");
+                        _msg.Show("未选择串口！");
                         return;
                     }
 
@@ -758,12 +757,12 @@ namespace ocean.ViewModels
                     if (ex.Message.Contains("占用"))
                     {
                         TbComStateText = PortConfig.SelectedPortName + "串口被占用！";
-                        ShowMsg("串口被占用！");
+                        _msg.Show("串口被占用！");
                     }
                     else
                     {
                         TbComStateText = "串口打开失败：" + ex.Message;
-                        ShowMsg("串口打开失败：" + ex.Message);
+                        _msg.Show("串口打开失败：" + ex.Message);
                     }
                     return;
                 }

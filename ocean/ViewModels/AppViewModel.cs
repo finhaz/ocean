@@ -1,5 +1,7 @@
 ﻿using ocean.Communication;
+using ocean.Interfaces;
 using ocean.Mvvm;
+using ocean.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,16 +22,28 @@ namespace ocean.ViewModels
         // 2. 公共静态属性，提供全局访问点
         public static AppViewModel Instance => _lazyInstance.Value;
 
+
+        // ======================
+        // 全局消息服务（唯一一份）
+        // ======================
+        public IMessageService MessageService { get; }
+
         // 3. 私有构造函数，防止外部通过 new 关键字创建实例
         private AppViewModel()
         {
+            // 1. 创建全局唯一的消息服务
+            MessageService = new MessageService();
             // 初始化Modbusset实例
             _modbusSet = new GeneralDebugPageViewModel();
             _mcctronller = new DeviceControlPageViewModel();
+
+            SerialConfig = new SerialConfigViewModel(MessageService);
+
             // 初始化ShellViewModel
             ShellViewModel = new ShellViewModel();
             // 初始化默认通讯类型
             SelectedCommType = CommunicationType.SerialPort;
+
         }
 
         // *************************
@@ -43,7 +57,7 @@ namespace ocean.ViewModels
         }
 
         // 全局串口配置实例（所有页面共享）
-        public SerialConfigViewModel SerialConfig { get; } = new SerialConfigViewModel();
+        public SerialConfigViewModel SerialConfig { get; set; } 
 
         private DeviceControlPageViewModel _mcctronller;
         public DeviceControlPageViewModel McController
@@ -80,5 +94,10 @@ namespace ocean.ViewModels
         // 可添加其他全局共享属性（如之前的CommonRes、Debugsera等）
         // private CommonRes _ucom;
         // public CommonRes Ucom { get => _ucom; set => SetProperty(ref _ucom, value); }
+
+
+
+
+
     }
 }
