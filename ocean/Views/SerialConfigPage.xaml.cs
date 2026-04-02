@@ -83,7 +83,7 @@ namespace ocean.UI
             // 替换 CommonRes.mySerialPort.IsOpen 判断
             if (_serialComm != null && _serialComm.IsConnected)
             {
-                btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+                _globalVM.SerialConfig.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
             }
         }
 
@@ -163,48 +163,10 @@ namespace ocean.UI
 
         private void btSend_Click(object sender, RoutedEventArgs e)
         {
-            btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
+            _globalVM.SerialConfig.btSend_Event(tbSend.Text, (bool)ck16Send.IsChecked);
         }
 
-        public void btSend_Event(string strSend, bool hexState)
-        {
-            if (_serialComm.IsConnected)
-            {
-                try
-                {
-                    if (hexState == false)
-                    {
-
-                        byte[] sendData = System.Text.Encoding.Default.GetBytes(strSend);
-                        // 替换 CommonRes.mySerialPort.Write 为 Send 接口
-                        _serialComm.Send(sendData, 0, sendData.Length);
-                        txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + sendData.Length);
-
-                        if (ckAdvantechCmd.IsChecked == true)
-                        {
-                            byte[] sendAdvCmd = _globalVM.SerialConfig.HexStringToByteArray("0D 0A");
-                            _serialComm.Send(sendAdvCmd, 0, 2);
-                            txtSend.Text = Convert.ToString(Convert.ToInt32(txtSend.Text) + 2); // 修正：原逻辑重复加了sendData.Length
-                        }
-                    }
-                    else
-                    {
-                        byte[] sendHexData = _globalVM.SerialConfig.HexStringToByteArray(strSend);
-                        _serialComm.Send(sendHexData, 0, sendHexData.Length);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("发送失败：" + ex.Message);
-                }
-            }
-            else
-            {
-                _globalVM.SerialConfig.TbComStateText = "串口未开";
-                MessageBox.Show("串口没有打开，请检查！");
-            }
-        }
-
+        
         private void btClearView_Click(object sender, RoutedEventArgs e)
         {
             _globalVM.SerialConfig.ReceiveCount = "0";
@@ -341,7 +303,7 @@ namespace ocean.UI
             string str = bt1.Content.ToString();
             TextBox tb1 = gdExpend.FindName("expendTextBox" + str.Substring(str.Length - 1, 1)) as TextBox;
             CheckBox ck1 = gdExpend.FindName("ckExpend" + str.Substring(str.Length - 1, 1)) as CheckBox;
-            btSend_Event(tb1.Text, (bool)ck1.IsChecked);
+            _globalVM.SerialConfig.btSend_Event(tb1.Text, (bool)ck1.IsChecked);
         }
 
         private void tbSend_TextChanged(object sender, TextChangedEventArgs e)
