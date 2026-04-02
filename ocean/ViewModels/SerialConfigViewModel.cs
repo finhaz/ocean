@@ -30,7 +30,7 @@ namespace ocean.ViewModels
         // ViewModel 内部：添加一个公共事件
         public event Action ScrollToEndRequested;
         // 定义事件
-        public event Action<string> ShowMessage;
+        public event Action<string, string, MessageBoxButton, MessageBoxImage> ShowMessage;
 
 
         // 保存数据的命令
