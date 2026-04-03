@@ -2,7 +2,7 @@
 using ocean.database;
 using ocean.Interfaces;
 using ocean.Mvvm;
-using ocean.ViewModels;
+using ocean.Communication;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ocean.Communication
+namespace ocean.ViewModels
 
 {
     public class GeneralDebugPageViewModel: ObservableObject
