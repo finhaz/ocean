@@ -24,17 +24,23 @@ namespace ocean.ViewModels
 
 
         // ======================
-        // 全局消息服务（唯一一份）
+        // 全局服务
         // ======================
-        public IMessageService MessageService { get; }
+        public IMessageService MessageService { get; }//消息服务
+
+        public JsonConfigService ConfigService { get; }//json配置服务
+        public IFileDialogService FileDialogService { get; } // 文件对话框服务
 
         // 3. 私有构造函数，防止外部通过 new 关键字创建实例
         private AppViewModel()
         {
-            // 1. 创建全局唯一的消息服务
+            // 1. 创建全局的消息服务
+            ConfigService=new JsonConfigService();
             MessageService = new MessageService();
+            FileDialogService = new FileDialogService();
+
             // 初始化Modbusset实例
-            _modbusSet = new GeneralDebugPageViewModel(MessageService);
+            _modbusSet = new GeneralDebugPageViewModel(ConfigService,MessageService, FileDialogService);
             _mcctronller = new DeviceControlPageViewModel(MessageService);
 
             SerialConfig = new SerialConfigViewModel(MessageService);

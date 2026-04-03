@@ -1,4 +1,5 @@
-﻿using ocean.Converters;
+﻿using Microsoft.Win32;
+using ocean.Converters;
 using ocean.database;
 using ocean.Interfaces;
 using ocean.Mvvm;
@@ -37,6 +38,8 @@ namespace ocean.Communication
         public ICommand ButtonCommand { get; }
 
         private readonly IMessageService _msg;
+        private readonly JsonConfigService _configService;
+        private readonly IFileDialogService _fileDialog;
 
         // 从**字段**改为**私有字段+公共属性**（带通知）
         // 条目地址
@@ -99,7 +102,7 @@ namespace ocean.Communication
         // 切换列显示/隐藏的命令
         public ICommand ToggleAdvancedColumnsCommand { get; }
 
-        public GeneralDebugPageViewModel(IMessageService msg)
+        public GeneralDebugPageViewModel(JsonConfigService configService, IMessageService msg, IFileDialogService fileDialog)
         {
             //dtm = new DataTable();
             //AddDataTableColumns(dtm);
@@ -124,7 +127,9 @@ namespace ocean.Communication
                 // 切换布尔值（原有逻辑不变，一行都不用改）
                 IsAdvancedColumnsVisible = !IsAdvancedColumnsVisible;
             });
+            _configService = configService;
             _msg = msg;
+            _fileDialog = fileDialog;
         }
 
 
@@ -542,6 +547,52 @@ namespace ocean.Communication
                 obj = VisualTreeHelper.GetParent(obj);
             }
             return null;
+        }
+
+
+        // ====================== 导出 ======================
+        public void ExportConfig()
+        {
+            try
+            {
+                // VM 只调用服务，不创建任何 UI 对话框
+                string path = _fileDialog.SaveFileDialog(
+                    "导出Modbus配置",
+                    "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+                    $"ModbusConfig_{DateTime.Now:yyyyMMddHHmmss}.json");
+
+                if (path == null) return;
+
+                _configService.ExportToFile(ModbusDataList, path);
+                _msg.Show("导出成功！");
+            }
+            catch (Exception ex)
+            {
+                _msg.Show($"导出失败：{ex.Message}", "错误", MessageBoxButton.OK);
+            }
+        }
+
+        // ====================== 导入 ======================
+        public void ImportConfig()
+        {
+            try
+            {
+                string path = _fileDialog.OpenFileDialog(
+                    "导入Modbus配置",
+                    "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*");
+
+                if (path == null) return;
+
+                var list = _configService.ImportFromFile<List<ModbusDataItem>>(path);
+                ModbusDataList.Clear();
+                foreach (var item in list) ModbusDataList.Add(item);
+
+                _msg.Show("导入成功！");
+            }
+            catch (Exception ex)
+            {
+                _msg.Show($"导入失败：{ex.Message}", "错误");
+            }
         }
 
         public void Page_LoadedD(object sender, RoutedEventArgs e)

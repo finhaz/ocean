@@ -69,19 +69,6 @@ namespace ocean.UI
             Setadd.Visibility = Visibility.Visible;
         }
 
-        /*
-        private void ButtonDelete_Click(object sender, RoutedEventArgs e)
-        {
-            if (dataGrodx.SelectedItem is DataRowView selectedRowView)
-            {
-                _globalVM.ModbusSet.dtm.Rows.Remove(selectedRowView.Row);
-            }
-            else
-            {
-                MessageBox.Show("请指定行！");
-            }
-        }
-        */
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             // 多选删除：获取所有选中的ModbusDataItem
@@ -118,75 +105,12 @@ namespace ocean.UI
 
         private void ExportConfig_Click(object sender, RoutedEventArgs e)
         {
-            // 打开保存文件对话框
-            var saveFileDialog = new SaveFileDialog
-            {
-                Filter = "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*",
-                Title = "导出Modbus配置",
-                FileName = $"ModbusConfig_{DateTime.Now:yyyyMMddHHmmss}.json"
-            };
-
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    // 方式1：如果是ObservableCollection<ModbusConfigItem>
-                    var configList = _globalVM.ModbusSet.ModbusDataList.ToList();
-                    string json = JsonConvert.SerializeObject(configList, Newtonsoft.Json.Formatting.Indented);
-
-                    //// 方式2：如果是DataTable
-                    //string json = JsonConvert.SerializeObject(_globalVM.ModbusSet.dtm, Newtonsoft.Json.Formatting.Indented);
-
-                    // 写入文件
-                    File.WriteAllText(saveFileDialog.FileName, json);
-                    MessageBox.Show("导出成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"导出失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            _globalVM.ModbusSet.ExportConfig();
         }
 
         private void ImportConfig_Click(object sender, RoutedEventArgs e)
         {
-            // 打开文件选择对话框
-            var openFileDialog = new OpenFileDialog
-            {
-                Filter = "JSON配置文件 (*.json)|*.json|所有文件 (*.*)|*.*",
-                Title = "导入Modbus配置"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    string json = File.ReadAllText(openFileDialog.FileName);
-
-                    // 方式1：如果是ObservableCollection<ModbusConfigItem>
-                    var configList = JsonConvert.DeserializeObject<List<ModbusDataItem>>(json);
-                    _globalVM.ModbusSet.ModbusDataList.Clear(); // 清空原有数据
-                    foreach (var item in configList)
-                    {
-                        _globalVM.ModbusSet.ModbusDataList.Add(item);
-                    }
-
-                    /*
-                    //方式2：如果是DataTable
-                    DataTable importedDt = JsonConvert.DeserializeObject<DataTable>(json);
-                    _globalVM.ModbusSet.dtm.Clear();
-                    foreach (DataRow row in importedDt.Rows)
-                    {
-                         _globalVM.ModbusSet.dtm.ImportRow(row);
-                    }
-                    */
-                    MessageBox.Show("导入成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"导入失败：{ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            _globalVM.ModbusSet.ImportConfig();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
