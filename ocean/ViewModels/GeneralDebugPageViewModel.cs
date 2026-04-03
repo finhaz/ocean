@@ -1,15 +1,27 @@
-﻿using ocean.Converters;
-using ocean.database;
-using ocean.Interfaces;
-using ocean.Mvvm;
-using ocean.Communication;
+﻿// 系统基础
 using System;
+using System.Linq;
+using System.Text;
+
+// 系统集合
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 接口 & 业务
+using ocean.Interfaces;
+using ocean.Communication;
+using ocean.database;
+using ocean.Converters;
+
+// ==============================================
+// TODO: 待重构 - 后续通过服务抽象移除所有UI依赖
+// ==============================================
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ocean.ViewModels

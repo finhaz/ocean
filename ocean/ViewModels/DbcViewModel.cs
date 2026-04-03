@@ -1,9 +1,20 @@
-﻿using ocean.Communication;
-using ocean.Interfaces;
-using ocean.Mvvm;
+﻿// 系统基础
 using System;
-using System.Collections.ObjectModel;
 using System.Text;
+
+// 系统集合
+using System.Collections.ObjectModel;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 接口与通讯
+using ocean.Interfaces;
+using ocean.Communication;
+
+// ==============================================
+// TODO: 待重构 - 后续通过服务抽象移除所有UI依赖
+// ==============================================
 using System.Windows;
 using System.Windows.Threading;
 

@@ -1,6 +1,16 @@
-﻿using ocean.Communication;
-using ocean.Mvvm;
+﻿// 系统基础
+using System;
 using System.Collections.Generic;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 业务通讯
+using ocean.Communication;
+
+// ==============================================
+// TODO: 待重构 - 后续通过服务抽象移除所有UI依赖
+// ==============================================
 using System.Windows.Input;
 
 namespace ocean.ViewModels

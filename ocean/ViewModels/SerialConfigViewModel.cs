@@ -1,13 +1,22 @@
-﻿using Microsoft.Win32;
-using ocean.Communication;
-using ocean.Mvvm;
+﻿// 系统基础
 using System;
-using System.IO;
 using System.Text;
+using System.IO;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 接口 & 业务
+using ocean.Interfaces;
+using ocean.Communication;
+
+// ==============================================
+// TODO: 待重构 - 后续通过服务抽象移除所有UI/系统依赖
+// ==============================================
+using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using ocean.Interfaces;
 
 namespace ocean.ViewModels
 {

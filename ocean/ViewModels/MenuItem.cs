@@ -1,7 +1,12 @@
-﻿using System;
+﻿// 系统基础
+using System;
+
+// ==============================================
+// TODO: 待重构 - 后续通过服务抽象移除所有UI依赖
+// ==============================================
 using System.Windows;
 using MahApps.Metro.Controls;
-using SomeNameSpace;
+
 
 namespace ocean.ViewModels
 {

@@ -1,11 +1,20 @@
-﻿using MahApps.Metro.IconPacks;
-using ocean.Mvvm;
-using ocean.UI;
-using ocean.Views;
+﻿// 系统基础
 using System;
+using System.Linq;
+
+// 系统集合
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 业务 & UI 相关
+using ocean.UI;
+using ocean.Views;
+
+// 第三方控件
+using MahApps.Metro.IconPacks;
 
 namespace ocean.ViewModels
 {

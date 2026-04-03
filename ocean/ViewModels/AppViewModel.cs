@@ -1,12 +1,15 @@
-﻿using ocean.Communication;
-using ocean.Interfaces;
-using ocean.Mvvm;
-using ocean.Services;
+﻿// 系统基础
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+// 自研 MVVM 框架
+using ocean.Mvvm;
+
+// 通用接口 & 服务
+using ocean.Interfaces;
+using ocean.Services;
+
+// 业务通讯层
+using ocean.Communication;
 
 namespace ocean.ViewModels
 {
