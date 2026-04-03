@@ -1,19 +1,13 @@
 ﻿using Microsoft.Win32;
-using Microsoft.Xaml.Behaviors.Core;
 using ocean.Communication;
 using ocean.Mvvm;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Ports; // 必须引入：包含StopBits、Parity枚举
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 using ocean.Interfaces;
 
 namespace ocean.ViewModels
