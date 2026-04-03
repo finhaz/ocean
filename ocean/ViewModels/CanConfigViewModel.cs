@@ -1,12 +1,20 @@
-﻿using ocean.Communication;
-using ocean.Interfaces;
-using ocean.Mvvm;
+﻿// 1. .NET 原生基础系统
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO.Ports;
 using System.Text;
 using System.Threading.Tasks;
+
+// 2. 系统集合 & 可观察集合（VM刚需）
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+// 3. 自研 MVVM 框架底层
+using ocean.Mvvm;
+
+// 4. 自研通用接口/契约
+using ocean.Interfaces;
+
+// 5. 自研业务通讯层（纯业务，非硬件直连）
+using ocean.Communication;
 
 namespace ocean.ViewModels
 {
@@ -158,7 +166,8 @@ namespace ocean.ViewModels
         /// </summary>
         public void RefreshPortNameList()
         {
-            PortConfig.PortNames= new ObservableCollection<string>(SerialPort.GetPortNames());
+            var portService = AppViewModel.Instance.SerialPortService;
+            PortConfig.PortNames= new ObservableCollection<string>(portService.GetPortNames());
             AtModuleStatus = PortConfig.PortNames.Count > 0 ? "已加载串口号，请选择配置" : "未检测到可用串口";
         }
 
