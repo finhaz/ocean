@@ -1,10 +1,17 @@
-﻿using Microsoft.Win32;
-using ocean.database;
-using ocean.Interfaces;
-using ocean.Mvvm;
-using SomeNameSpace;
+﻿// 1. 系统核心
 using System;
 using System.Data;
+
+// 2. 自研框架
+using ocean.Mvvm;
+using ocean.Interfaces;
+
+// 3. 业务 & 数据库
+using ocean.database;
+using ocean.ViewModels;
+using SomeNameSpace;
+
+// 4. WPF & 其他
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -423,6 +430,7 @@ namespace ocean.Communication
         /// </summary>
         private void SelectDatabaseFile()
         {
+            /*
             var openFileDialog = new OpenFileDialog
             {
                 Filter = "数据库文件|*.db;*.mdb;*.accdb|SQLite文件(*.db)|*.db|Access文件(*.mdb;*.accdb)|*.mdb;*.accdb",
@@ -437,6 +445,22 @@ namespace ocean.Communication
                 // 初始化数据库操作实例
                 InitDbOperation(DbFilePath);
             }
+            */
+            // 从全局单例获取文件服务
+            var fileService = AppViewModel.Instance.FileDialogService;
+
+            // 直接调用你已有的 OpenFileDialog 方法
+            string filePath = fileService.OpenFileDialog(
+                "选择数据库文件",  // title
+                "数据库文件|*.db;*.mdb;*.accdb|SQLite文件(*.db)|*.db|Access文件(*.mdb;*.accdb)|*.mdb;*.accdb" // filter
+            );
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                DbFilePath = filePath;
+                InitDbOperation(filePath);
+            }
+
         }
 
         /// <summary>
