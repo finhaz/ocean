@@ -30,6 +30,8 @@ namespace ocean.ViewModels
 
         public JsonConfigService ConfigService { get; }//json配置服务
         public IFileDialogService FileDialogService { get; } // 文件对话框服务
+        
+        public ISerialPortService SerialPortService { get; }// 🔥 新增：串口服务（全局可用）
 
         // 3. 私有构造函数，防止外部通过 new 关键字创建实例
         private AppViewModel()
@@ -38,6 +40,8 @@ namespace ocean.ViewModels
             ConfigService=new JsonConfigService();
             MessageService = new MessageService();
             FileDialogService = new FileDialogService();
+
+            SerialPortService = new SerialPortService();
 
             // 初始化Modbusset实例
             _modbusSet = new GeneralDebugPageViewModel(ConfigService,MessageService, FileDialogService);

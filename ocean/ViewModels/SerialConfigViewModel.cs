@@ -3,7 +3,6 @@ using ocean.Communication;
 using ocean.Mvvm;
 using System;
 using System.IO;
-using System.IO.Ports; // 必须引入：包含StopBits、Parity枚举
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
@@ -40,6 +39,7 @@ namespace ocean.ViewModels
 
         // 注入消息服务（所有VM都一样）
         private readonly IMessageService _msg;
+
 
         // 保存数据的核心方法
         private void ExecuteSaveReceiveData(object _)
@@ -100,7 +100,9 @@ namespace ocean.ViewModels
             PortConfig.PortNames.Clear();
             try
             {
-                foreach (var port in SerialPort.GetPortNames())
+                // 从全局单例获取串口服务
+                var portService = AppViewModel.Instance.SerialPortService;
+                foreach (var port in portService.GetPortNames())
                 {
                     PortConfig.PortNames.Add(port);
                 }
@@ -216,7 +218,7 @@ namespace ocean.ViewModels
         public SerialConfigViewModel(IMessageService msg)
         {
             _msg = msg;
-            InitPortNames();
+            //InitPortNames();
             InitComStateStyle();
             // 初始化保存命令
             //SaveReceiveDataCommand = new ActionCommand(ExecuteSaveReceiveData);
@@ -647,6 +649,7 @@ namespace ocean.ViewModels
         {
             try
             {
+                InitPortNames();
                 // 获取串口实例
                 _serialComm = (SerialCommunication)CommunicationManager.Instance.GetCurrentCommunication();
                 // 设置串口编码
